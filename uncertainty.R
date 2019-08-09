@@ -119,7 +119,7 @@ prop_condom_scenario = base_pars[[3]]
 eff_prep_change = base_pars[[4]]
 
 
-eff_gel[] = 0.3
+eff_gel = 0.3
 
 prop_nil_to_gel = 0
 prop_condom_to_gel = 0

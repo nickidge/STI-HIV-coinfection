@@ -5,12 +5,8 @@
 run_model = function(y_init, tvec_in){
   # set proportion on prep to 0%, to be changed if necessary
   # prop_prep_interp[] = 0
-  # if(iss2){
-  #   delta_prep_prop_all <<- numeric(length(tvec_in))
-  #   names(delta_prep_prop_all) <<- tvec_in
-  # }
   
-  
+
   # apply intervention scenarios
   if (intervention==1){
     # print("--------------------------------")
@@ -19,11 +15,11 @@ run_model = function(y_init, tvec_in){
     }
     
     if(int=="b" | int=="c"){
-      t_testing_interp[,1:2] = 180
+      t_testing_interp[,1:2,] = 180
     }
     
     if(int=="d"){
-      t_testing_interp[,3] = 180
+      t_testing_interp[,3,] = 180
     }
     
     if(int=="e" | int=="f" | int=="g" | int=="h"){
@@ -36,7 +32,7 @@ run_model = function(y_init, tvec_in){
     }
     
     if(int=="g" | int=="h"){
-      t_testing_interp[,2] = 90
+      t_testing_interp[,2,] = 90
     }
     
     # if(int=="h"){
@@ -55,130 +51,86 @@ run_model = function(y_init, tvec_in){
   #   mix2=0.5
   # }
   
- # apply sensitivity scenarios
-  if (sensitivity_supp==1){
-    gel_mat[1:2,1:3] = 0.5
-    
+  # apply sensitivity scenarios
+  if (sensitivity==1){
+    prop_prep_interp[] = prop_prep_base
+
+    # if(int=="h"){
+      mix2=0.1
+      condom_by_HIV_interp[,2] = 0.5 * condom_by_HIV_interp[,1]
+      t_testing_interp[,2,] = 90
+    # }
+
     if(unc=="1a"){
-      
-      eff_condom = 0.7
+      prop_prep_interp[] = 0.1
     }
 
     if(unc=="1b"){
-      eff_condom = 0.9
+      prop_prep_interp[] = 0.3
     }
 
     if(unc=="2a"){
-      prop_prep=base_raw[,c(1,2)]
-      prop_prep=prop_prep[c(1:8,9),]
-      prop_prep[8,2]=0.5
-      prop_prep_interp = approx(unlist(prop_prep[,1]), unlist(prop_prep[,2]), xout=tvec0, rule=2)$y
-      names(prop_prep_interp) = tvec0
-      
+      condom_by_HIV_interp[,2] = condom_by_HIV_interp[,1] * 0.75
     }
 
     if(unc=="2b"){
-      prop_prep=base_raw[,c(1,2)]
-      prop_prep=prop_prep[c(1:8,9),]
-      prop_prep[8,2]=0.80
-      prop_prep_interp = approx(unlist(prop_prep[,1]), unlist(prop_prep[,2]), xout=tvec0, rule=2)$y
-      names(prop_prep_interp) = tvec0
-      
-      
+      condom_by_HIV_interp[,2] = condom_by_HIV_interp[,1] * 0.25
     }
 
     if(unc=="3a"){
-      prop_treat=0.8
-      
+      mix2=0.05
     }
 
     if(unc=="3b"){
-      prop_treat=0.4
+      mix2=0.15
     }
 
     if(unc=="4a"){
-      risk_mat[2,2]=2
-    }
-  
-    if(unc=="4b"){
-      risk_mat[2,2]=10
-    }
-  
-    if(unc=="4c"){
-      risk_mat[2,2]=20
+      mix2=0.1
+      condom_by_HIV_interp[,2] = 0.5 * condom_by_HIV_interp[,2]
+      t_testing_interp[,2,] = t_testing_interp[,1,]
     }
   }
-
-
   
-  if(sensitivity==1){
-    prop_prep_interp = approx(c(unlist(prop_prep[,1]), 2022), c(unlist(prop_prep[,2]), 0.3), xout=tvec0, rule=2)$y
-    names(prop_prep_interp) = tvec0
-    if(sens_scen=="a"){}
-    if(sens_scen=="b"){
-      gel_mat[1:2,1:3] = 0.5
-    }
-    if(sens_scen=="c"){
-      gel_mat[2,] = 1
-    }
-    if(sens_scen=="d"){
-      gel_mat[,2] = 1
-    }
-    if(sens_scen=="e"){
-      gel_mat[,2:3]=0.5
-    }
-    if(sens_scen=="f"){
-      gel_mat[,1]=0.5
-    }
-    if(sens_scen=="g"){
-      gel_mat[1,2] = 1
-    }
-    if(sens_scen=="h"){
-      gel_mat[2,2] = 1
-    }
-    if(sens_scen=="i"){
-      gel_mat = gel_mat_best_estimate
-    }
-    if(sens_scen=="j"){
-      gel_mat[2,2:3]=0.5
-    }
-    if(sens_scen=="k"){
-      gel_mat[1,1]=0.5
-    }
-    if(sens_scen=="l"){
-      gel_mat[1,1]=0.5
-      gel_mat[2,2:3]=0.5
-    }
-    if(sens_scen=="m"){
-      gel_mat[2,]=1
-    }
-    if(sens_scen=="n"){
-      gel_mat[1,]=1
-    }
-    if(sens_scen=="o"){
-      gel_mat[2,]=0.5
-    }
-    if(sens_scen=="p"){
-      gel_mat[1,]=0.5
-    }
-    if(sens_scen=="q"){
-      gel_mat[1:2,]=0.5
-    }
-  }
-  # 
+  # if(sensitivity==1){
+  #   if(sens_scen=="a"){
+  #     prop_prep_interp = approx(c(unlist(prop_prep[,1]), 2022), c(unlist(prop_prep[,2]), 0.3), xout=tvec0, rule=2)$y
+  #     names(prop_prep_interp) = tvec0
+  #     
+  #   }
+  #   if(sens_scen=="b"){
+  #     eff_gel_heat = 0.6
+  #     gel_up_heat = 0.5
+  #     gel_down_heat = 0.5
+  #   }
+  #   if(sens_scen=="c"){
+  #     t_testing_interp[,2,1] = min(60, t_testing_interp[,2,1])
+  #     t_testing_interp[,2,2] = min(60, t_testing_interp[,2,2])
+  #   }
+  #   if(sens_scen=="d"){
+  #     gamma = 15
+  #     risk_mat[2,2] = gamma
+  #   }
+  #   if(sens_scen=="e"){
+  #     lambda=0.1
+  #   }
+  #   if(sens_scen=="f"){
+  #     mix1=0.5
+  #     mix2=0.5
+  #     mix3=0.5
+  #   }
+  # }
+  
   # gel condom scenarios
-  if (is_gel){
+  if (heat_scen_q==1 | plot_gel_q==1){
     gel_up_interp = strat_interp(rbind(c(split_year, 0, 0, 0),
-                                       c(split_year+2, (gel_mat[1,]))))
+                                       c(split_year+2, rep(gel_up_heat, 3))))
     gel_down_interp = strat_interp(rbind(c(split_year, 0, 0, 0),
-                                       c(split_year+2, (gel_mat[2,]))))
-    gel_array = aperm(abind(gel_up_interp, gel_down_interp, along=3), c(1,3,2))
-    # eff_gel = eff_gel_heat
+                                       c(split_year+2, rep(gel_down_heat, 3))))
+    eff_gel = eff_gel_heat
   } else {
-      # gel_up_interp[] = 0
-      # gel_down_interp[] = 0
-      gel_array = array(0, dim = c(length(tvec_in), 2, 3))
-      dimnames(gel_array)[[1]] = tvec_in
+      gel_up_interp[] = 0
+      gel_down_interp[] = 0
   }
   
   # debugging
@@ -228,6 +180,9 @@ run_model = function(y_init, tvec_in){
     }
   }
   
+  if(cal_q>0){
+    # risk_mat_de = risk_mat_apply(gamma_de)
+  }
   
   pr_infect_log <<- matrix(0, ncol=3, nrow=length(tvec_in)-2)
   
@@ -245,12 +200,12 @@ run_model = function(y_init, tvec_in){
     SID = array(0, dim = c(length(tvec_de)-1, 13, 11, 3),
                 dimnames = list(head(tvec_de, -1),
                                 c("S1", "S2", "I", "D", "D1", "D2", "D3", "HIV_minus", "HIV_plus", "incidence_HIV", "diagnoses_HIV", "deaths_HIV", "pop_HIV"),
-                                c("S_sti", "E_sti", "Sy_sti", "ASy_sti", "T_sti", "sti_minus", "sti_plus", "incidence_sti", "diagnoses_sti", "recovered_sti", "pop_sti"),
+                                c("S_sti", "E_sti", "I_sti", "L_sti", "T_sti", "sti_minus", "sti_plus", "incidence_sti", "diagnoses_sti", "recovered_sti", "pop_sti"),
                                 c("low_risk", "high_risk", "all")))
     
     
     
-    if(intervention==0 & sensitivity==0 & debug_check==0 & !is_gel){
+    if(intervention==0 & sensitivity==0 & debug_check==0 & heat_scen_q==0 & plot_gel_q==0){
       SID[1,,,3] = y_init
       # set initial compartments (at t=1)
       SID[1,1,,3] = SID[1,8,,3] * (1 - prop_prep_interp_base[paste0(tvec_de[1])])
@@ -400,7 +355,7 @@ run_model = function(y_init, tvec_in){
       # initialise temp
       temp = array(0, dim = c(13,11,3),
                    dimnames = list(c("S1", "S2", "I", "D", "D1", "D2", "D3", "HIV_minus", "HIV_plus", "incidence_HIV", "diagnoses_HIV", "deaths_HIV", "pop_HIV"),
-                                   c("S_sti", "E_sti", "Sy_sti", "ASy_sti", "T_sti", "sti_minus", "sti_plus", "incidence_sti", "diagnoses_sti", "recovered_sti", "pop_sti"),
+                                   c("S_sti", "E_sti", "I_sti", "L_sti", "T_sti", "sti_minus", "sti_plus", "incidence_sti", "diagnoses_sti", "recovered_sti", "pop_sti"),
                                    c("low_risk", "high_risk", "all")))
       
 
@@ -420,55 +375,25 @@ run_model = function(y_init, tvec_in){
       # t_infect_sti_de = t_infect_sti/(365 * dt)
       # t_treatment_sti_de = t_treatment_sti/(365 * dt)
       t_testing_de = t_testing_interp[as.character(TT),,]
-      r_testing_de = 4*(365 * dt)/t_testing_de
+      r_testing_de = 2 * (365 * dt)/t_testing_de
       eff_gel_de = eff_gel
-      gel_mat_de = gel_array[as.character(TT),,]
-      # gel_up_de = gel_up_interp[as.character(TT),]
-      # gel_down_de = gel_down_interp[as.character(TT),]
+      gel_up_de = gel_up_interp[as.character(TT),]
+      gel_down_de = gel_down_interp[as.character(TT),]
       
-      # prop_condom_strat = rbind(
-      #   (1-condom_by_HIV_de)*(1-gel_up_de),
-      #   (1-condom_by_HIV_de)*gel_up_de + condom_by_HIV_de*gel_down_de,
-      #   condom_by_HIV_de*(1-gel_down_de)
-      # )
       prop_condom_strat = rbind(
-        (1-condom_by_HIV_de)*(1-gel_mat_de[1,]),
-        (1-condom_by_HIV_de)*gel_mat_de[1,] + condom_by_HIV_de*gel_mat_de[2,],
-        condom_by_HIV_de*(1-gel_mat_de[2,])
+        (1-condom_by_HIV_de)*(1-gel_up_de),
+        (1-condom_by_HIV_de)*gel_up_de + condom_by_HIV_de*gel_down_de,
+        condom_by_HIV_de*(1-gel_down_de)
       )
-      
-      if(sensitivity==1){
-        if(sens_scen=="a") {
-          prop_condom_strat = rbind(
-            c(0,0,0),
-            rep(lube_threshold, 3),
-            condom_by_HIV_de
-          )
-          prop_condom_strat[1,] = 1 - colSums(prop_condom_strat[2:3,])
-          
-        }
-       }
-      dimnames(prop_condom_strat) = list(c("Nil", "Gel", "Condom"),
-                                                    c("HIV- no prep", "HIV- prep", "HIV+"))
-      if(any(abs(colSums(prop_condom_strat)-1) > 10^-10) | any(prop_condom_strat<0)){
+      # dimnames(prop_condom_strat) = list(c("Nil", "Gel", "Condom"),
+      #                                               c("HIV- no prep", "HIV- prep", "HIV+"))
+      if(any(abs(colSums(prop_condom_strat)-1) > 10^-10)){
         print("Condom proportions are not contained!")
       }
-      # through_condom_by_type = c(1,(1-eff_gel_de[1]),(1-eff_condom))
-      through_condom_by_type = cbind(1, 1-eff_gel_de, 1-eff_condom)
-      dimnames(through_condom_by_type) = list(c("HIV", "Gonorrhoea"),
-                                              c("Nil", "Gel", "Condom"))
-      # dot_condom = prop_condom_strat * through_condom_by_type
-      dot_condom = NULL
-      for(i in 1:nrow(through_condom_by_type)){
-        dot_condom = abind(dot_condom, prop_condom_strat * through_condom_by_type[i,], along=3)
-      }
-      dimnames(dot_condom)[[3]] = c("HIV", "Gonorrhoea")
+      through_condom_by_type = c(1,(1-eff_gel_de),(1-eff_condom))
+      dot_condom = prop_condom_strat * through_condom_by_type
       mult_condom = colSums(dot_condom)
-      mult_condom_means = colSums(SID[t,c(1,2,9),"pop_sti",3] * mult_condom) / SID[t,13,"pop_sti",3]
-      cond_HIV = mult_condom_means[1]
-      cond_sti = mult_condom[,2]
-      
-      # if(is_gel & t==20){print(mult_condom_means)}
+      mult_condom_mean = sum(SID[t,c(1,2,9),"pop_sti",3] * mult_condom) / SID[t,13,"pop_sti",3]
       
       sti_testing_by_HIV = c(1,0)
 
@@ -478,12 +403,12 @@ run_model = function(y_init, tvec_in){
       pr_infect_HIV = f_infect_HIV * rel_incidence / SID[t,13,"pop_sti",3]
       pr_infect_sti = numeric(3)
       
-      pr_infect_sti[1] =  f_infect_sti[1] * ((1-mix1) * sum(SID[t,8,3:4,3]) / SID[t,8,"pop_sti",3] + # HIV-
-                                                 mix1 * sum(SID[t,9,3:4,3]) / SID[t,9,"pop_sti",3]) # HIV+
-      pr_infect_sti[2] =  f_infect_sti[1] * ((1-mix2) * sum(SID[t,8,3:4,3]) / SID[t,8,"pop_sti",3] + # HIV-
-                                                 mix2 * sum(SID[t,9,3:4,3]) / SID[t,9,"pop_sti",3]) # HIV+
-      pr_infect_sti[3] =  f_infect_sti[2] * (mix3 * sum(SID[t,8,3:4,3]) / SID[t,8,"pop_sti",3] + # HIV-
-                                                 (1-mix3) * sum(SID[t,9,3:4,3]) / SID[t,9,"pop_sti",3]) # HIV+
+      pr_infect_sti[1] =  f_infect_sti[1] * ((1-mix1) * sum(SID[t,8,3,3]) / SID[t,8,"pop_sti",3] + # HIV-
+                                                 mix1 * sum(SID[t,9,3,3]) / SID[t,9,"pop_sti",3]) # HIV+
+      pr_infect_sti[2] =  f_infect_sti[1] * ((1-mix2) * sum(SID[t,8,3,3]) / SID[t,8,"pop_sti",3] + # HIV-
+                                                 mix2 * sum(SID[t,9,3,3]) / SID[t,9,"pop_sti",3]) # HIV+
+      pr_infect_sti[3] =  f_infect_sti[2] * (mix3 * sum(SID[t,8,3,3]) / SID[t,8,"pop_sti",3] + # HIV-
+                                                 (1-mix3) * sum(SID[t,9,3,3]) / SID[t,9,"pop_sti",3]) # HIV+
       
       # pr_infect_sti[1] =  f_infect_sti[1] * ((1) * sum(SID[t,8,3:4,3]) / SID[t,8,"pop_sti",3] + # HIV-
       #                                            mix1 * sum(SID[t,9,3:4,3]) / SID[t,9,"pop_sti",3]) # HIV+
@@ -494,7 +419,7 @@ run_model = function(y_init, tvec_in){
       
       # pr_infect_sti = c(f_infect_sti[1], f_infect_sti[1], f_infect_sti[2])
       
-      pr_infect_sti = pr_infect_sti * cond_sti # + c(f_infect_base[1], f_infect_base[1], f_infect_base[2])
+      pr_infect_sti = pr_infect_sti * mult_condom # + c(f_infect_base[1], f_infect_base[1], f_infect_base[2])
       
       pr_infect_log[t,] = pr_infect_sti
       
@@ -510,18 +435,22 @@ run_model = function(y_init, tvec_in){
       #################################
       
       # S1 and S2 for HIV
-      temp[1,1:5,1:2] = SID[t,1,1:5,1:2] + dt * (SID[t,1,1:5,1:2] * (- pr_infect_HIV * cond_HIV  -
+      temp[1,1:5,1:2] = SID[t,1,1:5,1:2] + dt * (SID[t,1,1:5,1:2] * (- pr_infect_HIV * mult_condom_mean  -
                                                            mu))
-      temp[2,1:5,1:2] = SID[t,2,1:5,1:2] + dt * (SID[t,2,1:5,1:2] * (- pr_infect_HIV * cond_HIV * (1 - eff_prep_de) -
+      temp[2,1:5,1:2] = SID[t,2,1:5,1:2] + dt * (SID[t,2,1:5,1:2] * (- pr_infect_HIV * mult_condom_mean * (1 - eff_prep_de) -
                                                            mu))
 
-      # # growth
+      # # growth (old)
       # temp[1,1,1:2] = temp[1,1,1:2] + dt * growth * SID[t,"pop_HIV","pop_sti",1:2] * (1-prop_prep_de)
       # temp[2,1,1:2] = temp[2,1,1:2] + dt * growth * SID[t,"pop_HIV","pop_sti",1:2] * prop_prep_de
-
+      
+      # # growth
+      # temp[1,1,1:2] = temp[1,1,1:2] + (pop_growth - colSums(temp[1,1:2,1:2]))*(1-prop_prep_de) * c((1-rho), rho)
+      # temp[1,2,1:2] = temp[1,2,1:2] + (pop_growth - colSums(temp[1,1:2,1:2]))*(prop_prep_de) * c((1-rho), rho)
+      
       # I and D for HIV
-      temp[3,1:5,1:2] = SID[t,3,1:5,1:2] + dt * (SID[t,1,1:5,1:2] * (pr_infect_HIV * cond_HIV) +
-                                           SID[t,2,1:5,1:2] * (pr_infect_HIV * cond_HIV * (1 - eff_prep_de)) -
+      temp[3,1:5,1:2] = SID[t,3,1:5,1:2] + dt * (SID[t,1,1:5,1:2] * (pr_infect_HIV * mult_condom_mean) +
+                                           SID[t,2,1:5,1:2] * (pr_infect_HIV * mult_condom_mean * (1 - eff_prep_de)) -
                                            SID[t,3,1:5,1:2] * (r_diag_HIV_de + mu + extra_death_I))
       temp[4,1:5,1:2] = SID[t,4,1:5,1:2] + dt * (SID[t,3,1:5,1:2] * r_diag_HIV_de -
                                            SID[t,4,1:5,1:2] * (mu + extra_death_D))
@@ -541,7 +470,7 @@ run_model = function(y_init, tvec_in){
       temp[13,,1:2] = colSums(temp[8:9,,1:2])
 
       # calculate HIV totals for the next time period (incidence, diagnoses and deaths)
-      temp[10,1:5,1:2] = dt *  colSums(SID[t,1:2,1:5,1:2] * pr_infect_HIV * cond_HIV) # incidence of HIV
+      temp[10,1:5,1:2] = dt *  colSums(SID[t,1:2,1:5,1:2] * pr_infect_HIV * mult_condom_mean) # incidence of HIV
       temp[11,1:5,1:2] = dt *  SID[t,3,1:5,1:2] * r_diag_HIV_de # diagnoses of HIV
       temp[12,1:5,1:2] = dt *  (SID[t,8,1:5,1:2] * mu + # S deaths
                               SID[t,3,1:5,1:2] * (mu + extra_death_I) + # I deaths
@@ -553,11 +482,10 @@ run_model = function(y_init, tvec_in){
 
 
       # calculate and distribute diagnoses and incidence
-      temp[c(1,2,9),8,1:2] = dt * pr_infect_sti * temp[c(1,2,9),1,1:2] * risk_mat
+      temp[c(1,2,9),8,1:2] = dt * pr_infect_sti * temp[c(1,2,9),1,1:2] * risk_mat_de
       # temp[c(1,2,9),9,1:2] = dt * t(t(r_testing_de * apply(temp[c(1,2,9),2:4,1:2], c(1,3), sum)) * c(1,0))
-      # temp[c(1,2,9),9,1] = dt * r_testing_de * rowSums(t(t(temp[c(1,2,9),2:4,1]) * c(1,lambda,1)))
-      temp[c(1,2,9),9,1:2] = dt * r_testing_de * colSums(aperm(sweep(temp[c(1,2,9),2:4,1:2], c(2), c(1,lambda,1), FUN="*"), c(2,1,3)))+
-        dt * (1/t_exp_sti_de * temp[c(1,2,9),2,1:2] * (1-prop_treat)) 
+      # temp[c(1,2,9),9,1] = dt * r_testing_de * rowSums(t(t(temp[c(1,2,9),2:4,1]) * c(1,1,lambda)))
+      temp[c(1,2,9),9,1:2] = dt * r_testing_de * colSums(aperm(sweep(temp[c(1,2,9),2:4,1:2], c(2), c(1,1,1), FUN="*"), c(2,1,3)))
       temp[c(1,2,9),10,1:2] = dt * 1/t_treatment_sti_de * temp[c(1,2,9),5,1:2]
 
       
@@ -585,6 +513,19 @@ run_model = function(y_init, tvec_in){
       temp[10:12,8:10,1] = outer(temp[10:12,"pop_sti",1], temp[13,8:10,1]) / temp[13,"pop_sti",1]
       temp[10:12,8:10,2] = outer(temp[10:12,"pop_sti",2], temp[13,8:10,2]) / temp[13,"pop_sti",2]
       
+      temp[,,3] = temp[,,1] + temp[,,2]
+      
+      # # growth
+      # temp[1:2,"pop_sti",1:2] = temp[1:2,"pop_sti",1:2] + (pop_growth - temp["pop_HIV","pop_sti",3]) * outer(c((1-prop_prep_de),prop_prep_de), c((1-rho), rho))
+      # # temp[t+1,1,"pop_sti",1] = temp[t+1,1,"pop_sti",1] + (pop_growth - temp[t+1,"pop_HIV","pop_sti",3]) #* outer(c((1-prop_prep_de),prop_prep_de), c((1-rho), rho))
+      # 
+      # 
+      # temp[8,,1:2] = apply(temp[1:2,,1:2], c(2,3), sum)
+      # temp["pop_HIV",,1:2] = temp[8,,1:2] + temp[9,,1:2]
+      # temp[1:9,6,1:2] = apply(temp[1:9,c(1,5),1:2], c(1,3), sum)
+      # temp[,"pop_sti",1:2] = apply(temp[,1:5,1:2], c(1,3), sum)
+      # 
+      # temp[,,3] = temp[,,1] + temp[,,2]
       
       
       #############################################
@@ -618,25 +559,24 @@ run_model = function(y_init, tvec_in){
       
       # calculate sti compartments
       # S
-      SID[t+1,c(1,2,9),1,1:2] = temp[c(1,2,9),1,1:2] + dt * (- pr_infect_sti * temp[c(1,2,9),1,1:2] * risk_mat +
+      SID[t+1,c(1,2,9),1,1:2] = temp[c(1,2,9),1,1:2] + dt * (- pr_infect_sti * temp[c(1,2,9),1,1:2] * risk_mat_de +
                                                                1/t_treatment_sti_de * temp[c(1,2,9),5,1:2])
-    
+      
       SID[t+1,1,1,1:2] = SID[t+1,1,1,1:2] + (pop_growth - sum(temp["pop_HIV","pop_sti",1:2]))*c((1-rho),rho)
       
       # E
-      SID[t+1,c(1,2,9),2,1:2] = temp[c(1,2,9),2,1:2] + dt * (pr_infect_sti * temp[c(1,2,9),1,1:2] * risk_mat -
+      SID[t+1,c(1,2,9),2,1:2] = temp[c(1,2,9),2,1:2] + dt * (pr_infect_sti * temp[c(1,2,9),1,1:2] * risk_mat_de -
                                                                1/t_exp_sti_de * temp[c(1,2,9),2,1:2] -
-                                                               r_testing_de * temp[c(1,2,9),2,1:2])
+                                                               prop_testing_de * r_testing_de * temp[c(1,2,9),2,1:2])
       
-      # # Sy
-      # SID[t+1,c(1,2,9),3,1:2] = temp[c(1,2,9),3,1:2] + dt * (1/t_exp_sti_de * temp[c(1,2,9),2,1:2] * symp -
-      #                                                          # 1/t_infect_sti_de * temp[c(1,2,9),3,1:2] -
-      #                                                          r_testing_de * temp[c(1,2,9),3,1:2] * lambda)
+      # I
+      SID[t+1,c(1,2,9),3,1:2] = temp[c(1,2,9),3,1:2] + dt * (1/t_exp_sti_de * temp[c(1,2,9),2,1:2] -
+                                                               1/t_infect_sti_de * temp[c(1,2,9),3,1:2] -
+                                                               prop_testing_de * r_testing_de * temp[c(1,2,9),3,1:2])
       
-      # ASy
-      SID[t+1,c(1,2,9),4,1:2] = temp[c(1,2,9),4,1:2] + dt * (1/t_exp_sti_de * temp[c(1,2,9),2,1:2] * (1-prop_treat) -
-                                                               # 1/t_infect_sti_de * temp[c(1,2,9),4,1:2] -
-                                                               r_testing_de * temp[c(1,2,9),4,1:2])
+      # L
+      SID[t+1,c(1,2,9),4,1:2] = temp[c(1,2,9),4,1:2] + dt * (1/t_infect_sti_de * temp[c(1,2,9),3,1:2] -
+                                                               prop_testing_de * r_testing_de * temp[c(1,2,9),4,1:2])
       
       
       # SID[t+1,c(1,2,9),4,1:2] = temp[c(1,2,9),4,1:2] + dt * (1/t_infect_sti_de * temp[c(1,2,9),3,1:2] -
@@ -644,17 +584,14 @@ run_model = function(y_init, tvec_in){
       #                                                          t(t(r_testing_de * temp[c(1,2,9),4,1:2]) * c(1,0)))
       
       # # T
-      # SID[t+1,c(1,2,9),5,1] = temp[c(1,2,9),5,1] + dt * (rowSums(t(t(r_testing_de * temp[c(1,2,9),2:4,1])  *  c(1,lambda,1))) -
+      # SID[t+1,c(1,2,9),5,1] = temp[c(1,2,9),5,1] + dt * (rowSums(t(t(r_testing_de * temp[c(1,2,9),2:4,1])  *  c(1,1,lambda))) -
       #                                                          1/t_treatment_sti_de * temp[c(1,2,9),5,1])
       # 
       # SID[t+1,c(1,2,9),5,2] = temp[c(1,2,9),5,2] + dt * (-1/t_treatment_sti_de * temp[c(1,2,9),5,2])
       
       # T
-      # SID[t+1,c(1,2,9),5,1:2] = temp[c(1,2,9),5,1:2] + dt * (r_testing_de * colSums(aperm(sweep(temp[c(1,2,9),2:4,1:2], c(2), c(1,lambda,1), FUN="*"), c(2,1,3))) -
-      #                                                          1/t_treatment_sti_de * temp[c(1,2,9),5,1:2]) +
-      SID[t+1,c(1,2,9),5,1:2] = temp[c(1,2,9),5,1:2] + dt * (r_testing_de * colSums(aperm(sweep(temp[c(1,2,9),c(2,4),1:2], c(2), c(1,1), FUN="*"), c(2,1,3))) -
-                                                               1/t_treatment_sti_de * temp[c(1,2,9),5,1:2]) +
-        + dt * (1/t_exp_sti_de * temp[c(1,2,9),2,1:2] * prop_treat)
+      SID[t+1,c(1,2,9),5,1:2] = temp[c(1,2,9),5,1:2] + dt * (prop_testing_de * r_testing_de * colSums(aperm(temp[c(1,2,9),2:4,1:2], c(2,1,3))) -
+                                                               1/t_treatment_sti_de * temp[c(1,2,9),5,1:2])
       
       
       # sti status totals
@@ -685,14 +622,13 @@ run_model = function(y_init, tvec_in){
       
       
       # incidence and diagnoses of sti
-      SID[t+1,c(1,2,9),8,1:2] = dt * pr_infect_sti * temp[c(1,2,9),1,1:2] * risk_mat
+      SID[t+1,c(1,2,9),8,1:2] = dt * pr_infect_sti * temp[c(1,2,9),1,1:2] * risk_mat_de
       # SID[t+1,c(1,2,9),9,1:2] = dt * t(t(prop_testing_de * r_testing_de * apply(temp[c(1,2,9),2:4,1:2], MARGIN=c(1,3), sum)) * c(1,0))
       # SID[t+1,c(1,2,9),9,1:2] = dt * t(t(r_testing_de * apply(temp[c(1,2,9),2:4,1:2], MARGIN=c(1,3), sum)) * c(1,0))
       # SID[t+1,c(1,2,9),9,1:2] = dt * t(t(r_testing_de * temp[c(1,2,9),7,1:2]) * c(1,0))
       
-      # SID[t+1,c(1,2,9),9,1] = dt * r_testing_de * rowSums(t(t(temp[c(1,2,9),2:4,1]) * c(1,lambda,1)))
-      SID[t+1,c(1,2,9),9,1:2] = dt * r_testing_de * colSums(aperm(sweep(temp[c(1,2,9),2:4,1:2], c(2), c(1,lambda,1), FUN="*"), c(2,1,3)))+
-        dt * (1/t_exp_sti_de * temp[c(1,2,9),2,1:2] * (1-prop_treat)) 
+      # SID[t+1,c(1,2,9),9,1] = dt * r_testing_de * rowSums(t(t(temp[c(1,2,9),2:4,1]) * c(1,1,lambda)))
+      SID[t+1,c(1,2,9),9,1:2] = dt * r_testing_de * colSums(aperm(sweep(temp[c(1,2,9),2:4,1:2], c(2), c(1,1,1), FUN="*"), c(2,1,3)))
           
       SID[t+1,c(1,2,9),10,1:2] = dt * 1/t_treatment_sti_de * temp[c(1,2,9),5,1:2]
       
@@ -703,16 +639,11 @@ run_model = function(y_init, tvec_in){
       # redistribute HIV susceptible into PrEP proportions
       # SID[t+1,2,,1:2] = SID[t+1,8,,1:2] * prop_prep_de
       # SID[t+1,1,,1:2] = SID[t+1,8,,1:2] - SID[t+1,2,,1:2]
-      
-      # delta_prep_prop = (sum(SID[t+1,8,11,1:2])*prop_prep_de - sum(SID[t+1,2,11,1:2])) / sum(SID[t+1,1,11,1:2])
       delta_prep_prop = (sum(SID[t+1,8,11,1:2])*prop_prep_de - sum(SID[t+1,2,11,1:2])) / sum(SID[t+1,1,11,1:2])
       SID[t+1,2,c(1:5, 11),1:2] = SID[t+1,2,c(1:5, 11),1:2] + delta_prep_prop * SID[t+1,1,c(1:5, 11),1:2]
       SID[t+1,1,c(1:5, 11),1:2] = SID[t+1,1,c(1:5, 11),1:2] - delta_prep_prop * SID[t+1,1,c(1:5, 11),1:2]
       
-      # if(iss2){
-      #   delta_prep_prop_all[t] <<- delta_prep_prop
-      #   
-      # }
+      
       # 
       SID[t+1,8,8:10,1:2] = apply(SID[t+1,1:2,8:10,1:2], c(2,3), sum)
       
@@ -720,9 +651,9 @@ run_model = function(y_init, tvec_in){
       SID[t+1,3:4,8,1:2] = t(t(SID[t+1,3:4,1,1:2]) * (SID[t+1,9,8,1:2]/SID[t+1,9,1,1:2]))
       # SID[t+1,3:4,9,1:2] = t(t(SID[t+1,3:4,7,1:2]) * (SID[t+1,9,9,1:2]/SID[t+1,9,7,1:2]))
       # SID[t+1,3:4,9,1:2] = apply(SID[t+1,3:4,2:4,1:2] / aperm(replicate(2, SID[t+1,9,2:4,1:2]), c(3,1,2)) * aperm(replicate(2, replicate(3, SID[t+1,9,9,1:2])), c(3,2,1)), c(1,3), sum)
-      # SID[t+1,3:4,9,1] = colSums(t(SID[t+1,3:4,2:4,1])*c(1,lambda,1) / sum(SID[t+1,9,2:4,1] * c(1,1,lambda)) * SID[t+1,9,9,1])
-      SID[t+1,3:4,9,1:2] = t(t(colSums(aperm(sweep(SID[t+1,3:4,2:4,1:2], 2, c(1,lambda,1), FUN="*"), c(2,1,3)))) /
-        colSums(SID[t+1,9,2:4,1:2] * c(1,lambda,1)) * SID[t+1,9,9,1:2])
+      # SID[t+1,3:4,9,1] = colSums(t(SID[t+1,3:4,2:4,1])*c(1,1,lambda) / sum(SID[t+1,9,2:4,1] * c(1,1,lambda)) * SID[t+1,9,9,1])
+      SID[t+1,3:4,9,1:2] = t(t(colSums(aperm(sweep(SID[t+1,3:4,2:4,1:2], 2, c(1,1,1), FUN="*"), c(2,1,3)))) /
+        colSums(SID[t+1,9,2:4,1:2] * c(1,1,1)) * SID[t+1,9,9,1:2])
       SID[t+1,3:4,10,1:2] = t(t(SID[t+1,3:4,5,1:2]) * (SID[t+1,9,10,1:2]/SID[t+1,9,5,1:2]))
       
       SID[t+1,5,8:10,1:2] = SID[t+1,4,8:10,1:2] * (1 - cascade_de[2])
@@ -742,6 +673,23 @@ run_model = function(y_init, tvec_in){
       SID[t+1,13,,1:2] = apply(SID[t+1,8:9,,1:2], c(2,3), sum)
       
       SID[t+1,,,3] = SID[t+1,,,1] + SID[t+1,,,2]
+      
+      # growth
+      # SID[t+1,1:2,"pop_sti",1] = SID[t+1,1:2,"pop_sti",1] + (pop_growth*(1-rho) - SID[t+1,"pop_HIV","pop_sti",1]) * c((1-prop_prep_de),prop_prep_de)
+      # SID[t+1,1:2,"pop_sti",2] = SID[t+1,1:2,"pop_sti",2] + (pop_growth*rho - SID[t+1,"pop_HIV","pop_sti",2]) * c((1-prop_prep_de),prop_prep_de)
+      # 
+      #       # SID[t+1,1,"pop_sti",1] = SID[t+1,1,"pop_sti",1] + (pop_growth - SID[t+1,"pop_HIV","pop_sti",3]) #* outer(c((1-prop_prep_de),prop_prep_de), c((1-rho), rho))
+      # 
+      # 
+      # # SID[t+1,8,,1:2] = apply(SID[t+1,1:2,,1:2], c(2,3), sum)
+      # SID[t+1,8,,1:2] = SID[t+1,1,,1:2] + SID[t+1,2,,1:2]
+      # SID[t+1,"pop_HIV",,1:2] = SID[t+1,8,,1:2] + SID[t+1,9,,1:2]
+      # SID[t+1,,6,1:2] = SID[t+1,,1,1:2] + SID[t+1,,5,1:2]
+      # SID[t+1,,"pop_sti",1:2] = apply(SID[t+1,,6:7,1:2], c(1,3), sum)
+      # 
+      # SID[t+1,,,3] = SID[t+1,,,1] + SID[t+1,,,2]
+      
+      
       
       # SID[t+1,,,3] = SID[t+1,,,3] * (1 - 1/50 * dt)
       
@@ -766,7 +714,7 @@ run_model = function(y_init, tvec_in){
   
   tvec_year = unique(floor(as.numeric(rownames(SID))))
   
-  if(TRUE){
+  if(heat_scen_q!=1){
     HIV_out = array(0, dim = c(length(tvec_year), 3),
                     dimnames = list(tvec_year,
                                     c("incidence_HIV", "diagnoses_HIV", "deaths_HIV")))

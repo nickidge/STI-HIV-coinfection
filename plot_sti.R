@@ -175,7 +175,7 @@ plot_all_sti <- function(SID_list){
     ggplot(data=sti_by_testing, aes(x=year, y=prop, colour=testing_status)) +
     geom_line() +
     theme_plot_sti +
-    labs(y="prevalence of sti", title="sti proportion by testing status") +
+    labs(y="prevalence of sti", title="sti proportion by risk status", colour="risk status") +
     scale_x_continuous(breaks = seq(2000, 2040, by = 5)) +
     scale_y_continuous(expand=c(0,0),
                        # limits = c(0, 1.05*max(sti_by_testing$prop)),
@@ -190,65 +190,9 @@ plot_all_sti <- function(SID_list){
   all_sti = ggarrange(all_sti_1, all_sti_2, all_sti_3, all_sti_5, all_sti_6, all_sti_7, all_sti_8, all_sti_9, nrow=3, ncol=3)
   all_sti = annotate_figure(all_sti, top = text_grob("sti plots", face = "bold", size = 24))
   ggsave("all_sti_plots.pdf", plot=all_sti, width = 14, height=8)
+  # ggsave("all_sti_plots.png", plot=all_sti, width = 14, height=8)
   browseURL("all_sti_plots.pdf")
-  # 
-  # 
-  # paper_plot_1 =
-  #   ggplot(data = subset(sti_df, sti_group=="diagnoses_sti" & (HIV_group=="HIV_minus" | HIV_group=="HIV_plus")), aes(x=year, group=HIV_group, colour=HIV_group)) +
-  #   geom_line(data = subset(sti_df, N=="model" & sti_group=="diagnoses_sti" & (HIV_group=="HIV_minus" | HIV_group=="HIV_plus")), aes(y=value, group=HIV_group, colour=HIV_group)) +
-  #   geom_point(data = subset(sti_df, N=="data" & sti_group=="diagnoses_sti"), aes(y=value, group=HIV_group, colour=HIV_group, shape=HIV_group), na.rm=TRUE) +
-  #   labs(x=NULL, y="Notifications among GBM",
-  #        title="sti notifications among Victorian GBM by HIV status", subtitle="Data versus model") +
-  #   scale_x_continuous(breaks = seq(2007, 2015, by = 1)) +
-  #   coord_cartesian(xlim=c(2007,2015))
-  #   # facet_wrap(~HIV_group, nrow=1, scales="free_x")
-  # 
-  # paper_plot_2 =
-  #   ggplot(data = subset(y_sti_df, HIV_group=="HIV_minus" | HIV_group=="HIV_plus"), aes(x=year, y=value, group=HIV_group, colour=HIV_group)) +
-  #   geom_line(data = subset(y_sti_df, N=="model" & sti_group=="sti_plus" & (HIV_group=="HIV_minus" | HIV_group=="HIV_plus")), aes(x=year, y=value /
-  #                                                                                                                                      subset(y_sti_df, N=="model" & sti_group=="pop_sti" & (HIV_group=="HIV_minus" | HIV_group=="HIV_plus"))$value,
-  #                                                                                                                                    group=HIV_group, colour=HIV_group)) +
-  #   geom_point(data = subset(y_sti_df, N=="data" & sti_group=="prev_sti" & (HIV_group=="HIV_minus" | HIV_group=="HIV_plus")), aes(x=year, y=value, group=HIV_group, colour=HIV_group, shape=HIV_group), na.rm=TRUE) +
-  #   labs(x=NULL, y="Prevalence",
-  #        title="sti prevalence among Victorian GBM by HIV status", subtitle="Data versus model") +
-  #   scale_x_continuous(breaks = seq(2000, 2040, by = 5)) +
-  #   scale_y_continuous(labels = scales::percent) +
-  #   coord_cartesian(xlim=c(2007,2015))
-  #   # facet_wrap(~HIV_group, nrow=1)
-  # 
-  # 
-  # all_paper_grobs = list(paper_plot_1, paper_plot_2)
-  # all_paper = grid.arrange(grobs=all_paper_grobs)
-  # all_paper = annotate_figure(all_paper, top = text_grob("paper plots", face = "bold", size = 24))
-  # ggsave("all_paper_plots.pdf", plot=all_paper, width = 14, height=8)
-  # browseURL("all_paper_plots.pdf")
-  # 
-  # # paper_plot_1 =
-  # #   ggplot(data = subset(sti_df, sti_group=="diagnoses_sti" & (HIV_group=="HIV_minus" | HIV_group=="HIV_plus")), aes(x=year, group=HIV_group, colour=N)) +
-  # #   geom_line(data = subset(sti_df, N=="model" & sti_group=="diagnoses_sti" & (HIV_group=="HIV_minus" | HIV_group=="HIV_plus")), aes(y=value, group=HIV_group, colour=N)) +
-  # #   geom_point(data = subset(sti_df, N=="data" & sti_group=="diagnoses_sti"), aes(y=value, group=HIV_group, colour=N), na.rm=TRUE) +
-  # #   labs(x=NULL, y="Notifications among GBM",
-  # #        title="sti notifications among Victorian GBM by HIV status", subtitle="Data versus model") +
-  # #   scale_x_continuous(breaks = seq(2007, 2015, by = 1)) +
-  # #   coord_cartesian(xlim=c(2007,2015)) +
-  # #   facet_wrap(~HIV_group, nrow=1, scales="free_x")
-  # # 
-  # # paper_plot_2 =
-  # #   ggplot(data = subset(y_sti_df, HIV_group=="HIV_minus" | HIV_group=="HIV_plus"), aes(x=year, y=value, group=HIV_group, colour=N)) +
-  # #   geom_line(data = subset(y_sti_df, N=="model" & sti_group=="sti_plus" & (HIV_group=="HIV_minus" | HIV_group=="HIV_plus")), aes(x=year, y=value /
-  # #                                                                                                                                      subset(y_sti_df, N=="model" & sti_group=="pop_sti" & (HIV_group=="HIV_minus" | HIV_group=="HIV_plus"))$value,
-  # #                                                                                                                                    group=HIV_group, colour=N)) +
-  # #   geom_point(data = subset(y_sti_df, N=="data" & sti_group=="prev_sti" & (HIV_group=="HIV_minus" | HIV_group=="HIV_plus")), aes(x=year, y=value, group=HIV_group, colour=N), na.rm=TRUE) +
-  # #   labs(x=NULL, y="Prevalence",
-  # #        title="sti prevalence among Victorian GBM by HIV status", subtitle="Data versus model") +
-  # #   scale_x_continuous(breaks = seq(2000, 2040, by = 5)) +
-  # #   scale_y_continuous(labels = scales::percent) +
-  # #   coord_cartesian(xlim=c(2007,2015)) +
-  # #   facet_wrap(~HIV_group, nrow=1)
-  
-  
-    
-  
+
 }
 
 plot_all_sti(SID_list)

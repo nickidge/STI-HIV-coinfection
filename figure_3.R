@@ -8,8 +8,10 @@ sensitivity=0
 theme_fig_3 =
   theme_all +
   theme_font +
-  theme(strip.text = element_text(size=12)) +
-  theme(axis.title.y=element_text(size=15)) +
+  theme(legend.text = element_text(size=10)) +
+  theme(strip.text = element_text(size=11)) +
+  theme(axis.title.y=element_text(size=11),
+        axis.text = element_text(size=10)) +
   theme(plot.subtitle=element_text(size=15, face="bold", margin=margin(b=2)))
 
 # run base scenario
@@ -48,6 +50,8 @@ fig_3_sti_df[rownames(subset(sti_temp_df, scenario!="Base")),"value"] = fig_3_st
 prev_temp_df = subset(fig_3_prev_df, year==split_year)
 fig_3_prev_df[rownames(subset(prev_temp_df, scenario!="base")),"value"] = fig_3_prev_df[rownames(subset(prev_temp_df, scenario=="base")),"value"]
 
+fig_3_sti_df$order = match(fig_3_sti_df$scenario, rev(levels(fig_3_sti_df$scenario)))
+
 # find maximum values
 fig_3_maxval_left = max(subset(fig_3_sti_df, (HIV_group=="HIV-negative GBM in Victoria" | HIV_group=="HIV-positive GBM in Victoria") & (sti_group=="incidence_sti") & year<=2027)$value)
 fig_3_maxval_right = max(subset(fig_3_prev_df, prev_group=="HIV-negative GBM in Victoria" | prev_group=="HIV-positive GBM in Victoria" & year<=2027)$value)
@@ -56,20 +60,20 @@ fig_3_maxval_right = max(subset(fig_3_prev_df, prev_group=="HIV-negative GBM in 
 temptemp = subset(fig_3_sti_df, (HIV_group=="HIV-negative GBM in Victoria" | HIV_group=="HIV-positive GBM in Victoria") & (sti_group=="incidence_sti"))
 
 # create plots
-fig_3_left = ggplot(data = subset(fig_3_sti_df, (HIV_group=="HIV-negative GBM in Victoria" | HIV_group=="HIV-positive GBM in Victoria") & (sti_group=="incidence_sti")), aes(x=year, y=value, group=scenario, colour=scenario)) +
+fig_3_left = ggplot(data = subset(fig_3_sti_df, (HIV_group=="HIV-negative GBM in Victoria" | HIV_group=="HIV-positive GBM in Victoria") & (sti_group=="incidence_sti")), aes(x=year, y=value, group=order, colour=scenario)) +
   geom_line(lwd=1.2) +
-  labs(x=NULL, y="Estimated new STI infections in year", subtitle="Scenarios a-d", colour=NULL) +
+  labs(x=NULL, y="Estimated new syphilis infections in year", subtitle="Scenarios a-d", colour=NULL) +
   theme(legend.key.width = unit(1.5,'lines'),
-        legend.key.height = unit(1.75,'lines'),
+        legend.key.height = unit(1.2,'lines'),
         legend.spacing.y = unit(0, "mm"),
-        legend.justification = c(0, 1),
-        legend.position = c(0, 1)) +
+        legend.justification = c(0,1),
+        legend.position = c(0.535,1)) +
   theme_fig_3 +
   scale_x_continuous(breaks = seq(2005, 2025, by = 5), expand=c(0,0)) +
-  coord_cartesian(xlim=c(2007+2,2027),
-                  ylim=c(0,1.05*fig_3_maxval_left)) +
+  coord_cartesian(xlim=c(2009.5,2025.5),
+                  ylim=c(0,2100))+#1.05*fig_3_maxval_left)) +
   scale_y_continuous(expand = c(0, 0)) +
-  facet_rep_wrap(~ HIV_group, dir="v", repeat.tick.labels = TRUE) +
+  facet_rep_wrap(~ HIV_group, dir="h", repeat.tick.labels = TRUE) +
   scale_colour_manual(values=c("black", "blue", "darkgreen", "orange", "purple"))
 
 fig_3_right = ggplot(data = subset(fig_3_prev_df, prev_group=="HIV-negative GBM in Victoria" | prev_group=="HIV-positive GBM in Victoria"), aes(x=year, y=value, group=scenario, colour=scenario)) +
@@ -78,8 +82,8 @@ fig_3_right = ggplot(data = subset(fig_3_prev_df, prev_group=="HIV-negative GBM 
   guides(colour=FALSE) +
   theme_fig_3 +
   scale_x_continuous(breaks = seq(2005, 2025, by = 5), expand=c(0,0)) +
-  coord_cartesian(xlim=c(2007+2,2027),
-                  ylim=c(0,1.05*fig_3_maxval_right)) +
+  coord_cartesian(xlim=c(2009.5,2025.5),
+                  ylim=c(0,2100))+#1.05*fig_3_maxval_right)) +
   scale_y_continuous(labels = scales::percent, expand=c(0,0)) +
   facet_rep_wrap(~ prev_group,
                  dir="v", repeat.tick.labels = TRUE,
@@ -88,8 +92,9 @@ fig_3_right = ggplot(data = subset(fig_3_prev_df, prev_group=="HIV-negative GBM 
 
 # combine plots and output pdf and png
 fig_3 = ggarrange(fig_3_left, fig_3_right, nrow=1, ncol=2, common.legend=FALSE)
-fig_3 = annotate_figure(fig_3, top = text_grob("Figure 3", face = "bold", size = 24))
-ggsave("fig_3.pdf", plot=fig_3, width = 14, height=8)
-ggsave("fig_3.png", plot=fig_3, width = 14, height=8, dpi=500)
+fig_3 = fig_3_left
+#fig_3 = annotate_figure(fig_3, top = text_grob("Figure 3", face = "bold", size = 24))
+ggsave("fig_3.pdf", plot=fig_3, width=plot_width, height=plot_height, units="mm")
+ggsave("fig_3.png", plot=fig_3, width=plot_width, height=100, units="mm", dpi=500)
 # browseURL("fig_3.pdf")
 # browseURL("fig_3.png")

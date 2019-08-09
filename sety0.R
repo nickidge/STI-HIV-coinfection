@@ -65,7 +65,7 @@ sety0 = function(){
   # create array for y0
   y0 = array(0, dim = c(13,11),
              dimnames = list(c("S1", "S2", "I", "D", "D1", "D2", "D3", "HIV_minus", "HIV_plus", "incidence_HIV", "diagnoses_HIV", "deaths_HIV", "pop_HIV"),
-                             c("S_sti", "E_sti", "Sy_sti", "ASy_sti", "T_sti", "sti_minus", "sti_plus", "incidence_sti", "diagnoses_sti", "recovered_sti", "pop_sti")))
+                               c("S_sti", "E_sti", "I_sti", "L_sti", "T_sti", "sti_minus", "sti_plus", "incidence_sti", "diagnoses_sti", "recovered_sti", "pop_sti")))
 
   # use data to create y0
   y0[3,11] = as.numeric(data[[2]][1,2] * (1-data[[3]][1,2])) # I compartment
@@ -88,8 +88,8 @@ sety0 = function(){
   
   y0[13,11] = sum(y0[8:9, 6:7])
   
-  y0[,2:4] = outer(y0[,7], c(0.1, 0.9*(2/(2.8*symp))*symp, 0.9*(1-(2/(2.8*symp))*symp)))
-  y0[,c(1,5)] = outer(y0[,6], c(0.995,0.005))
+  y0[,2:4] = outer(y0[,7], c(0.1, 0.9*0.9, 0.9*0.1))
+  y0[,c(1,5)] = outer(y0[,6], c(0.9995,0.0005))
 
   
 

@@ -1,0 +1,22 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1540441944656.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "2018636710",
+    "id" : "E5852F12",
+    "lastKnownWriteTime" : 1540441954,
+    "last_content_update" : 1540441954350,
+    "path" : "G:/My Drive/HIV model in R/Syphilis model/Entire code/loadpars.R",
+    "project_path" : "loadpars.R",
+    "properties" : {
+        "cursorPosition" : "85,29",
+        "scrollLine" : "0"
+    },
+    "relative_order" : 11,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

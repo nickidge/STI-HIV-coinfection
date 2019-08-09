@@ -1,0 +1,23 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1539211284363.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "2145638264",
+    "id" : "F8F62750",
+    "lastKnownWriteTime" : 1539751144,
+    "last_content_update" : 1539751144658,
+    "path" : "G:/My Drive/HIV model in R/Syphilis model/Entire code/fig_S2.R",
+    "project_path" : "fig_S2.R",
+    "properties" : {
+        "cursorPosition" : "27,59",
+        "scrollLine" : "4",
+        "tempName" : "Untitled1"
+    },
+    "relative_order" : 5,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

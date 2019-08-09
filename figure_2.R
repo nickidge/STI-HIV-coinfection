@@ -3,15 +3,16 @@
 source("reset_pars.R", echo = F)
 intervention=0
 sensitivity=0
-is_gel=F
-# gel_up_heat=0
-# gel_down_heat=0
+heat_scen_q=0
+plot_gel_q=0
+gel_up_heat=0
+gel_down_heat=0
 
 # create a common theme for fig 2
 theme_fig_2 =
   theme_all +
-  theme(text = element_text(size=10.5))  +
-  theme(plot.title=element_text(size=11.5, face="bold", margin=margin())) +
+  theme(text = element_text(size=11))  +
+  theme(plot.title=element_text(size=11, face="bold", margin=margin())) +
   theme(plot.subtitle=element_text(margin=margin(t=3, b=0.2))) +
   theme(legend.position = c(0.01,1),
         legend.justification = c(0,1),
@@ -32,7 +33,7 @@ levels(y_sti_df$HIV_group) = c("HIV-", "HIV+", "All")
 sti_df$HIV_group = factor(sti_df$HIV_group)
 levels(sti_df$HIV_group) = c("HIV-", "HIV+", "All", "Not on PrEP", "On PrEP")
 
-maxval_fig_2_left = max(subset(sti_df, sti_group=="diagnoses_sti")$value, na.rm=T)
+maxval_fig_2_left = max(subset(sti_df, sti_group=="diagnoses_sti" & (sti_df$HIV_group %in% c("HIV-", "HIV+")) & year<=2025)$value, na.rm=T)
 
 # diagnoses plot
 fig_2_left =
@@ -43,10 +44,10 @@ fig_2_left =
             size=2.2) +
   labs(x=NULL, y="Notifications among GBM in year",
        colour="HIV Group  ", shape="HIV Group  ",
-       title="Gonorrhoea notifications among\nVictorian GBM by HIV status", subtitle="Data versus model") +
-  scale_x_continuous(breaks = seq(2005, 2025, by = 5), expand=c(0,0)) +
+       title="Syphilis notifications among Victorian GBM by HIV status", subtitle="Data versus model") +
+  scale_x_continuous(breaks = seq(2005, 2030, by = 1), expand=c(0,0)) +
   scale_y_continuous(expand=c(0,0)) +
-  coord_cartesian(xlim=c(start_year,2026), ylim=c(0,maxval_fig_2_left*1.01)) +
+  coord_cartesian(xlim=c(2009.5,2017.5), ylim=c(0,600)) + #maxval_fig_2_left*1.05)) +
   theme_fig_2 +
   theme(axis.title.y = element_text(margin = margin(r=8))) +
   # theme(legend.direction = "vertical") +
@@ -66,24 +67,18 @@ fig_2_right =
              size=2.2) +
   labs(x=NULL, y="Prevalence",
        colour="HIV Group  ", shape="HIV Group  ",
-       title="Gonorrhoea prevalence among\nVictorian GBM by HIV status", subtitle="Data versus model") +
-  scale_x_continuous(breaks = seq(2005, 2025.5, by = 5), expand=c(0,0)) +
+       title="Syphilis prevalence among\nVictorian GBM by HIV status", subtitle="Data versus model") +
+  scale_x_continuous(breaks = seq(2005, 2030, by = 5), expand=c(0,0)) +
   scale_y_continuous(labels = scales::percent, expand=c(0,0)) +
-  coord_cartesian(xlim=c(start_year,2026), ylim=c(0,0.6)) +
+  coord_cartesian(xlim=c(2009.5,2025.5), ylim=c(0,0.1)) +
   theme_fig_2 +
   scale_colour_manual(values=c("blue", "red"))
 
 # combine plots and output pdf and png
 fig_2 = ggarrange(fig_2_left, fig_2_right, nrow=1, ncol=2, common.legend=F)
-fig_2 = annotate_figure(fig_2, top = text_grob("Figure __", face = "bold", size = 15))
-ggsave("fig_2.pdf", plot=fig_2, width=170, height=120, units="mm")
-ggsave("fig_2.png", plot=fig_2, width=170, height=120, units="mm", dpi=500)
-browseURL("fig_2.pdf")
+fig_2 = fig_2_left
+#fig_2 = annotate_figure(fig_2, top = text_grob("Figure 2", face = "bold", size = 24))
+ggsave("fig_2.pdf", plot=fig_2, width=120, height=100, units="mm")
+ggsave("fig_2.png", plot=fig_2, width=120, height=100, units="mm", dpi=500)
+# browseURL("fig_2.pdf")
 # browseURL("fig_2.png")
-
-ggsave("fig_2_left.pdf", plot=fig_2_left, width=170, height=120, units="mm")
-ggsave("fig_2_left.png", plot=fig_2_left, width=170, height=120, units="mm", dpi=500)
-browseURL("fig_2_left.pdf")
-
-
-

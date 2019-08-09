@@ -11,7 +11,7 @@ source("figure_3.R", echo = F)
 source("figure_4.R", echo = F)
 source("figure_5.R", echo = F)
 figs = list(fig_2, fig_3, fig_4, fig_5)
-pdf("figs.pdf", onefile=TRUE, width=14, height=8)
+pdf("figs.pdf", onefile=TRUE, width=plot_width/25, height=plot_height/25)
 invisible(lapply(figs, print))
 dev.off()
 browseURL("figs.pdf")
@@ -35,8 +35,8 @@ int_table = matrix(0, nrow=9, ncol=6,
 fill_table_inc = function(SID_in){
   inc = SID_in[[3]][,,"incidence_sti"]
   inc_years = as.numeric(rownames(inc))
-  inc_1_year = inc["2016",]
-  inc_cumulative = colSums(inc[which(inc_years>=last_data_year & inc_years<2030),])
+  inc_1_year = inc[as.character(split_year),]
+  inc_cumulative = colSums(inc[which(inc_years>=last_data_year & inc_years<2026),])
   return(c(inc_1_year["HIV_minus"],
            inc_cumulative["HIV_minus"],
            inc_1_year["HIV_plus"],
@@ -46,6 +46,10 @@ fill_table_inc = function(SID_in){
 }
 
 # base scenario
+source("reset_pars.R", echo = F)
+intervention=1
+int = 0
+SID_base = run_model(y0_split, tvec_split)
 int_table[1,] = fill_table_inc(SID_base)
 
 # # create log of pr_infect for debugging
@@ -118,17 +122,17 @@ sens_table = matrix(0, nrow=9, ncol=2,
 fill_table_sens = function(SID_in){
   sens = SID_in[[3]][,"pop_HIV","incidence_sti"]
   sens_years = as.numeric(names(sens))
-  sens_cumulative = sum(sens[which(sens_years>=last_data_year & sens_years<2030)])
+  sens_cumulative = sum(sens[which(sens_years>=last_data_year & sens_years<2026)])
   return(sens_cumulative)
 }
 
 # reset parameters for base scenario
 source("reset_pars.R", echo = F)
-intervention = 0
+intervention = 1
 sensitivity = 0
-
+int = 0
 # run base scenario
-sens_temp = run_model(y0,tvec)
+sens_temp = run_model(y0_split, tvec_split)
 sens_table[1,1] = fill_table_sens(sens_temp)
 
 # set parameters for scenarios
