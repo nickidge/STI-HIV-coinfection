@@ -1,0 +1,22 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1562825587150.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "1998300357",
+    "id" : "EC24DEA4",
+    "lastKnownWriteTime" : 1562825254,
+    "last_content_update" : 1562825254,
+    "path" : "G:/My Drive/HIV model in R/Gonorrhoea model/Entire code/HIV_Model_R_gon_gel_1/figure_5.R",
+    "project_path" : "figure_5.R",
+    "properties" : {
+        "cursorPosition" : "122,74",
+        "scrollLine" : "0"
+    },
+    "relative_order" : 1,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}

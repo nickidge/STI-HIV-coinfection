@@ -1,0 +1,22 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1556087711549.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "41DC9FA1",
+    "lastKnownWriteTime" : 1539216828,
+    "last_content_update" : 1539216828,
+    "path" : "C:/Users/michael.traeger/Google Drive/Gonorrhoea model/Entire code/HIV_Model_R_gon_gel/reset_pars.R",
+    "project_path" : "reset_pars.R",
+    "properties" : {
+        "cursorPosition" : "1,0",
+        "scrollLine" : "0"
+    },
+    "relative_order" : 3,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}
