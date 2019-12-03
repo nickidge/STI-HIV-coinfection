@@ -1,0 +1,23 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1574747096745.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "2AB68D6B",
+    "lastKnownWriteTime" : 1575349643,
+    "last_content_update" : 1575349643075,
+    "path" : "~/GitHub/STI-HIV-coinfection/info.R",
+    "project_path" : "info.R",
+    "properties" : {
+        "cursorPosition" : "14,48",
+        "scrollLine" : "0",
+        "tempName" : "Untitled1"
+    },
+    "relative_order" : 7,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}
