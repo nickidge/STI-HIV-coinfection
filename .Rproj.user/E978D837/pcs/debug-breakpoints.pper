@@ -1,6 +1,36 @@
 {
     "debugBreakpointsState" : {
         "breakpoints" : [
+            {
+                "editor_line_number" : 204,
+                "editor_state" : 1,
+                "function_name" : "run_model",
+                "function_steps" : "13,4,52",
+                "id" : 33,
+                "is_package_breakpoint" : false,
+                "is_pending_debug_completion" : false,
+                "line_number" : 204,
+                "needs_updated_steps" : false,
+                "package_name" : "",
+                "path" : "~/GitHub/STI-HIV-coinfection/model.R",
+                "state" : 1,
+                "type" : 0
+            },
+            {
+                "editor_line_number" : 188,
+                "editor_state" : 1,
+                "function_name" : "run_model",
+                "function_steps" : "13,4,49",
+                "id" : 34,
+                "is_package_breakpoint" : false,
+                "is_pending_debug_completion" : true,
+                "line_number" : 188,
+                "needs_updated_steps" : false,
+                "package_name" : "",
+                "path" : "~/GitHub/STI-HIV-coinfection/model.R",
+                "state" : 1,
+                "type" : 0
+            }
         ]
     }
 }

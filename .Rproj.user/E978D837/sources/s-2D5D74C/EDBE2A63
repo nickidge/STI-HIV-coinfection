@@ -1,0 +1,23 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1575271215677.000,
+    "dirty" : false,
+    "encoding" : "UTF-8",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "EDBE2A63",
+    "lastKnownWriteTime" : 1575348789,
+    "last_content_update" : 1575348789004,
+    "path" : "~/GitHub/STI-HIV-coinfection/processing.R",
+    "project_path" : "processing.R",
+    "properties" : {
+        "cursorPosition" : "40,22",
+        "scrollLine" : "0",
+        "tempName" : "Untitled1"
+    },
+    "relative_order" : 3,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_source"
+}
