@@ -24,10 +24,10 @@ for(i_base in 1:3){
 }
 rownames(cascade_interp) = tvec_base
 
-# effectiveness of PrEP
-eff_prep0 = cbind(c(2010,2020),c(0,eff_prep))
-eff_prep_interp = approx(eff_prep0[,1], eff_prep0[,2], xout=tvec_base, rule=2)$y
-names(eff_prep_interp) = tvec_base
+# # effectiveness of PrEP
+# eff_prep0 = cbind(c(2010,2020),c(0,eff_prep))
+# eff_prep_interp = approx(eff_prep0[,1], eff_prep0[,2], xout=tvec_base, rule=2)$y
+# names(eff_prep_interp) = tvec_base
 
 # rate of diagnosis of STI, stratified by HIV status
 r_diag_sti0 = base_raw[,c(1,4:6)]

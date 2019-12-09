@@ -6,6 +6,12 @@ widen_sources = function(...){
   return(df_wide)
 }
 
+make_interp = function(v, tvec=tvec_base){
+  mat_interp = t(replicate(length(tvec), v))
+  row.names(mat_interp) = as.character(tvec)
+  return(mat_interp)
+}
+
 extr = function(output, keys, tvec=tvec_base){
   keys = unique(keys)
   SID = output$SID
@@ -14,15 +20,11 @@ extr = function(output, keys, tvec=tvec_base){
   tvec = intersect(tvec, dimnames(SID)[[1]])
   dat = list()
   df = data.frame()
-  # if(!is.null(intersect(c('PLHIV'), keys))){
-  #   SID = uncal$SID
-  # }
   for(i in 1:length(keys)){
     key = keys[i]
     if(key == 'PLHIV'){
       this = SID[tvec,sHIV$PLHIV,,]
       this = apply(this, 1, sum)
-      # this = this[as.numeric(names(this)) == floor(as.numeric(names(this)))]
       thisdf = data.frame(t = names(this), value = this, type = 'pop', dt = 1,
                           sti_pop = 'all', risk_pop = 'all', HIV_pop = 'PLHIV')
     } else if(key == 'HIV_diag'){

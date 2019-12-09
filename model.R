@@ -2,7 +2,7 @@
 # 
 # # model function
 # # takes initial conditions and tvec as input, and outputs the model as a matrix
-run_model = function(y0, tvec=tvec_base, modelpars=list(), options=list()){
+run_model = function(y0, tvec=tvec_base, modelpars=list(), options=list(), spars=static_pars){
   # for(key in optvarkeys){
   #   if(key %in% names(modelpars)){
   #     assign(key, modelpars[[key]])
@@ -22,6 +22,10 @@ run_model = function(y0, tvec=tvec_base, modelpars=list(), options=list()){
     } else {
       assign(key, thispar)
     }
+  }
+  
+  for(spar in spars){
+    assign(spar$name, spar$v)
   }
   
   y0["I_lo_new", "S", "lo"] = init_PLHIV

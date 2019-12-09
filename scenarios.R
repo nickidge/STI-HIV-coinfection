@@ -11,7 +11,7 @@ scen_df = rbind(scen_df, dat)
 
 scen_sheet_names = c('timepars', 'scen_1', 'scen_2')
 scen_short_names = c('base', 'no_prep', 'less_test')
-scen_long_names = c('Base', 'Prep has no effectiveness', 'Testing less often')
+scen_long_names = c('Base', 'Everyone stops using PrEP', 'Testing less often')
 
 for(s in 2:3){
   thisscen = load_time_par_sheet(scen_sheet_names[s], deflist = baselist)

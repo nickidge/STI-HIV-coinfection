@@ -1,6 +1,5 @@
-tvec_base = seq(2007, 2022, by=1/12)
-tvec = tvec_base
-nt = length(tvec)
+tvec_base = seq(2007, 2025, by=1/12)
+plot_years = c(2010, 2022)
 
 source("init.R", echo = F)
 source("loadpars.R", echo = F)
@@ -13,15 +12,6 @@ source("plotting.R", echo = F)
 source("pars.R", echo = F)
 
 baselist = load_time_par_sheet('timepars', deflist = defaultlist)
-
-# set key dates
-last_data_year = as.numeric(tail(data_raw[,1], 1))
-end_year = max(tvec_base)
-
-# # load the base scenario and set initial conditions
-# source("loadbase.R", echo = F)
-# source("sety0.R", echo = F)
-# y0 = sety0()
 
 # run model and calibrate
 source("model.R", echo = F)

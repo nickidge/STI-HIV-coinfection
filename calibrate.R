@@ -7,13 +7,16 @@ all_dat = rbind.fill(PLHIV_dat, HIV_diag_dat)
 
 output_keys = c('PLHIV', 'HIV_diag')
 
+# calibrationvars = c('f_infect_HIV', 'init_PLHIV', 'init_diag_prop')
+calibrationvars = c('f_infect_HIV', 'init_diag_prop')
+
 distance_given_f_infect_HIV_optim = function(x, keys, norm=l2){
   callist = baselist
   for(i in 1:length(x)){
     callist[[keys[i]]] = x[i]
   }
   
-  output = run_model(y0_base, tvec=seq(min(tvec_base), 2018, by=dt), modelpars=callist,
+  output = run_model(y0_base, tvec=seq(min(tvec_base), max(all_dat$t)+1, by=dt), modelpars=callist,
                      options=list('only_cal_outs' = TRUE))
   
   res = extr(output, output_keys)
@@ -43,20 +46,15 @@ plot_calibration = function(result, dat){
   return(p)
 }
 
-calibrationvars = c('f_infect_HIV', 'init_PLHIV', 'init_diag_prop')
-optim_result = nmkb(c(1e-6, 50, 0.1), distance_given_f_infect_HIV_optim,
-                    lower=c(0, 0, 0),
-                    upper=c(1e-2, 8000, 1),
+optim_result = nmkb(c(1e-6, 0.1), distance_given_f_infect_HIV_optim,
+                    lower=c(0, 0),
+                    upper=c(1e-2, 1),
                     keys=calibrationvars)
 optim_pars = optim_result$par
 
-f_infect_HIV_optim = optim_pars[1]
-init_PLHIV_optim = optim_pars[2]
-init_diag_prop_optim = optim_pars[3]
-
-baselist[['f_infect_HIV']] = f_infect_HIV_optim
-baselist[['init_diag_prop']] = init_diag_prop_optim
-baselist[['init_PLHIV']] = init_PLHIV_optim
+for(i in 1:length(optim_pars)){
+  baselist[[calibrationvars[i]]] = optim_pars[i]
+}
 
 cal = run_model(y0_base, modelpars=baselist)
 

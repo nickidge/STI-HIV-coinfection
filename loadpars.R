@@ -107,52 +107,44 @@ cascade0 = cascade0[!is.na(cascade0[,2]),]
 
 pars_raw = read_excel("data_sti.xlsx", sheet="pars", col_names=TRUE)
 
-s = 1
-# set_pars = function(){
-  if (s == 1){
-    for(i in 1:nrow(pars_raw)){
-      assign(paste(pars_raw[i,2]), as.numeric(pars_raw[i,3]), envir = .GlobalEnv)
-      if(!is.na(pars_raw[i,4]))
-      {
-        assign(paste(pars_raw[i,2], "_lb", sep=""), as.numeric(pars_raw[i,4]), envir = .GlobalEnv)
-        assign(paste(pars_raw[i,2], "_ub", sep=""), as.numeric(pars_raw[i,5]), envir = .GlobalEnv)
-      }
-    }
-  } else {
-    for(i in 1:nrow(pars_raw)){
-      assign(paste(pars_raw[i,2]), as.numeric(pars_raw[i,3]), envir = .GlobalEnv)
-      assign("temp", get(paste(pars_raw[i,2])))
-      uncert_pars[i,trial] <<- as.numeric(temp)
-      # new.names[i] = paste(pars_raw[i,2])
-      if(!is.na(pars_raw[i,4]))
-      {
-        assign(paste(pars_raw[i,2], "_lb", sep=""), as.numeric(pars_raw[i,4]), envir = .GlobalEnv)
-        assign(paste(pars_raw[i,2], "_ub", sep=""), as.numeric(pars_raw[i,5]), envir = .GlobalEnv)
-        assign(paste(pars_raw[i,2]), runif(1,as.numeric(pars_raw[i,4]),as.numeric(pars_raw[i,5])), envir = .GlobalEnv)
-       
-        assign("temp", get(paste(pars_raw[i,2])))
-        uncert_pars[i,trial] <<- as.numeric(temp)
+static_pars = list()
+for(i in 1:nrow(pars_raw)){
+  thisname = paste0(pars_raw[i,2])
+  thisval = as.numeric(pars_raw[i,3])
+  
+  if(!is.na(pars_raw[i,4]))
+  {
+    thislb = as.numeric(pars_raw[i,4])
+    thisub = as.numeric(pars_raw[i,5])
 
-        # alpha3 <<- 0.5
-      }
-    }
+  } else {
+    thislb = thisval
+    thisub = thisval
   }
-# }
+  # assign(thisname, thisval, envir = .GlobalEnv)
+  # assign(paste0(thisname, "_lb"), thislb, envir = .GlobalEnv)
+  # assign(paste0(thisname, "_ub"), thisub, envir = .GlobalEnv)
+  thispar = list('name' = thisname,
+                 'v' = thisval,
+                 'lb' = thislb,
+                 'ub' = thisub)
+  static_pars[[thisname]] = thispar
+}
 
 # set_pars()
 
-t_exp_sti_de = t_exp_sti/(365 * dt)
-# t_infect_sti_de = t_infect_sti/(365 * dt)
-t_treatment_sti_de = t_treatment_sti/(365 * dt)
-
-gel_mat_base = matrix(0, nrow=2, ncol=3, dimnames=list(c("gel_up", "gel_down"),
-                                                       c("HIV- no PrEP", "HIV- PrEP", "HIV+")))
-gel_mat = gel_mat_base
-eff_gel = c(eff_gel_HIV, eff_gel_gon)
-
-eff_gel_base = eff_gel
-# alpha3 = 0.5
-
-gel_mat_best_estimate =
-  rbind(c(0.1, 0.2, 0.3),
-        c(0.3, 0.5, 0.05))
+# t_exp_sti_de = t_exp_sti/(365 * dt)
+# # t_infect_sti_de = t_infect_sti/(365 * dt)
+# t_treatment_sti_de = t_treatment_sti/(365 * dt)
+# 
+# gel_mat_base = matrix(0, nrow=2, ncol=3, dimnames=list(c("gel_up", "gel_down"),
+#                                                        c("HIV- no PrEP", "HIV- PrEP", "HIV+")))
+# gel_mat = gel_mat_base
+# eff_gel = c(eff_gel_HIV, eff_gel_gon)
+# 
+# eff_gel_base = eff_gel
+# # alpha3 = 0.5
+# 
+# gel_mat_best_estimate =
+#   rbind(c(0.1, 0.2, 0.3),
+#         c(0.3, 0.5, 0.05))
