@@ -9,8 +9,10 @@ source("info.R", echo = F)
 source("default_values.R", echo = F)
 source("y0.R", echo = F)
 source("themes.R", echo = F)
+source("plotting.R", echo = F)
 source("pars.R", echo = F)
-source("loadtimepars.R", echo = F)
+
+baselist = load_time_par_sheet('timepars', deflist = defaultlist)
 
 # set key dates
 last_data_year = as.numeric(tail(data_raw[,1], 1))
@@ -25,9 +27,8 @@ end_year = max(tvec_base)
 source("model.R", echo = F)
 source("processing.R", echo=F)
 
-uncal = run_model(y0_base, tvec_base, modelpars=baselist)
-
 source("calibrate.R", echo = T)
+source("scenarios.R", echo = T)
 
 
 #######

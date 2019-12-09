@@ -19,3 +19,18 @@ theme_all = theme(panel.grid.minor = element_blank(),
                   legend.key = element_blank(),
                   legend.background = element_rect(colour=NA,
                                                    fill=alpha("grey92", 0.7)))
+
+theme_fig_HIV = theme_all +
+  theme(legend.box.margin = margin(),
+        legend.box.spacing = margin(),
+        legend.key.width = unit(4, "mm"),
+        legend.key.height = unit(6.3, "mm"),
+        legend.justification = c(1, 0),
+        legend.position = c(1, 0),
+        axis.title.x = element_blank(),
+        axis.title.y = element_text(size=11, face="bold", margin=margin(r=3)),
+        axis.ticks.length = unit(0, "mm"),
+        # axis.ticks.x = element_line(size=2),
+        plot.title = element_text(size=11.5, margin=margin(b=1)),
+        # plot.margin = unit(c(0,0,0,0), "mm"),
+        text = element_text(size = 10.5))

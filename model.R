@@ -62,7 +62,7 @@ run_model = function(y0, tvec=tvec_base, modelpars=list(), options=list()){
         assign(key, asub(modelpars[[key]], TT, 1))
       }
       
-      thispopsize = modelpars$popsize[TT]
+      thispopsize = popsize[TT]
       
       # initialise temp
       if(t==1){
@@ -159,7 +159,7 @@ run_model = function(y0, tvec=tvec_base, modelpars=list(), options=list()){
       # ensure all transitions are as expected
       if(any(is.nan(HIV_p))) print('nan values in transitions?!')
       if(any(HIV_p < 0)) print('negative transitions?!')
-      if(any(HIV_p[tHIV$inf] > 1)){
+      if(any(HIV_p[tHIV$inf] > 1) & t > 2){
         print('everyone infected?!')
       }
       HIV_p = vapply(HIV_p, function(x) median(c(0, x, 1)), 1)
@@ -172,6 +172,19 @@ run_model = function(y0, tvec=tvec_base, modelpars=list(), options=list()){
       HIV_trans = lapply(1:length(HIV_p), FUN=trans_i)
       HIV_trans = abind(HIV_trans, along=0, new.names=names(HIV_p))
       
+      # calculate prep transitions
+      # s_hi = prevdt['S_hi',,] - HIV_trans['S_hi_inf',,]
+      s_hi = prevdt['S_hi',,] + get_movement('S_hi', HIV_trans)
+      s_pr = prevdt['S_pr',,] + get_movement('S_pr', HIV_trans)
+      
+      if(sum(s_pr) > num_prep){
+        HIV_trans['start_prep',,] = (num_prep - sum(s_pr)) / sum(s_pr) * s_pr
+      } else if(sum(s_hi + s_pr) <= num_prep){
+        HIV_trans['start_prep',,] = s_hi
+      } else {
+        HIV_trans['start_prep',,] = (num_prep - sum(s_pr)) / sum(s_hi) * s_hi
+      }
+
       # care cascade info
       d1 = sum(prevdt["D1",,] + apply(HIV_trans[tHIV$test,,], c(2,3), sum))
       d2 = sum(prevdt["D2",,])
@@ -542,80 +555,3 @@ run_model = function(y0, tvec=tvec_base, modelpars=list(), options=list()){
                 'popgrowth_log' = popgrowth_log))
 }
       
-      
-  
-#   pr_infect_log <<- pr_infect_log
-#   
-#   SID[1,10:12,,] =  SID[2,10:12,,]
-#   SID[1,,8:10,] =  SID[2,,8:10,]
-#   
-#   
-#   tvec_year = unique(floor(as.numeric(rownames(SID))))
-#   
-#   if(TRUE){
-#     HIV_out = array(0, dim = c(length(tvec_year), 3),
-#                     dimnames = list(tvec_year,
-#                                     c("incidence_HIV", "diagnoses_HIV", "deaths_HIV")))
-#     sti_out = array(0, dim = c(length(tvec_year), 5, 3),
-#                      dimnames = list(tvec_year,
-#                                      c("S1","S2", "HIV_minus", "HIV_plus","pop_HIV"),
-#                                      c("incidence_sti","diagnoses_sti","recovered_sti")))
-#     
-#     
-#     HIV_SID = SID[,10:12,"pop_sti",3]
-#     sti_SID = SID[,c(1,2,8,9,13),c(8,9,10),3]
-#     
-#     # for (i in 1:3){
-#     #   HIV_out[,i] = unname(tapply(HIV_SID[,i], (seq_along(HIV_SID[,i])-1) %/% (1/dt), sum))
-#     # }
-#     # 
-#     # for (i in 1:5){
-#     #   for (j in 1:2){
-#     #     # sti_out[,i,j] = unname(tapply(sti_SID[,i,j], (seq_along(sti_SID[,i,j])-1) %/% (1/dt), sum))
-#     #   }
-#     # }
-#     
-#     for (t in 1:length(tvec_year)){
-#       TT = tvec_year[t]
-#       for (i in 1:5){
-#         for (j in 1:3){
-#           sti_out[t,i,j] = sum(sti_SID[which(floor(as.numeric(dimnames(sti_SID)[[1]]))==TT),i,j])
-#         }
-#       }
-#       
-#       for (i in 1:3){
-#         HIV_out[t,i] = sum(HIV_SID[which(floor(as.numeric(dimnames(HIV_SID)[[1]]))==TT),i])
-#       }
-#     }
-#     
-#     prev_out = array(0, dim = c(length(tvec)-1, 4),
-#                      dimnames = list(tvec[1:(length(tvec)-1)],
-#                                      c("HIV", "sti_in_HIV_minus", "sti_in_HIV_plus", "sti")))
-#     
-#     prev_out[,1] = SID[,9,"pop_sti",3] / SID[,13,"pop_sti",3]
-#     prev_out[,2] = SID[,8,7,3] / SID[,8,"pop_sti",3]
-#     prev_out[,3] = SID[,9,7,3] / SID[,9,"pop_sti",3]
-#     prev_out[,4] = SID[,13,7,3] / SID[,13,"pop_sti",3]
-#     
-#     sti_by_testing = SID[,"pop_HIV","sti_plus",1:2] / SID[,"pop_HIV","pop_sti",1:2]
-#     sti_by_testing = as.data.frame.table(sti_by_testing)
-#     sti_by_testing[,1] = as.numeric(levels(sti_by_testing[,1]))[sti_by_testing[,1]]
-#     colnames(sti_by_testing) = c("year", "testing_status", "prop")
-#     # sti_by_testing = cbind(rownames(sti_by_testing), sti_by_testing)
-#     # colnames(sti_by_testing) = c("year", "testing", "not_testing")
-#     
-#     all_df = as.data.frame.table(SID)
-#     all_df[,1] = as.numeric(levels(all_df[,1]))[all_df[,1]]
-#     colnames(all_df) = c("year", "HIV_stat", "sti_stat", "risk_stat", "value")
-#     
-#     
-#     return(list(SID[,,,3], HIV_out, sti_out, prev_out, sti_by_testing, all_df, SID))
-#   } else {
-#     return(list(SID[,,,3]))
-#   }
-#   
-#  
-#   
-# }
-# 
-# # SID_list = run_model(y0,tvec0)

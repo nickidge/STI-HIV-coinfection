@@ -39,7 +39,8 @@ HIV_transitions = rbind(c("S_lo_inf", "S_lo", "I_lo_new"),
                         c("I_pr_mid_d", "I_pr_mid", "D1"),
                         c("I_pr_old_d", "I_pr_old", "D1"),
                         c("treat", "D1", "D2"),
-                        c("viral_supp", "D2", "D3")
+                        c("viral_supp", "D2", "D3"),
+                        c("start_prep", "S_hi", "S_pr")
                         )
 colnames(HIV_transitions) = c("trans", "from", "to")
 
