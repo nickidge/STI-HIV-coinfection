@@ -32,8 +32,10 @@ modelpar = function(t=t_dat, y=NULL, parname=NA, pop=NA, subpop=NA, tvec=tvec_ba
   
   refvar = NA
   
+  popindex = c("HIV_low_risk", "HIV_high_risk", "HIV_prep")
+  careindex = c("diagnosed", "diagnosed_treated", "treated_virally_suppressed")
   if(parname == 't_testing'){
-    col = -3 + 3*match(pop, c("HIV_low_risk", "HIV_high_risk", "HIV_prep")) + match(subpop, c("new_infection", "mid_infection", "old_infection"))
+    col = -3 + 3*match(pop, popindex) + match(subpop, c("new_infection", "mid_infection", "old_infection"))
     refvar = 't_testing'
     maxcol = 9
   } else if(parname == 'test_wait'){
@@ -41,23 +43,23 @@ modelpar = function(t=t_dat, y=NULL, parname=NA, pop=NA, subpop=NA, tvec=tvec_ba
     refvar = 'test_wait'
     maxcol = 2
   } else if(parname == 'condom_usage'){
-    col = match(pop, c("HIV_low_risk", "HIV_high_risk", "HIV_prep"))
+    col = match(pop, popindex)
     refvar = 'condom_usage'
     maxcol = 3
   } else if(parname == 'gel_up'){
-    col = match(pop, c("HIV_low_risk", "HIV_high_risk", "HIV_prep"))
+    col = match(pop, popindex)
     refvar = 'gel_mat'
     maxcol = 6
   } else if(parname == 'gel_down'){
-    col = match(pop, c("HIV_low_risk", "HIV_high_risk", "HIV_prep")) + 3
+    col = match(pop, popindex) + 3
     refvar = 'gel_mat'
     maxcol = 6
   } else if(parname == 'care_cascade'){
-    col = match(subpop, c("diagnosed", "diagnosed_treated", "treated_virally_suppressed"))
+    col = match(subpop, careindex)
     refvar = 'care_cascade'
     maxcol = 3
   } else if(parname == 'treatment_eff'){
-    col = match(subpop, c("diagnosed", "diagnosed_treated", "treated_virally_suppressed"))
+    col = match(subpop, careindex)
     refvar = 'treatment_eff'
     maxcol = 3
   } else if(parname == 'eff_condom'){
@@ -65,7 +67,7 @@ modelpar = function(t=t_dat, y=NULL, parname=NA, pop=NA, subpop=NA, tvec=tvec_ba
     refvar = 'eff_condom'
     maxcol = 1
   } else if(parname == 'relative_foi'){
-    col = match(pop, c("HIV_low_risk", "HIV_high_risk", "HIV_prep"))
+    col = match(pop, popindex)
     refvar = 'risk_mat'
     maxcol = 3
   } else if(parname == 'num_prep'){

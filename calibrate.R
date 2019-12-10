@@ -7,9 +7,7 @@ all_dat = rbind.fill(PLHIV_dat, HIV_diag_dat)
 
 output_keys = c('PLHIV', 'HIV_diag')
 
-# calibrationvars = c('f_infect_HIV', 'init_PLHIV', 'init_diag_prop')
 calibrationvars = c('f_infect_HIV', 'init_diag_prop')
-
 
 optim_result = nmkb(c(1e-6, 0.1), distance_given_f_infect_HIV_optim,
                     lower=c(0, 0),

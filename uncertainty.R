@@ -7,5 +7,3 @@ p = plot_df(cal_wide)
 
 p = p + geom_ribbon(data=trials_df, aes(ymin = lower_ci, ymax = upper_ci, x=t), alpha=0.2, colour=NA)
 saveopen(p, 'uncertainty', 'plots')
-
-
