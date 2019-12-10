@@ -29,6 +29,9 @@ run_model = function(y0, tvec=tvec_base, modelpars=list(), options=list(), spars
   }
   
   if(!getdict(options, 'split', FALSE)){
+    # ninf = y0[sHIV$S,,] * init_prev_HIV
+    # y0[sHIV$S,,] = y0[sHIV$S,,] - ninf
+    # y0[sHIV$I_new,,] = y0[sHIV$I_new,,] + ninf
     y0["I_lo_new", "S", "lo"] = init_PLHIV
     ndiag = y0["I_lo_new",,] * init_diag_prop
     y0["I_lo_new",,] = y0["I_lo_new",,] - ndiag
@@ -177,8 +180,25 @@ run_model = function(y0, tvec=tvec_base, modelpars=list(), options=list(), spars
       HIV_trans = lapply(1:length(HIV_p), FUN=trans_i)
       HIV_trans = abind(HIV_trans, along=0, new.names=names(HIV_p))
       
+      # if(any(!is.finite(HIV_trans)) | any(!is.finite(prevdt))){
+      #   print('')
+      # }
+      # 
+      # if(any(!is.finite(get_movement(c('S_hi', 'S_pr', "S_lo"), HIV_trans)))){
+      #   print('')
+      # }
+      
+      # calculate risk transitions
+      s_lo = prevdt['S_lo',,] + get_movement('S_lo', HIV_trans)
+      s_hi = apply(prevdt[c('S_hi', 'S_pr'),,], c(2,3), sum) + get_movement(c('S_hi', 'S_pr'), HIV_trans)
+      
+      if(sum(s_lo) > 0){
+        HIV_trans['become_high_risk',,] = (sum(s_lo + s_hi) * prop_high_risk - sum(s_hi)) / sum(s_lo) * s_lo
+      } else if(sum(s_hi) > 0){
+        HIV_trans['become_high_risk',,] = (1 - prop_high_risk) * s_hi
+      }
+
       # calculate prep transitions
-      # s_hi = prevdt['S_hi',,] - HIV_trans['S_hi_inf',,]
       s_hi = prevdt['S_hi',,] + get_movement('S_hi', HIV_trans)
       s_pr = prevdt['S_pr',,] + get_movement('S_pr', HIV_trans)
       
@@ -242,7 +262,7 @@ run_model = function(y0, tvec=tvec_base, modelpars=list(), options=list(), spars
       if(popgrowth < 0){
         print('Negative population growth?!')
       } else {
-        prevdt["S_lo", "S", "lo"] = prevdt["S_lo", "S", "lo"] + popgrowth
+        prevdt[c("S_lo", "S_hi"), "S", "lo"] = prevdt[c("S_lo", "S_hi"), "S", "lo"] + popgrowth * c((1-prop_high_risk), prop_high_risk)
       }
       
       ###################

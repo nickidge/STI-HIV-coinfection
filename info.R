@@ -14,6 +14,7 @@ sHIV = list()
 sHIV[['S']] = grep("^S.*", HIV_labs, value=TRUE)
 sHIV[['I']] = grep("^I.*", HIV_labs, value=TRUE)
 sHIV[['D']] = grep("^D.*", HIV_labs, value=TRUE)
+sHIV[['I_new']] = grep("I_.._new", HIV_labs, value=TRUE)
 sHIV[['I_lo']] = grep("^I_lo.*", HIV_labs, value=TRUE)
 sHIV[['I_hi']] = grep("^I_hi.*", HIV_labs, value=TRUE)
 sHIV[['D1plus']] = c("D1", "D2", "D3")
@@ -40,8 +41,9 @@ HIV_transitions = rbind(c("S_lo_inf", "S_lo", "I_lo_new"),
                         c("I_pr_old_d", "I_pr_old", "D1"),
                         c("treat", "D1", "D2"),
                         c("viral_supp", "D2", "D3"),
+                        c("become_high_risk", "S_lo", "S_hi"),
                         c("start_prep", "S_hi", "S_pr")
-                        )
+)
 colnames(HIV_transitions) = c("trans", "from", "to")
 
 tHIV = list()

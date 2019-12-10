@@ -2,6 +2,9 @@ tvec_base = seq(2007, 2025, by=1/12)
 plot_years = c(2010, 2022)
 split_year = 2014
 
+plot_keys = c('PLHIV', 'HIV_diag', 'HIV_inf')
+plot_long = c('Total PLHIV', 'Annual HIV diagnoses', 'Annual HIV incidence')
+
 source("init.R", echo = F)
 source("loadpars.R", echo = F)
 source("info.R", echo = F)

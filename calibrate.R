@@ -11,7 +11,7 @@ calibrationvars = c('f_infect_HIV', 'init_diag_prop')
 
 optim_result = nmkb(c(1e-6, 0.1), distance_given_f_infect_HIV_optim,
                     lower=c(0, 0),
-                    upper=c(1e-2, 1),
+                    upper=c(1e-4, 1),
                     keys=calibrationvars)
 optim_pars = optim_result$par
 

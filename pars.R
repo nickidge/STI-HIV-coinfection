@@ -11,12 +11,13 @@ modelpar = function(t=t_dat, y=NULL, parname=NA, pop=NA, subpop=NA, tvec=tvec_ba
     const = sum(notna_index) == 1
     
     if(const){
-      # v = thisy
-      # names(v) = thist
-      v = rep(NA, length(tvec))
+      # # v = thisy
+      # # names(v) = thist
+      # v = rep(NA, length(tvec))
+      v = rep(thisy, length(tvec))  ### is this right or should it be the line above?
       names(v) = tvec
       if(as.character(thist) %in% tvec){
-        v[thist] = thisy
+        v[as.character(thist)] = thisy
       } else {
         v[1] = thisy
       }
@@ -73,6 +74,10 @@ modelpar = function(t=t_dat, y=NULL, parname=NA, pop=NA, subpop=NA, tvec=tvec_ba
   } else if(parname == 'num_prep'){
     col = 1
     refvar = 'num_prep'
+    maxcol = 1
+  } else if(parname == 'prop_high_risk'){
+    col = 1
+    refvar = 'prop_high_risk'
     maxcol = 1
   } else {
     col = 0

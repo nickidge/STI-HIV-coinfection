@@ -1,12 +1,15 @@
 scen_keys = c('PLHIV', 'HIV_diag', 'HIV_inf')
+scen_names = c('Total PLHIV', 'Annual HIV diagnoses', 'Annual HIV incidence')
 
 dat = all_dat
 dat$scen = 'data'
 dat = widen_sources(dat)
 
-ntrials_scen = 10
+ntrials_scen = 50
 
-scen_df = ci_df(ntrials_scen, basevar=0.2)
+basevar = 0.2
+
+scen_df = ci_df(ntrials_scen, basevar=basevar, options=list('keep_static'=TRUE))
 # scen_df = extr(cal, scen_keys)
 scen_df = widen_sources(scen_df)
 scen_df$scen = 'base'
@@ -19,7 +22,7 @@ scen_long_names = c('Base', 'Everyone stops using PrEP', 'Testing less often')
 for(s in 2:3){
   thisscen = load_time_par_sheet(scen_sheet_names[s], deflist = baselist, syear=split_year+1)
   
-  this_scen_trials = ci_df(ntrials=ntrials_scen, timepars=thisscen, basevar=0.1, options=list('keep_static'=TRUE), syear=split_year+1)
+  this_scen_trials = ci_df(ntrials=ntrials_scen, timepars=thisscen, basevar=basevar, options=list('keep_static'=TRUE), syear=split_year+1)
   # this_scen_trials = ci_df(ntrials=5, timepars=thisscen, basevar=0.1, tvec=tvec_split, y0=y0_split, options=list('split'=TRUE, 'keep_static'=TRUE), syear=split_year+1)
   
   # thismodel = run_model(y0_base, modelpars=thisscen)
@@ -32,7 +35,7 @@ for(s in 2:3){
   scen_df = rbind.fill(scen_df, thisdf)
 }
 
-# diffscens = thisscen[laply(names(thisscen), function(x) !identical(thisscen[[x]], baselist[[x]]))]
+diffscens = thisscen[laply(names(thisscen), function(x) !identical(thisscen[[x]], baselist[[x]]))]
 
 scen_df$t = as.numeric(as.character(scen_df$t))
 scen_df$scen = factor(scen_df$scen, levels = c('data', rev(scen_short_names)), labels = c('Data', rev(scen_long_names)))

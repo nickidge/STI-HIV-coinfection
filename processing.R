@@ -12,6 +12,7 @@ widen_sources = function(...){
   df_wide = spread(df, source, value)
   for(key in c('model', 'data')){if(!(key %in% colnames(df_wide))){df_wide[key]=NA}}
   df_wide$t = as.numeric(as.character(df_wide$t))
+  df_wide$facet_long = plot_long[match(df_wide$HIV_pop, plot_keys)]
   return(df_wide)
 }
 
@@ -78,9 +79,12 @@ extr = function(output, keys, tvec=tvec_base){
 }
 
 
-get_movement = function(HIV_compartment, HIV_trans){
-  l = lapply(1:nrow(HIV_transitions), function(x) HIV_trans[x,,] * ((HIV_transitions[x, "to"] == HIV_compartment) - (HIV_transitions[x, "from"] == HIV_compartment)))
+get_movement = function(HIV_compartments, HIV_trans){
+  l = lapply(1:nrow(HIV_transitions), function(x) HIV_trans[x,,] * ((HIV_transitions[x, "to"] %in% HIV_compartments) - (HIV_transitions[x, "from"] %in% HIV_compartments)))
   d = Reduce('+', l)
+  # if(any(is.na(d))){
+  #   print('')
+  # }
   return(d)
 }
 

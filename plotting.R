@@ -2,7 +2,7 @@
 plot_df = function(df){
   p = ggplot(df, aes(x=t, group=scen, colour=scen, fill=scen))
 
-  p = p + facet_wrap(.~HIV_pop+type, scales="free_y", ncol=1)
+  p = p + facet_wrap(.~facet_long, scales="free_y", ncol=1)
   p = p + geom_point(aes(y = data), na.rm=T, size=1.3)
   p = p + geom_path(aes(y = model), na.rm=T, lwd=1.3)
   
@@ -24,6 +24,6 @@ saveopen = function(p, fname='untitled', fdir='/', ext='png', ...){
   pdfname = paste0(fname, '.', ext)
   fpath = file.path(getwd(), fdir)
   dir.create(fpath, showWarnings = FALSE)
-  ggsave(pdfname, plot=p, path=fpath, units = "mm", width = 0.9*page_width, device=ext, ...)
+  ggsave(pdfname, plot=p, path=fpath, units = "mm", width = 0.9*page_width, height = 0.9*page_height, device=ext, ...)
   browseURL(file.path(fpath, pdfname))
 }
