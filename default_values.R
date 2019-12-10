@@ -1,5 +1,7 @@
 
-baselist = list()
+# if(!exists('baselist')){
+#   baselist = list()
+# }
 defaultlist = list()
 
 defaultlist[['t_testing']] = c(c(1, 3, 10), c(0.5, 1.5, 5), c(3/12, 3/12, 3/12)) # testing for i_lo_new, i_lo_mid, i_lo_old, i_hi_new, i_hi_mid, i_hi_old
@@ -9,12 +11,12 @@ defaultlist[['eff_condom']] = 0.7
 defaultlist[['num_prep']] = 0
 defaultlist[['risk_mat']] = c(1, 10, 0.05)
 defaultlist[['test_wait']] = c(Inf, 2)
-defaultlist[['care_cascade_interp']] = cascade_interp
+# defaultlist[['care_cascade_interp']] = cascade_interp
 defaultlist[['treatment_eff']] = c(1, 0.5, 0.1)
 
 defaultlist[['f_infect_HIV']] = 6.5e-6
 defaultlist[['init_PLHIV']] = 3000
-defaultlist[['init_diag_prop']] = cascade0$`Prop HIV diagnosed`[1]
+defaultlist[['init_diag_prop']] = 0.7
 
 # popsize_t = seq(1990, 2050, by=1/12)
 # popsize = setNames(unlist(lapply(popsize_t, function(x) population_value * (1 + growth)^( 12 * (x - population_year)))), popsize_t)

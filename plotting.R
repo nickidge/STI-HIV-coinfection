@@ -1,8 +1,8 @@
 
 plot_df = function(df){
-  p = ggplot(df, aes(x=t, group=scen, colour=scen))
+  p = ggplot(df, aes(x=t, group=scen, colour=scen, fill=scen))
   if('order' %in% colnames(df)){p = p + aes(order=order)}
-  p = p + facet_wrap(.~HIV_pop+type, scales="free_y")
+  p = p + facet_wrap(.~HIV_pop+type, scales="free_y", ncol=1)
   p = p + geom_point(aes(y = data), na.rm=T, size=1.3)
   p = p + geom_path(aes(y = model), na.rm=T, lwd=1.3)
   

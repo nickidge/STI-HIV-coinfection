@@ -103,6 +103,15 @@ data = list(diagnoses0, PLHIV0, prop_diag0, prop_treat0, prop_suppressed0, total
 cascade0 = data_raw[,grepl("Year", colnames(data_raw)) | grepl("Prop HIV", colnames(data_raw), fixed=T)]
 cascade0 = cascade0[!is.na(cascade0[,2]),]
 
+# HIV care cascade
+cascade_goal = rbind(c(2030, 0.95, 0.95, 0.95), c(2035, 0.99, 0.99, 0.99))
+cascade_scenario = rbind(as.matrix(cascade0), cascade_goal)
+cascade_interp <<- array(0, dim = c(length(tvec_base), 3))
+for(i_base in 1:3){
+  cascade_interp[,i_base] = approx(cascade_scenario[,1], cascade_scenario[,(i_base+1)], xout=tvec_base, rule=2)$y
+}
+rownames(cascade_interp) = tvec_base
+
 # import parameters, including upper and lower bounds (if they exist)
 
 pars_raw = read_excel("data_sti.xlsx", sheet="pars", col_names=TRUE)
@@ -131,20 +140,4 @@ for(i in 1:nrow(pars_raw)){
   static_pars[[thisname]] = thispar
 }
 
-# set_pars()
 
-# t_exp_sti_de = t_exp_sti/(365 * dt)
-# # t_infect_sti_de = t_infect_sti/(365 * dt)
-# t_treatment_sti_de = t_treatment_sti/(365 * dt)
-# 
-# gel_mat_base = matrix(0, nrow=2, ncol=3, dimnames=list(c("gel_up", "gel_down"),
-#                                                        c("HIV- no PrEP", "HIV- PrEP", "HIV+")))
-# gel_mat = gel_mat_base
-# eff_gel = c(eff_gel_HIV, eff_gel_gon)
-# 
-# eff_gel_base = eff_gel
-# # alpha3 = 0.5
-# 
-# gel_mat_best_estimate =
-#   rbind(c(0.1, 0.2, 0.3),
-#         c(0.3, 0.5, 0.05))

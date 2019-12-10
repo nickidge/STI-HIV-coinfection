@@ -132,11 +132,11 @@ fill_list = function(parlist, deflist=baselist){
       }
     }
     notnas = apply(thispar, 2, function(x) length(which(!is.na(x))))
-    if(any(notnas > 1)){
+    # if(any(notnas > 1)){
       thismat = apply(thispar, 2, function(y) fill_vec(x=thist, y=y))
-    } else {
-      thismat = matrix(apply(thispar, 2, function(x) ifelse(length(which(!is.na(x))) == 0, NA, x[which(!is.na(x))])), nrow=1)
-    }
+    # } else {
+    #   thismat = matrix(apply(thispar, 2, function(x) ifelse(length(which(!is.na(x))) == 0, NA, x[which(!is.na(x))])), nrow=1)
+    # }
     outlist[[parname]] = thismat
   }
   # for(parname in optvarkeys){
@@ -155,7 +155,7 @@ fill_list = function(parlist, deflist=baselist){
   return(outlist)
 }
 
-add_data_col = function(thislist, t_dat, data_col, deflist = baselist){
+add_data_col = function(thislist, t_dat, data_col, deflist = baselist, syear = NA){
   
   parname = data_col[1]
   pop = data_col[2]
@@ -167,37 +167,75 @@ add_data_col = function(thislist, t_dat, data_col, deflist = baselist){
   thiscol = thispar$col
   
   if(!(thisname %in% names(thislist))){
-    thislist[[thisname]] = matrix(NA, nrow = length(tvec_base), ncol = thispar$maxcol,
-                                  dimnames = list(tvec_base, 1:thispar$maxcol))
+    thisentry = matrix(NA, nrow = length(tvec_base), ncol = thispar$maxcol,
+                       dimnames = list(tvec_base, 1:thispar$maxcol))
+  } else {
+    thisentry = thislist[[thisname]]
   }
-  colnames(thislist[[thisname]])[thiscol] = paste(parname, pop, subpop, sep='__')
+  colnames(thisentry)[thiscol] = paste(parname, pop, subpop, sep='__')
+  thisentrycol = thisentry[,thiscol]
   
-  if(thispar$getbase){
+  if(thispar$getbase | !is.na(syear)){
     if(thisname %in% names(deflist)){
       if(is.matrix(deflist[[thisname]])){
-        if(nrow(deflist[[thisname]]) > 1){
-          thislist[[thisname]][,thiscol] = deflist[[thisname]][,thiscol]
-        } else {
-          thislist[[thisname]][1,thiscol] = deflist[[thisname]][1,thiscol]
-        }
+        baseentry = deflist[[thisname]][,thiscol]
       } else {
-        thislist[[thisname]][1,thiscol] = deflist[[thisname]][thiscol]
+        baseentry = deflist[[thisname]][thiscol]
+        thisentrycol[1] = baseentry
       }
     } else if(paste0(thisname, '_interp') %in% names(deflist)){
-      tempname = paste0(thisname, '_interp')
-      thislist[[thisname]][,thiscol] = deflist[[tempname]][,thiscol]
+      baseentry = deflist[[paste0(thisname, '_interp')]][,thiscol]
     } else {
       print(paste0("Variable '", thisname, "' not in defaultlist at all"))
+      return(thislist)
     }
+    
+    baseentrylen = length(baseentry)
+    thisentrycollen = length(thisentrycol)
+    
+    if(baseentrylen == 1){
+      thisentrycolindex = 1
+      print('this probably shouldnt be happening anymore')
+    } else if(baseentrylen == thisentrycollen){
+      thisentrycolindex = 1:baseentrylen
+    } else if(baseentrylen < thisentrycollen){
+      print('baseentry is shorter than thisentrycol')
+      thisentrycolindex = 1:baseentrylen
+    } else if(baseentrylen > thisentrycollen){
+      print('baseentry is longer than thisentrycol')
+      thisentrycolindex = 1:thisentrycollen
+    }
+    
+    if(thispar$getbase){
+      thisentrycol[thisentrycolindex] = baseentry[thisentrycolindex]
+    } else {
+      vl = baseentry[tvec_base <= syear]
+      vh = thispar$v[tvec_base >= (syear + 1)]
+      
+      tvec_m = tvec_base[(syear < tvec_base) & (tvec_base < (syear + 1))]
+      
+      vm = approx(x = c(syear, syear + 1), y=c(vl[as.character(syear)], vh[as.character(syear + 1)]), xout=tvec_m,
+                  method = 'constant',
+                  f=1)
+      vm = setNames(vm$y, vm$x)
+      # names(vm) = tvec_m
+      
+      v = c(vl, vm, vh)
+      thisentrycol = v
+    }
+    
   } else {
-    thislist[[thisname]][,thiscol] = thispar$v
+    thisentrycol = thispar$v
   }
+  
+  thisentry[,thiscol] = thisentrycol
+  thislist[[thisname]] = thisentry
   
   return(thislist)
 }
 
 
-load_time_par_sheet = function(sheetname, deflist = baselist){
+load_time_par_sheet = function(sheetname, deflist = baselist, syear=NA){
   
   timepars_raw = read_excel("data_sti.xlsx", sheet=sheetname, col_names = F)
   timepars_raw = as.data.frame(timepars_raw)
@@ -210,10 +248,11 @@ load_time_par_sheet = function(sheetname, deflist = baselist){
   
   thislist = list()
   for(col in 2:timepars_col){
-    thislist = add_data_col(thislist, t_dat, timepars_raw[,col], deflist = deflist)
+    thislist = add_data_col(thislist, t_dat, timepars_raw[,col], deflist = deflist, syear = syear)
   }
   
   thislist = fill_list(thislist, deflist = deflist)
   
 }
+
 

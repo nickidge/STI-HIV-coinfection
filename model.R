@@ -28,11 +28,12 @@ run_model = function(y0, tvec=tvec_base, modelpars=list(), options=list(), spars
     assign(spar$name, spar$v)
   }
   
-  y0["I_lo_new", "S", "lo"] = init_PLHIV
-  ndiag = y0["I_lo_new",,] * init_diag_prop
-  y0["I_lo_new",,] = y0["I_lo_new",,] - ndiag
-  y0["D1",,] = y0["D1",,] + ndiag
-  
+  if(!getdict(options, 'split', FALSE)){
+    y0["I_lo_new", "S", "lo"] = init_PLHIV
+    ndiag = y0["I_lo_new",,] * init_diag_prop
+    y0["I_lo_new",,] = y0["I_lo_new",,] - ndiag
+    y0["D1",,] = y0["D1",,] + ndiag
+  }
   
   # initialise model array
   SID = replicate(length(tvec), SID_mat)
