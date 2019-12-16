@@ -9,7 +9,13 @@ distance_given_f_infect_HIV_optim = function(x, keys, norm=l2){
   
   res = extr(output, cal_keys)
   
-  df_wide = widen_sources(all_dat, res)
+  dat = all_dat
+  dat$scen = ""
+  dat$scen_long = ""
+  res$scen = ""
+  res$scen_long = ""
+  
+  df_wide = widen_sources(dat, res)
   
   distance = norm(df_wide$data, df_wide$model)
   
@@ -24,16 +30,16 @@ distance_given_f_infect_HIV_optim = function(x, keys, norm=l2){
 
 gen_calibration = function(calibrationvars = c('f_infect_HIV', 'init_diag_prop')){
   
-  optim_result = nmkb(c(1e-6, 0.1), distance_given_f_infect_HIV_optim,
-                      lower=c(0, 0),
-                      upper=c(1e-4, 1),
-                      keys=calibrationvars,
-                      control = list())
+  optim_result <<- nmkb(c(1e-6, 0.1), distance_given_f_infect_HIV_optim,
+                        lower=c(0, 0),
+                        upper=c(1e-4, 1),
+                        keys=calibrationvars)
   
   for(i in 1:length(calibrationvars)){
     baselist[[calibrationvars[i]]] = optim_result$par[i]
   }
   
+  baselist <<- baselist
   cal <<- run_model(y0_base, modelpars=baselist)
   
   tvec_split <<- tvec_base[tvec_base >= split_year]
