@@ -136,18 +136,18 @@ upper_ci <- function(mean, se, n, conf_level = 0.95){
   upper_ci <- mean + qt(1 - ((1 - conf_level) / 2), n - 1) * se
 }
 
-summarise_trials = function(df, value='value', lbfunc=lower_ci, ubfunc=upper_ci){
+summarise_trials = function(df, value='value', lbfunc=lower_ci, ubfunc=upper_ci, conf_level=0.95){
   df = df %>%
     group_by_at(vars(-!!sym(value), -trial)) %>%
     summarise(smean = mean(!!sym(value), na.rm = TRUE),
               ssd = sd(!!sym(value), na.rm = TRUE),
               count = n(),
+              lower_ci = quantile(!!sym(value), probs=(1-conf_level)/2),
+              upper_ci = quantile(!!sym(value), probs=1 - (1-conf_level)/2),
               value = first(!!sym(value))) %>%
-    mutate(se = ssd / sqrt(count),
-           lower_ci = lbfunc(smean, se, count),
-           upper_ci = ubfunc(smean, se, count)) %>%
-    # mutate(lower_ci = max(!!sym(value)),
-    #        upper_ci = min(!!sym(value))) %>% 
+    # mutate(se = ssd / sqrt(count),
+    #        lower_ci = lbfunc(smean, se, count),
+    #        upper_ci = ubfunc(smean, se, count)) %>%
     ungroup() %>% 
     mutate(t = as.numeric(t)) %>% 
     as.data.frame()
