@@ -52,14 +52,15 @@ plot_scens = function(df){
   
   scen_colours = c('black', 'red', 'green')
   
-  scen_keys = c('PLHIV', 'HIV_diag', 'HIV_inf', 'prop_diag')
+  scen_keys = c('PLHIV', 'HIV_diag', 'HIV_inf', 'HIV_prev', 'prop_diag')
   df = subset(df, HIV_pop %in% scen_keys)
   
   max_df = df %>%
     group_by(scen, plot) %>%
     filter(min(plot_years) <= t & t <= max(plot_years)) %>% 
     summarise(max = max(model, data, na.rm=T)) %>%
-    mutate(upperlim = ifelse(plot == 'care_cascade', 1, 1.1 * max)) %>% 
+    # mutate(upperlim = ifelse(plot %in% c('HIV_prev', 'care_cascade'), 1, 1.1 * max)) %>% 
+    mutate(upperlim = ifelse(plot %in% c('care_cascade'), 1, 1.1 * max)) %>% 
     as.data.frame()
   
   p = ggplot(df, aes(x=t, group=scen, colour=scen, fill=scen))

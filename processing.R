@@ -29,7 +29,6 @@ extr = function(output, keys, tvec=tvec_base){
   HIV_trans_log = output$HIV_trans_log
   tvec = as.character(tvec)
   tvec = intersect(tvec, dimnames(SID)[[1]])
-  # dat = list()
   if(any(is.na(SID))){
     print('')
   }
@@ -86,7 +85,7 @@ extr = function(output, keys, tvec=tvec_base){
       thisD1plus_prop = thisD1plus / thisPLHIV
       thisD2plus_prop = thisD2plus / thisD1plus
       thisD3plus_prop = thisD3plus / thisD2plus
-
+      
       tvec = names(thisPLHIV)
       
       thisD1plus_df = data.frame(t = tvec, value = thisD1plus_prop, type = 'pop', dt = 1,
@@ -97,8 +96,20 @@ extr = function(output, keys, tvec=tvec_base){
                                  sti_pop = 'all', risk_pop = 'all', HIV_pop = 'prop_suppr', plot='care_cascade')
       thisdf = rbind.fill(thisD1plus_df, thisD2plus_df, thisD3plus_df)
       
+    } else if(key == 'HIV_prev'){
+      thisPLHIV = SID[tvec,sHIV$PLHIV,,]
+      thisPLHIV = apply(thisPLHIV, 1, sum)
+      thistotpop = SID[tvec,,,]
+      thistotpop = apply(thistotpop, 1, sum)
+      
+      thisprev = thisPLHIV / thistotpop
+      
+      tvec = names(thistotpop)
+      
+      thisdf = data.frame(t = tvec, value = thisprev, type = 'pop', dt = 1,
+                          sti_pop = 'all', risk_pop = 'all', HIV_pop = 'HIV_prev', plot='HIV_prev')
+      
     }
-    # dat = c(dat, setNames(list(this), key))
     df = rbind.fill(df, thisdf)
   }
   if('plot' %in% names(df)){

@@ -2,12 +2,13 @@
 plot_index = c(PLHIV = 'PLHIV',
                HIV_diag = 'HIV_diag',
                HIV_inf = 'HIV_inf',
+               HIV_prev = 'HIV_prev',
                prop_diag = 'care_cascade',
                prop_treat = 'care_cascade',
                prop_suppr = 'care_cascade')
 
-plot_keys = c('PLHIV', 'HIV_diag', 'HIV_inf', 'care_cascade')
-plot_long = c('Total PLHIV', 'Annual HIV diagnoses', 'Annual HIV incidence', 'Care cascade')
+plot_keys = c('PLHIV', 'HIV_diag', 'HIV_inf', 'HIV_prev', 'care_cascade')
+plot_long = c('Total PLHIV', 'Annual HIV diagnoses', 'Annual HIV incidence', 'Prevalence of HIV', 'Care cascade')
 
 
 saveopen = function(p, fname='untitled', fdir='/', ext='png', open=T, ...){

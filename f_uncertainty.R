@@ -22,7 +22,8 @@ plot_uncertainty = function(df){
     group_by(plot) %>%
     filter(min(plot_years) <= t & t <= max(plot_years)) %>% 
     summarise(max = max(model, data, upper_ci, na.rm=T)) %>%
-    mutate(upperlim = ifelse(plot == 'care_cascade', 1, 1.1 * max)) %>% 
+    # mutate(upperlim = ifelse(plot %in% c('HIV_prev', 'care_cascade'), 1, 1.1 * max)) %>% 
+    mutate(upperlim = ifelse(plot %in% c('care_cascade'), 1, 1.1 * max)) %>% 
     as.data.frame()
   
   df$HIV_pop = factor(df$HIV_pop, levels = unique(df$HIV_pop)[order(sapply(unique(df$HIV_pop), function(x) max(c(0, match(x, colour_scale$HIV_pop)), na.rm=TRUE)), decreasing=TRUE)])
