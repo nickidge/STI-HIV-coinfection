@@ -19,7 +19,6 @@ source("themes.R", echo = F)
 source("pars.R", echo = F)
 source("loadpars.R", echo = F)
 source("default_values.R", echo = F)
-source("y0.R", echo = F)
 source("model.R", echo = F)
 
 # function scripts
@@ -32,7 +31,6 @@ if(!exists('cal')){
   baselist = load_time_par_sheet('timepars', deflist = defaultlist)
   cal_keys = c('PLHIV', 'HIV_diag', 'care_cascade')
   gen_calibration(c('f_infect_HIV', 'init_diag_prop', 'init_prev_HIV'))
-  # source("pars.R", echo = F)
 }
 
 # run base scenario (with uncertainty)

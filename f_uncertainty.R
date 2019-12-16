@@ -120,7 +120,7 @@ randomise_keys = function(statkeys=static_pars, timepars=baselist, basekeyindex=
   return(list(timepars, statkeys))
 }
 
-run_trial = function(timepars=baselist, basevar=0.05, y0=y0_base, tvec=tvec_base, options=options, syear=0){
+run_trial = function(timepars=baselist, basevar=0.05, y0=NULL, tvec=tvec_base, options=options, syear=0){
   basekeyindex = c(t_testing = NA, condom_usage = NA, num_prep = NA, eff_condom = NA,
                    f_infect_HIV = NA, risk_mat = NA)
   
@@ -162,7 +162,7 @@ summarise_trials = function(df, value='value', lbfunc=lower_ci, ubfunc=upper_ci,
     as.data.frame()
 }
 
-ci_df = function(ntrials=5, timepars=baselist, basevar=0.05, y0=y0_base, tvec=tvec_base, options=list(), syear=0){
+ci_df = function(ntrials=5, timepars=baselist, basevar=0.05, y0=NULL, tvec=tvec_base, options=list(), syear=0){
   trials_df = run_model(y0=y0, tvec=tvec, modelpars=timepars, options=options)
   trials_df = extr(trials_df, plot_keys)
   trials_df$trial=0

@@ -2,7 +2,7 @@
 # 
 # # model function
 # # takes initial conditions and tvec as input, and outputs the model as a matrix
-run_model = function(y0, tvec=tvec_base, modelpars=list(), options=list(), spars=static_pars){
+run_model = function(y0=NULL, tvec=tvec_base, modelpars=list(), options=list(), spars=static_pars){
 
   interpvars = c()
   for(key in names(modelpars)){
@@ -22,10 +22,11 @@ run_model = function(y0, tvec=tvec_base, modelpars=list(), options=list(), spars
     assign(spar$name, spar$v)
   }
   
-  if(!getdict(options, 'split', FALSE)){
+  # if(!getdict(options, 'split', FALSE)){
+  if(is.null(y0)){
+    y0 = SID_mat
     
     npop = popsize[as.character(tvec[1])]
-    
     y0[1,1,1] = npop
     
     ninf = y0[sHIV$S,,] * init_prev_HIV
@@ -43,12 +44,6 @@ run_model = function(y0, tvec=tvec_base, modelpars=list(), options=list(), spars
   SID = replicate(length(tvec), SID_mat)
   SID = aperm(SID, c(4,1,2,3))
   dimnames(SID)[[1]] = tvec
-    # SID = array(0, dim = c(length(tvec)-1, 13, 11, 3),
-    #             dimnames = list(head(tvec, -1),
-    #                             c("S1", "S2", "I", "D", "D1", "D2", "D3", "HIV_minus", "HIV_plus", "incidence_HIV", "diagnoses_HIV", "deaths_HIV", "pop_HIV"),
-    #                             c("S_sti", "E_sti", "Sy_sti", "ASy_sti", "T_sti", "sti_minus", "sti_plus", "incidence_sti", "diagnoses_sti", "recovered_sti", "pop_sti"),
-    #                             c("low_risk", "high_risk", "all")))
-    
   
   HIV_trans_log = makearray(list(tvec, HIV_transitions[,"trans"], STI_labs, RISK_labs))
   deaths_log = makearray(list(tvec, HIV_labs, STI_labs, RISK_labs))
@@ -167,7 +162,9 @@ run_model = function(y0, tvec=tvec_base, modelpars=list(), options=list(), spars
       
       # ensure all transitions are as expected
       if(any(is.nan(HIV_p))) print('nan values in transitions?!')
-      if(any(HIV_p < 0)) print('negative transitions?!')
+      if(any(HIV_p < -1e-6)){
+        print('negative transitions?!')
+      }
       if(any(HIV_p[tHIV$inf] > 1) & t > 2){
         print('everyone infected?!')
       }

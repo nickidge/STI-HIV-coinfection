@@ -4,7 +4,7 @@ distance_given_cal_vec = function(x, keys, norm=l2){
     callist[[keys[i]]] = x[i]
   }
   
-  output = run_model(y0=y0_base, tvec=seq(min(tvec_base), max(all_dat$t)+1, by=dt),
+  output = run_model(tvec=seq(min(tvec_base), max(all_dat$t)+1, by=dt),
                      modelpars=callist, options=list('only_cal_outs' = TRUE))
   
   df = compare_model_to_data(output)
@@ -15,7 +15,6 @@ distance_given_cal_vec = function(x, keys, norm=l2){
   if(runif(1) < saveprob){
     p = plot_calibration(df)
     saveopen(p, paste0('calplots/', round(distance * 1e7)), open=FALSE)
-    # ggsave(paste0('calplots/', round(distance * 1e7), '.png'), p)
   }
   
   return(distance)
@@ -94,8 +93,6 @@ plot_calibration = function(df){
   return(p)
 }
 
-
-
 gen_calibration = function(cal_vars = c('f_infect_HIV', 'init_diag_prop')){
   
   bes = c('f_infect_HIV' = 6e-6, 'init_diag_prop' = 0.7, 'init_prev_HIV' = 0.07)
@@ -113,7 +110,7 @@ gen_calibration = function(cal_vars = c('f_infect_HIV', 'init_diag_prop')){
   }
   
   baselist <<- baselist
-  cal <<- run_model(y0_base, modelpars=baselist)
+  cal <<- run_model(modelpars=baselist)
   
   tvec_split <<- tvec_base[tvec_base >= split_year]
   y0_split <<- cal$SID[as.character(split_year),,,]
