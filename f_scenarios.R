@@ -54,6 +54,7 @@ plot_scens = function(df){
   
   scen_keys = c('PLHIV', 'HIV_diag', 'HIV_inf', 'HIV_prev', 'prop_diag')
   df = subset(df, HIV_pop %in% scen_keys)
+  df$plot[df$HIV_pop == 'prop_diag'] = 'prop_diag'
   
   max_df = df %>%
     group_by(scen, plot) %>%
@@ -65,7 +66,7 @@ plot_scens = function(df){
   
   p = ggplot(df, aes(x=t, group=scen, colour=scen, fill=scen))
   
-  p = p + facet_wrap(.~plot, scales="free_y", ncol=1,
+  p = p + facet_wrap(.~plot, scales="free", ncol=2,
                      labeller = labeller(plot = setNames(plot_long, plot_keys)))
   
   p = p + geom_blank(data=max_df, aes(y=upperlim), inherit.aes = F)

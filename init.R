@@ -26,6 +26,7 @@ library(gdata)
 library(tidyr)
 library(dplyr)
 library(minpack.lm)
+library(grid)
 
 # record start time. This is to record how long the model takes to run
 ptm <- proc.time()

@@ -3,13 +3,7 @@
 # # model function
 # # takes initial conditions and tvec as input, and outputs the model as a matrix
 run_model = function(y0, tvec=tvec_base, modelpars=list(), options=list(), spars=static_pars){
-  # for(key in optvarkeys){
-  #   if(key %in% names(modelpars)){
-  #     assign(key, modelpars[[key]])
-  #   } else {
-  #     assign(key, get(paste0(key, '_base')))
-  #   }
-  # }
+
   interpvars = c()
   for(key in names(modelpars)){
     thispar = modelpars[[key]]
@@ -29,10 +23,17 @@ run_model = function(y0, tvec=tvec_base, modelpars=list(), options=list(), spars
   }
   
   if(!getdict(options, 'split', FALSE)){
-    # ninf = y0[sHIV$S,,] * init_prev_HIV
-    # y0[sHIV$S,,] = y0[sHIV$S,,] - ninf
-    # y0[sHIV$I_new,,] = y0[sHIV$I_new,,] + ninf
-    y0["I_lo_new", "S", "lo"] = init_PLHIV
+    
+    npop = popsize[as.character(tvec[1])]
+    
+    y0[1,1,1] = npop
+    
+    ninf = y0[sHIV$S,,] * init_prev_HIV
+    y0[sHIV$S,,] = y0[sHIV$S,,] - ninf
+    y0[sHIV$I_new,,] = y0[sHIV$I_new,,] + ninf
+    
+    # y0["I_lo_new", "S", "lo"] = init_PLHIV
+    
     ndiag = y0["I_lo_new",,] * init_diag_prop
     y0["I_lo_new",,] = y0["I_lo_new",,] - ndiag
     y0["D1",,] = y0["D1",,] + ndiag

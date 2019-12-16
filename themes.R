@@ -16,10 +16,19 @@ theme_all = theme(panel.grid.minor = element_blank(),
                                                   colour = NA),
                   panel.border = element_blank(),
                   axis.title.y = element_blank(),
-                  axis.ticks = element_blank(),
+                  axis.ticks.y = element_blank(),
+                  axis.ticks.x = element_line(size=0.1),
                   legend.key = element_blank(),
                   legend.background = element_rect(colour=NA,
                                                    fill=alpha("grey92", 0.7)))
+
+theme_all = theme_all + theme(
+  plot.background = element_blank(),
+  # panel.background = element_blank(),
+  strip.background = element_blank(),
+  legend.justification = c(0.5, 0.5),
+  legend.position = c(3/4, 1/6)
+)
 
 theme_fig_HIV = theme_all +
   theme(legend.box.margin = margin(),

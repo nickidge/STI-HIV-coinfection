@@ -30,7 +30,7 @@ plot_uncertainty = function(df){
   
   p = ggplot(df, aes(x=t, group=HIV_pop, colour=HIV_pop, fill=HIV_pop))
   
-  p = p + facet_wrap(.~plot, scales="free_y", ncol=1,
+  p = p + facet_wrap(.~plot, scales="free", ncol=2,
                      labeller = labeller(plot = setNames(plot_long, plot_keys)))
   p = p + geom_point(aes(y = data), na.rm=T, size=1.3)
   p = p + geom_path(aes(y = model), na.rm=T, lwd=1.3)
@@ -65,24 +65,33 @@ plot_uncertainty = function(df){
   p = p + coord_cartesian(xlim = plot_years)
   
   p = p + theme_all
-  p = p + theme(legend.justification = c(0, 0.08))
+  
+  p = convert_axis(p)
   
   return(p)
 }
 
 randomise_within_bounds = function(v, lb, ub){
-  if(lb < v & v < ub){
-    lbp = v - lb
-    ubp = 1 / (ub - v)
-    if(runif(1) < lbp / (lbp + ubp)){
-      y = runif(1, min=lb, max=v)
-    } else {
-      y = runif(1, min=v, max=ub)
-    }
+  # if(lb < v & v < ub){
+  #   lbp = v - lb
+  #   ubp = 1 / (ub - v)
+  #   if(runif(1) < lbp / (lbp + ubp)){
+  #     y = runif(1, min=lb, max=v)
+  #   } else {
+  #     y = runif(1, min=v, max=ub)
+  #   }
+  # } else {
+  #   y = runif(1, min=lb, max=ub)
+  # }
+  # return(y)
+  if(lb > ub){
+    return(v)
+  } else if(lb > 0){
+    return(exp(runif(1, log(lb), log(ub))))
   } else {
-    y = runif(1, min=lb, max=ub)
+    return(runif(1, lb, ub))
   }
-  return(y)
+  
 }
 
 randomise_keys = function(statkeys=static_pars, timepars=baselist, basekeyindex=c(), basevar=0.05, syear=0){
