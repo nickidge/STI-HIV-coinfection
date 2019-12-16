@@ -19,6 +19,7 @@ sHIV[['I_lo']] = grep("^I_lo.*", HIV_labs, value=TRUE)
 sHIV[['I_hi']] = grep("^I_hi.*", HIV_labs, value=TRUE)
 sHIV[['D1plus']] = c("D1", "D2", "D3")
 sHIV[['D2plus']] = c("D2", "D3")
+sHIV[['D3plus']] = c("D3")
 sHIV[['PLHIV']] = union(sHIV[['I']], sHIV[['D']])
 
 HIV_transitions = rbind(c("S_lo_inf", "S_lo", "I_lo_new"),

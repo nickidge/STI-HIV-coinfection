@@ -12,7 +12,8 @@ widen_sources = function(...){
   df_wide = spread(df, source, value)
   for(key in c('model', 'data')){if(!(key %in% colnames(df_wide))){df_wide[key]=NA}}
   df_wide$t = as.numeric(as.character(df_wide$t))
-  df_wide$facet_long = plot_long[match(df_wide$HIV_pop, plot_keys)]
+  # df_wide$plot = factor(plot_keys[match(df_wide$HIV_pop, plot_keys)], levels=(plot_keys))
+  df_wide$plot = factor(plot_index[df_wide$HIV_pop], levels=(plot_keys))
   return(df_wide)
 }
 
@@ -28,7 +29,10 @@ extr = function(output, keys, tvec=tvec_base){
   HIV_trans_log = output$HIV_trans_log
   tvec = as.character(tvec)
   tvec = intersect(tvec, dimnames(SID)[[1]])
-  dat = list()
+  # dat = list()
+  if(any(is.na(SID))){
+    print('')
+  }
   df = data.frame()
   for(i in 1:length(keys)){
     key = keys[i]
@@ -69,15 +73,43 @@ extr = function(output, keys, tvec=tvec_base){
         mutate(dt = 1) %>% 
         select(-floort) %>% 
         as.data.frame()
+    } else if(key == 'care_cascade'){
+      thisPLHIV = SID[tvec,sHIV$PLHIV,,]
+      thisPLHIV = apply(thisPLHIV, 1, sum)
+      thisD1plus = SID[tvec,sHIV$D1plus,,]
+      thisD1plus = apply(thisD1plus, 1, sum)
+      thisD2plus = SID[tvec,sHIV$D2plus,,]
+      thisD2plus = apply(thisD2plus, 1, sum)
+      thisD3plus = SID[tvec,sHIV$D3plus,,]
+      thisD3plus = apply(thisD3plus, 1, sum)
+      
+      thisD1plus_prop = thisD1plus / thisPLHIV
+      thisD2plus_prop = thisD2plus / thisD1plus
+      thisD3plus_prop = thisD3plus / thisD2plus
+
+      tvec = names(thisPLHIV)
+      
+      thisD1plus_df = data.frame(t = tvec, value = thisD1plus_prop, type = 'pop', dt = 1,
+                                 sti_pop = 'all', risk_pop = 'all', HIV_pop = 'prop_diag', plot='care_cascade')
+      thisD2plus_df = data.frame(t = tvec, value = thisD2plus_prop, type = 'pop', dt = 1,
+                                 sti_pop = 'all', risk_pop = 'all', HIV_pop = 'prop_treat', plot='care_cascade')
+      thisD3plus_df = data.frame(t = tvec, value = thisD3plus_prop, type = 'pop', dt = 1,
+                                 sti_pop = 'all', risk_pop = 'all', HIV_pop = 'prop_suppr', plot='care_cascade')
+      thisdf = rbind.fill(thisD1plus_df, thisD2plus_df, thisD3plus_df)
+      
     }
-    dat = c(dat, setNames(list(this), key))
+    # dat = c(dat, setNames(list(this), key))
     df = rbind.fill(df, thisdf)
+  }
+  if('plot' %in% names(df)){
+    df$plot[is.na(df$plot)] = df$HIV_pop[is.na(df$plot)]
+  } else {
+    df$plot = df$HIV_pop
   }
   df$source = 'model'
   df$scen = ''
   return(df)
 }
-
 
 get_movement = function(HIV_compartments, HIV_trans){
   l = lapply(1:nrow(HIV_transitions), function(x) HIV_trans[x,,] * ((HIV_transitions[x, "to"] %in% HIV_compartments) - (HIV_transitions[x, "from"] %in% HIV_compartments)))
@@ -87,4 +119,3 @@ get_movement = function(HIV_compartments, HIV_trans){
   # }
   return(d)
 }
-

@@ -1,39 +1,45 @@
 tvec_base = seq(2007, 2025, by=1/12)
-plot_years = c(2010, 2022)
+plot_years = c(2010, 2020)
+label_years = unique(c(plot_years, seq(2000, 2050, by=5)))
 split_year = 2014
 
-plot_keys = c('PLHIV', 'HIV_diag', 'HIV_inf')
-plot_long = c('Total PLHIV', 'Annual HIV diagnoses', 'Annual HIV incidence')
+scenarios = list(list(sheet = 'scen_1',
+                      short = 'no_prep',
+                      long = 'Everyone stops using PrEP'),
+                 list(sheet = 'scen_2',
+                      short = 'less_test',
+                      long = 'Testing less often'))
 
+# bulk of code
 source("init.R", echo = F)
-source("loadpars.R", echo = F)
 source("info.R", echo = F)
+source("processing.R", echo=F)
+source("plotting.R", echo = F)
+source("themes.R", echo = F)
+source("pars.R", echo = F)
+source("loadpars.R", echo = F)
 source("default_values.R", echo = F)
 source("y0.R", echo = F)
-source("themes.R", echo = F)
-source("plotting.R", echo = F)
-source("pars.R", echo = F)
+source("model.R", echo = F)
 
 # function scripts
-source("f_uncertainty.R", echo = F)
 source("f_calibrate.R", echo = F)
+source("f_uncertainty.R", echo = F)
+source("f_scenarios.R", echo = T)
 
-
-# run model and calibrate
-source("model.R", echo = F)
-source("processing.R", echo=F)
-
+# calibrate model
 if(!exists('cal')){
   baselist = load_time_par_sheet('timepars', deflist = defaultlist)
-  source("calibrate.R", echo = T)
-  source("pars.R", echo = F)
+  cal_keys = c('PLHIV', 'HIV_diag', 'care_cascade')
+  gen_calibration()
+  # source("pars.R", echo = F)
 }
 
-source("scenarios.R", echo = T)
-source("uncertainty.R", echo = T)
+# run base scenario (with uncertainty)
+base_df = gen_uncertainty(3)
+saveopen(plot_uncertainty(base_df), 'calibration', 'plots')
 
+# run all scenarios (with uncertainty)
+scen_df = gen_scenarios(scen_df=base_df, scenarios=scenarios, ntrials=3)
+saveopen(plot_scens(scen_df), 'scenarios', 'plots')
 
-#######
-
-# # print the total run time
-# print(proc.time() - ptm)

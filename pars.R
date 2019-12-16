@@ -8,6 +8,8 @@ modelpar = function(t=t_dat, y=NULL, parname=NA, pop=NA, subpop=NA, tvec=tvec_ba
     thist = t[notna_index]
     thisy = y[notna_index]
     
+    thisy[thisy %in% c('Inf', 'inf')] = Inf
+    
     const = sum(notna_index) == 1
     
     if(const){
