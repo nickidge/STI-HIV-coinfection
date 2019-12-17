@@ -1,8 +1,9 @@
+# base model information
 tvec_base = seq(2007, 2030, by=1/12)
 plot_years = c(2007, 2030)
-label_years = unique(c(plot_years, seq(2000, 2050, by=5)))
 split_year = 2014
 
+# scenario details (names, tab in data_sti.xlsx)
 scenarios = list(list(sheet = 'scen_1',
                       short = 'no_prep',
                       long = 'Everyone stops using PrEP'),

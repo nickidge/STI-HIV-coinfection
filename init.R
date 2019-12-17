@@ -28,16 +28,6 @@ library(dplyr)
 library(minpack.lm)
 library(grid)
 
-# record start time. This is to record how long the model takes to run
-ptm <- proc.time()
-
-fixnan = function(x){
-  x[is.nan(x)] = 0
-  return(x)
-}
-
-makearray = function(dimnames){
-  return(array(0, dim=lengths(dimnames), dimnames=dimnames))
-}
+label_years = unique(c(plot_years, seq(2000, 2050, by=5)))
 
 options(stringsAsFactors = FALSE)

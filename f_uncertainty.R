@@ -6,9 +6,6 @@ gen_uncertainty = function(ntrials=10){
   cal_wide$scen_long = 'Base'
   cal_wide = rbind.fill(cal_wide, data_wide)
   
-  # p = plot_df(cal_wide)
-  # p = p + geom_ribbon(aes(ymin = lower_ci, ymax = upper_ci, x=t), alpha=0.2, colour=NA, na.rm=T)
-  
   return(cal_wide)
 }
 
@@ -33,8 +30,6 @@ plot_uncertainty = function(df){
   max_df = max_df_base[max_df_base$plot %in% df$plot,]
   max_df$plot = factor(max_df$plot)
   
-  df$HIV_pop = factor(df$HIV_pop, levels = unique(df$HIV_pop)[order(sapply(unique(df$HIV_pop), function(x) max(c(0, match(x, colour_scale$HIV_pop)), na.rm=TRUE)), decreasing=TRUE)])
-  df$HIV_pop = as.character(df$HIV_pop)
   df$HIV_pop = factor(df$HIV_pop, levels=rev(both_colour_scale$HIV_pop))
   
   p = ggplot(subset(df, plot!='num_cascade'), aes(x=t, group=HIV_pop, colour=HIV_pop, fill=HIV_pop))

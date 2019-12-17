@@ -1,17 +1,4 @@
 
-plot_index = c(PLHIV = 'PLHIV',
-               HIV_diag = 'HIV_diag',
-               HIV_inf = 'HIV_inf',
-               HIV_prev = 'HIV_prev',
-               prop_diag = 'care_cascade',
-               prop_treat = 'care_cascade',
-               prop_suppr = 'care_cascade',
-               num_und = 'num_cascade',
-               num_d1 = 'num_cascade',
-               num_d2 = 'num_cascade',
-               num_d3 = 'num_cascade'
-               )
-
 plot_index = rbind(
   c('PLHIV_tot', 'PLHIV'),
   c('HIV_diag_tot', 'HIV_diag'),
@@ -48,9 +35,6 @@ saveopen = function(p, fname='untitled', fdir='/', ext='png', open=T, ...){
 
 convert_axis = function(out_gg, labels=c('axis-l-3-1', 'axis-l-2-2')){
   gp <- ggplotGrob(out_gg)
-  
-  # gp[["layout"]]
-  # gtable::gtable_show_layout(gp)
   
   gp <- grid.force(gp)
   
