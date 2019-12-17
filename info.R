@@ -5,7 +5,7 @@ HIV_labs = c("S_lo", "S_hi", "S_pr",
              "I_hi_new", "I_hi_mid", "I_hi_old",
              "I_pr_new", "I_pr_mid", "I_pr_old",
              "D1", "D2", "D3")
-STI_labs = c("S", "E", "Sy", "ASy", "T")
+STI_labs = c("S", "E", "I_s", "I_a", "T")
 RISK_labs = c("lo", "hi")
 
 # compartment array
@@ -63,3 +63,17 @@ tHIV[['test_new']] = grep("I_.._new_d", HIV_transitions, value=TRUE)
 tHIV[['test_mid']] = grep("I_.._mid_d", HIV_transitions, value=TRUE)
 tHIV[['test_old']] = grep("I_.._old_d", HIV_transitions, value=TRUE)
 tHIV[['test']] = grep("I_.._..._d", HIV_transitions, value=TRUE)
+
+
+# STI compartment label index
+sSTI = list()
+sSTI[['I']] = grep("I", STI_labs, value=TRUE)
+
+STI_transitions = rbind(c('exp', 'S', 'E'),
+                        c('inf_s', 'E', 'I_s'),
+                        c('inf_a', 'E', 'I_a'),
+                        c('treat_s', 'I_s', 'T'),
+                        c('treat_a', 'I_a', 'T'),
+                        c('recov', 'T', 'S')
+)
+colnames(STI_transitions) = c("trans", "from", "to")
