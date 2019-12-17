@@ -1,3 +1,5 @@
+
+# labels
 HIV_labs = c("S_lo", "S_hi", "S_pr",
              "I_lo_new", "I_lo_mid", "I_lo_old",
              "I_hi_new", "I_hi_mid", "I_hi_old",
@@ -6,10 +8,13 @@ HIV_labs = c("S_lo", "S_hi", "S_pr",
 STI_labs = c("S", "E", "Sy", "ASy", "T")
 RISK_labs = c("lo", "hi")
 
+# compartment array
+# dim 1: HIV status -- only this one is in use at the moment
+# dim 2: STI status
+# dim 3: risk status # not really sure how to interpret this
 SID_mat = array(0, dim = c(length(HIV_labs), length(STI_labs), length(RISK_labs)), dimnames = list(HIV_labs, STI_labs, RISK_labs))
 
-
-
+# HIV compartment label index
 sHIV = list()
 sHIV[['S']] = grep("^S.*", HIV_labs, value=TRUE)
 sHIV[['I']] = grep("^I.*", HIV_labs, value=TRUE)
@@ -22,6 +27,7 @@ sHIV[['D2plus']] = c("D2", "D3")
 sHIV[['D3plus']] = c("D3")
 sHIV[['PLHIV']] = union(sHIV[['I']], sHIV[['D']])
 
+# HIV transitions -- e.g. infection, diagnosis, starting treatment, etc.
 HIV_transitions = rbind(c("S_lo_inf", "S_lo", "I_lo_new"),
                         c("S_hi_inf", "S_hi", "I_hi_new"),
                         c("S_pr_inf","S_pr", "I_pr_new"),
@@ -47,6 +53,7 @@ HIV_transitions = rbind(c("S_lo_inf", "S_lo", "I_lo_new"),
 )
 colnames(HIV_transitions) = c("trans", "from", "to")
 
+# HIV transition label index
 tHIV = list()
 tHIV[['inf']] = grep("inf", HIV_transitions, value=TRUE)
 tHIV[['wait_1']] = grep("wait_1", HIV_transitions, value=TRUE)
@@ -56,4 +63,3 @@ tHIV[['test_new']] = grep("I_.._new_d", HIV_transitions, value=TRUE)
 tHIV[['test_mid']] = grep("I_.._mid_d", HIV_transitions, value=TRUE)
 tHIV[['test_old']] = grep("I_.._old_d", HIV_transitions, value=TRUE)
 tHIV[['test']] = grep("I_.._..._d", HIV_transitions, value=TRUE)
-

@@ -68,16 +68,17 @@ plot_scens = function(df){
   max_df = max_df_base[max_df_base$plot %in% df$plot,]
   max_df$plot = factor(max_df$plot)
   
+  # initialise plot
   p = ggplot(df, aes(x=t, group=scen, colour=scen, fill=scen))
+  p = p + facet_wrap(.~plot, scales="free", ncol=2, labeller = labeller(plot = setNames(plot_long, plot_keys)))
   
-  p = p + facet_wrap(.~plot, scales="free", ncol=2,
-                     labeller = labeller(plot = setNames(plot_long, plot_keys)))
-  
-  p = p + geom_blank(data=max_df, aes(y=upperlim), inherit.aes = F)
+  # plot information
   p = p + geom_point(aes(y = data), na.rm=T, size=1.3)
   p = p + geom_path(aes(y = model), na.rm=T, lwd=1.3)
   p = p + geom_ribbon(aes(ymin = lower_ci, ymax = upper_ci, x=t), alpha=0.2, colour=NA)
   
+  # define axes scales
+  p = p + geom_blank(data=max_df, aes(y=upperlim), inherit.aes = F)
   p = p + scale_x_continuous(breaks = label_years,
                              name = 'Year',
                              limits = c(min(df$t), max(df$t)),
@@ -88,23 +89,26 @@ plot_scens = function(df){
   
   scen_longs = unique(df$scen_long)
   
-  guide_list = list(
+  # guides / legend
+  p = p + guides(colour = guide_legend(override.aes = list(
     linetype = c(0, 1, 1, 1),
     shape = c(19, NA, NA, NA),
     fill = NA,
     alpha = 1,
     size = c(2, 1, 1, 1)
-  )
-  
-  p = p + guides(colour = guide_legend(override.aes = guide_list))
-  
+  )))
   p = p + scale_colour_manual(limits = scen_longs,
                               name='Scenarios',
                               values=c('black', scen_colours),
                               aesthetics = c("colour", "fill"))
-  p = p + theme_all
   
-  p = convert_axis(p)
+  # themes
+  p = p + theme_all
+  p = p + theme(legend.justification = c(0.5, 0.5),
+                legend.position = c(3/4, 1/6))
+  
+  # add percentages
+  p = convert_axis(p, c('axis-l-3-1', 'axis-l-2-2'))
   
   return(p)
 }

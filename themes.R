@@ -15,7 +15,6 @@ theme_all = theme(panel.grid.minor = element_blank(),
                   panel.background = element_rect(fill = "grey92",
                                                   colour = NA),
                   panel.border = element_blank(),
-                  # plot.margin = unit(c(2,2,2,2), 'mm'),
                   axis.title.y = element_blank(),
                   axis.ticks.y = element_blank(),
                   axis.ticks.x = element_line(size=0.1),
@@ -25,7 +24,6 @@ theme_all = theme(panel.grid.minor = element_blank(),
 
 theme_all = theme_all + theme(
   plot.background = element_blank(),
-  # panel.background = element_blank(),
   strip.background = element_blank(),
   legend.justification = c(0.5, 0.5),
   legend.position = c(3/4, 1/6)

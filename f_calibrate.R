@@ -1,3 +1,9 @@
+l2 = function(x, y){
+  v = (x - y) / pmax(1e-6, pmin(x, y))
+  v = v^2
+  return(sum(v, na.rm=T))
+}
+
 distance_given_cal_vec = function(x, keys, norm=l2){
   callist = baselist
   for(i in 1:length(x)){
@@ -58,10 +64,4 @@ gen_calibration = function(cal_vars = c('f_infect_HIV', 'init_diag_prop'), contr
   tvec_split <<- tvec_base[tvec_base >= split_year]
   y0_split <<- cal$SID[as.character(split_year),,,]
   
-}
-
-l2 = function(x, y){
-  v = (x - y) / pmax(1e-6, pmin(x, y))
-  v = v^2
-  return(sum(v, na.rm=T))
 }

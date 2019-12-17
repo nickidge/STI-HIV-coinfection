@@ -1,3 +1,4 @@
+
 gen_uncertainty = function(ntrials=10){
   trials_df = ci_df(ntrials=ntrials, basevar=0.2, options=list('keep_static'=TRUE))
   
@@ -9,9 +10,9 @@ gen_uncertainty = function(ntrials=10){
   return(cal_wide)
 }
 
-
 plot_uncertainty = function(df){
   
+  # define colour scale for care cascade
   colour_scale = data.frame(HIV_pop = c('num_und', 'num_diag', 'num_treat', 'num_suppr'),
                             long = c('Proportion undiagnosed', 'Proportion diagnosed', 'Proportion diagnosed on treatment', 'Proportion on treatment virally suppressed'),
                             col = c('red', 'orange', 'yellow', 'green'))
@@ -32,21 +33,19 @@ plot_uncertainty = function(df){
   
   df$HIV_pop = factor(df$HIV_pop, levels=rev(both_colour_scale$HIV_pop))
   
+  # initialise plot
   p = ggplot(subset(df, plot!='num_cascade'), aes(x=t, group=HIV_pop, colour=HIV_pop, fill=HIV_pop))
+  p = p + facet_wrap(.~plot, scales="free", ncol=2, labeller = labeller(plot = setNames(plot_long, plot_keys)))
   
-  p = p + facet_wrap(.~plot, scales="free", ncol=2,
-                     labeller = labeller(plot = setNames(plot_long, plot_keys)))
-  p = p + geom_point(aes(y = data), na.rm=T, size=1.3)
-  p = p + geom_path(aes(y = model), na.rm=T, lwd=1.3)
-  
+  # plot information
+  p = p + geom_point(aes(y = data), na.rm=T, size=1.3) # data points
+  p = p + geom_path(aes(y = model), na.rm=T, lwd=1.3) # best estimate line
   if('lower_ci' %in% names(df)){
-    p = p + geom_ribbon(aes(ymin = lower_ci, ymax = upper_ci, x=t), alpha=0.2, colour=NA, na.rm=T)
+    p = p + geom_ribbon(aes(ymin = lower_ci, ymax = upper_ci, x=t), alpha=0.2, colour=NA, na.rm=T) # 95% confidence interval
   }
+  p = p + geom_area(data=subset(df, plot=='num_cascade'), aes(y = model), alpha=0.8, na.rm=T) # stacked care cascade
   
-  p = p + geom_area(data=subset(df, plot=='num_cascade'),
-                    aes(y = model), alpha=0.8,
-                    na.rm=T)
-  
+  # define axes scales
   p = p + geom_blank(data=max_df, aes(y=upperlim), inherit.aes = F)
   p = p + scale_x_continuous(breaks = label_years,
                              name = 'Year',
@@ -55,17 +54,14 @@ plot_uncertainty = function(df){
   p = p + scale_y_continuous(expand = c(0,0))
   p = p + expand_limits(y = 0)
   
-
-  guide_list = list(
+  # guides / legend
+  p = p + guides(colour = guide_legend(override.aes = list(
     linetype = 1,
     shape = NA,
     # fill = NA,
     colour = NA,
     alpha = 1
-  )
-  
-  p = p + guides(colour = guide_legend(override.aes = guide_list))
-  
+  )))
   # p = p + scale_colour_manual(na.value = 'black',
   #                             limits = colour_scale$HIV_pop,
   #                             breaks = colour_scale$HIV_pop,
@@ -83,11 +79,13 @@ plot_uncertainty = function(df){
   
   p = p + coord_cartesian(xlim = c(min(df$t), max(df$t)))
   
+  # themes
   p = p + theme_all
-  p = p + theme(  legend.justification = c(0.5, 0.5),
-                  legend.position = c(1/4, 1/6 - 0.04))
+  p = p + theme(legend.justification = c(0.5, 0.5),
+                legend.position = c(1/4, 1/6 - 0.04))
   
-  p = convert_axis(p)
+  # add percentages
+  p = convert_axis(p, c('axis-l-3-1', 'axis-l-2-2'))
   
   return(p)
 }

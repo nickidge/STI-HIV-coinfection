@@ -1,7 +1,4 @@
 
-# if(!exists('baselist')){
-#   baselist = list()
-# }
 defaultlist = list()
 
 defaultlist[['t_testing']] = c(c(1, 3, 10), c(0.5, 1.5, 5), c(3/12, 3/12, 3/12)) # testing for i_lo_new, i_lo_mid, i_lo_old, i_hi_new, i_hi_mid, i_hi_old
@@ -14,7 +11,6 @@ defaultlist[['test_wait']] = c(Inf, 2)
 defaultlist[['treatment_eff']] = c(1, 0.5, 0.1)
 
 defaultlist[['f_infect_HIV']] = 6.5e-6
-# defaultlist[['init_PLHIV']] = 3000
 defaultlist[['init_diag_prop']] = 0.7
 defaultlist[['init_prev_HIV']] = 0.1
 

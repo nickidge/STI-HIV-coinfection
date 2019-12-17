@@ -33,7 +33,7 @@ saveopen = function(p, fname='untitled', fdir='/', ext='png', open=T, ...){
   if(open){browseURL(file.path(fpath, pdfname))}
 }
 
-convert_axis = function(out_gg, labels=c('axis-l-3-1', 'axis-l-2-2')){
+convert_axis = function(out_gg, labels=c()){
   gp <- ggplotGrob(out_gg)
   
   gp <- grid.force(gp)
