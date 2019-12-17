@@ -24,20 +24,23 @@ run_model = function(y0=NULL, tvec=tvec_base, modelpars=list(), options=list(), 
   
   # if(!getdict(options, 'split', FALSE)){
   if(is.null(y0)){
+    
+    # S
     y0 = SID_mat
+    y0[1,1,1] = popsize[as.character(tvec[1])]
     
-    npop = popsize[as.character(tvec[1])]
-    y0[1,1,1] = npop
+    # HIV
+    ninf_HIV = y0[sHIV$S,,] * init_prev_HIV
+    y0[sHIV$S,,] = y0[sHIV$S,,] - ninf_HIV
+    y0[sHIV$I_new,,] = y0[sHIV$I_new,,] + ninf_HIV
     
-    ninf = y0[sHIV$S,,] * init_prev_HIV
-    y0[sHIV$S,,] = y0[sHIV$S,,] - ninf
-    y0[sHIV$I_new,,] = y0[sHIV$I_new,,] + ninf
+    ndiag_HIV = y0["I_lo_new",,] * init_diag_prop
+    y0["I_lo_new",,] = y0["I_lo_new",,] - ndiag_HIV
+    y0["D1",,] = y0["D1",,] + ndiag_HIV
     
-    # y0["I_lo_new", "S", "lo"] = init_PLHIV
+    # STI
+    ninf_STI = y0[,'S',] * init_prev_STI
     
-    ndiag = y0["I_lo_new",,] * init_diag_prop
-    y0["I_lo_new",,] = y0["I_lo_new",,] - ndiag
-    y0["D1",,] = y0["D1",,] + ndiag
   }
   
   # initialise model array
@@ -110,12 +113,14 @@ run_model = function(y0=NULL, tvec=tvec_base, modelpars=list(), options=list(), 
       
       
       # calculate force of infections
-      rel_incidence = sum(prevdt[sHIV$I,,]) + sum(treatment_eff[1]*prevdt["D1",,]) + sum(treatment_eff[2]*prevdt["D2",,]) + sum(treatment_eff[3]*prevdt["D3",,])
       totalppl = sum(prevdt)
+      rel_inc_HIV = sum(prevdt[sHIV$I,,]) + sum(treatment_eff[1]*prevdt["D1",,]) + sum(treatment_eff[2]*prevdt["D2",,]) + sum(treatment_eff[3]*prevdt["D3",,])
+      rel_inc_STI = sum(prevdt[,sSTI$I,])
       
-      # f_infect_HIV = 1e-7
-      foi_HIV = risk_mat * condom_thru * f_infect_HIV * rel_incidence / (totalppl)
+      foi_HIV = risk_mat * condom_thru * f_infect_HIV * rel_inc_HIV / totalppl
       foi_HIV = fixnan(foi_HIV)
+      
+      foi_STI = f_infect_STI * rel_inc_STI / totalppl
       
       # # pr_infect_sti[1] =  f_infect_sti[1] * ((1-mix1) * sum(prevdt[8,3:4,3]) / prevdt[8,"pop_sti",3] + # HIV-
       # #                                            mix1 * sum(prevdt[9,3:4,3]) / prevdt[9,"pop_sti",3]) # HIV+
@@ -126,12 +131,6 @@ run_model = function(y0=NULL, tvec=tvec_base, modelpars=list(), options=list(), 
       # 
       # pr_infect_sti = pr_infect_sti * cond_sti
       # 
-      # pr_infect_log[t,] = pr_infect_sti
-      # 
-      # 
-      # # temp = prevdt[,,]
-      # 
-      # pop_growth = SID[1,"pop_HIV", "pop_sti",3] * (1+growth)^(t)
       
       
       ###### TRANSITIONS ######
@@ -250,6 +249,15 @@ run_model = function(y0=NULL, tvec=tvec_base, modelpars=list(), options=list(), 
         prevdt[hfrom,,] = prevdt[hfrom,,] - hp
         prevdt[hto,,] = prevdt[hto,,] + hp
       }
+      
+      
+      ### STI ###
+      
+      
+      
+      ###########
+      
+      
       
       # deaths
       deaths = mu * prevdt

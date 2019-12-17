@@ -14,6 +14,9 @@ defaultlist[['f_infect_HIV']] = 6.5e-6
 defaultlist[['init_diag_prop']] = 0.7
 defaultlist[['init_prev_HIV']] = 0.1
 
+defaultlist[['f_infect_STI']] = 0
+defaultlist[['init_prev_STI']] = 0
+
 population_value = static_pars$population_value$v
 growth = static_pars$growth$v
 population_year = static_pars$population_year$v
