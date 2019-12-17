@@ -52,17 +52,21 @@ plot_scens = function(df){
   
   scen_colours = c('black', 'red', 'green')
   
-  scen_keys = c('PLHIV', 'HIV_diag', 'HIV_inf', 'HIV_prev', 'prop_diag')
+  scen_keys = c('PLHIV', 'HIV_diag', 'HIV_inf', 'HIV_prev', 'num_diag')
   df = subset(df, HIV_pop %in% scen_keys)
-  df$plot[df$HIV_pop == 'prop_diag'] = 'prop_diag'
+  df = subset(df, plot != 'num_cascade')
   
-  max_df = df %>%
-    group_by(scen, plot) %>%
-    filter(min(plot_years) <= t & t <= max(plot_years)) %>% 
-    summarise(max = max(model, data, na.rm=T)) %>%
-    # mutate(upperlim = ifelse(plot %in% c('HIV_prev', 'care_cascade'), 1, 1.1 * max)) %>% 
-    mutate(upperlim = ifelse(plot %in% c('care_cascade'), 1, 1.1 * max)) %>% 
-    as.data.frame()
+  # df$plot[df$HIV_pop == 'prop_diag'] = 'prop_diag'
+  
+  # max_df = df %>%
+  #   group_by(scen, plot) %>%
+  #   filter(min(plot_years) <= t & t <= max(plot_years)) %>% 
+  #   summarise(max = max(model, data, na.rm=T)) %>%
+  #   # mutate(upperlim = ifelse(plot %in% c('HIV_prev', 'care_cascade'), 1, 1.1 * max)) %>% 
+  #   mutate(upperlim = ifelse(plot %in% c('care_cascade'), 1, 1.1 * max)) %>% 
+  #   as.data.frame()
+  max_df = max_df_base[max_df_base$plot %in% df$plot,]
+  max_df$plot = factor(max_df$plot)
   
   p = ggplot(df, aes(x=t, group=scen, colour=scen, fill=scen))
   
@@ -99,6 +103,8 @@ plot_scens = function(df){
                               values=c('black', scen_colours),
                               aesthetics = c("colour", "fill"))
   p = p + theme_all
+  
+  p = convert_axis(p)
   
   return(p)
 }

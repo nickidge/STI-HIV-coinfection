@@ -12,29 +12,45 @@ gen_uncertainty = function(ntrials=10){
   return(cal_wide)
 }
 
+
 plot_uncertainty = function(df){
   
-  colour_scale = data.frame(HIV_pop = c('prop_diag', 'prop_treat', 'prop_suppr'),
-                            long = c('Proportion diagnosed', 'Proportion diagnosed on treatment', 'Proportion on treatment virally suppressed'),
-                            col = c('orange', 'yellow', 'green'))
+  colour_scale = data.frame(HIV_pop = c('num_und', 'num_diag', 'num_treat', 'num_suppr'),
+                            long = c('Proportion undiagnosed', 'Proportion diagnosed', 'Proportion diagnosed on treatment', 'Proportion on treatment virally suppressed'),
+                            col = c('red', 'orange', 'yellow', 'green'))
+  black_colour_scale = data.frame(HIV_pop = unique(df$HIV_pop)[!(unique(df$HIV_pop) %in% colour_scale$HIV_pop)],
+                                  col = 'black',
+                                  long = 'na')
+  both_colour_scale = rbind(colour_scale, black_colour_scale)
   
-  max_df = df %>%
-    group_by(plot) %>%
-    filter(min(plot_years) <= t & t <= max(plot_years)) %>% 
-    summarise(max = max(model, data, upper_ci, na.rm=T)) %>%
-    # mutate(upperlim = ifelse(plot %in% c('HIV_prev', 'care_cascade'), 1, 1.1 * max)) %>% 
-    mutate(upperlim = ifelse(plot %in% c('care_cascade'), 1, 1.1 * max)) %>% 
-    as.data.frame()
+  # max_df = df %>%
+  #   group_by(plot) %>%
+  #   filter(min(plot_years) <= t & t <= max(plot_years)) %>%
+  #   summarise(max = max(model, data, upper_ci, na.rm=T)) %>%
+  #   # mutate(upperlim = ifelse(plot %in% c('HIV_prev', 'care_cascade'), 1, 1.1 * max)) %>%
+  #   mutate(upperlim = ifelse(plot %in% c('care_cascade'), 1, 1.1 * max)) %>%
+  #   as.data.frame()
+  max_df = max_df_base[max_df_base$plot %in% df$plot,]
+  max_df$plot = factor(max_df$plot)
   
   df$HIV_pop = factor(df$HIV_pop, levels = unique(df$HIV_pop)[order(sapply(unique(df$HIV_pop), function(x) max(c(0, match(x, colour_scale$HIV_pop)), na.rm=TRUE)), decreasing=TRUE)])
+  df$HIV_pop = as.character(df$HIV_pop)
+  df$HIV_pop = factor(df$HIV_pop, levels=rev(both_colour_scale$HIV_pop))
   
-  p = ggplot(df, aes(x=t, group=HIV_pop, colour=HIV_pop, fill=HIV_pop))
+  p = ggplot(subset(df, plot!='num_cascade'), aes(x=t, group=HIV_pop, colour=HIV_pop, fill=HIV_pop))
   
   p = p + facet_wrap(.~plot, scales="free", ncol=2,
                      labeller = labeller(plot = setNames(plot_long, plot_keys)))
   p = p + geom_point(aes(y = data), na.rm=T, size=1.3)
   p = p + geom_path(aes(y = model), na.rm=T, lwd=1.3)
-  p = p + geom_ribbon(aes(ymin = lower_ci, ymax = upper_ci, x=t), alpha=0.2, colour=NA, na.rm=T)
+  
+  if('lower_ci' %in% names(df)){
+    p = p + geom_ribbon(aes(ymin = lower_ci, ymax = upper_ci, x=t), alpha=0.2, colour=NA, na.rm=T)
+  }
+  
+  p = p + geom_area(data=subset(df, plot=='num_cascade'),
+                    aes(y = model), alpha=0.8,
+                    na.rm=T)
   
   p = p + geom_blank(data=max_df, aes(y=upperlim), inherit.aes = F)
   p = p + scale_x_continuous(breaks = label_years,
@@ -48,23 +64,33 @@ plot_uncertainty = function(df){
   guide_list = list(
     linetype = 1,
     shape = NA,
-    fill = NA,
+    # fill = NA,
+    colour = NA,
     alpha = 1
   )
   
   p = p + guides(colour = guide_legend(override.aes = guide_list))
   
-  p = p + scale_colour_manual(na.value = 'black',
-                              limits = colour_scale$HIV_pop,
+  # p = p + scale_colour_manual(na.value = 'black',
+  #                             limits = colour_scale$HIV_pop,
+  #                             breaks = colour_scale$HIV_pop,
+  #                             values = colour_scale$col,
+  #                             labels = colour_scale$long,
+  #                             aesthetics = c('colour', 'fill'),
+  #                             name = 'Care cascade')
+  p = p + scale_colour_manual(na.value = NA,
+                              limits = both_colour_scale$HIV_pop,
+                              values = both_colour_scale$col,
                               breaks = colour_scale$HIV_pop,
-                              values = colour_scale$col,
                               labels = colour_scale$long,
                               aesthetics = c('colour', 'fill'),
                               name = 'Care cascade')
   
-  p = p + coord_cartesian(xlim = plot_years)
+  p = p + coord_cartesian(xlim = c(min(df$t), max(df$t)))
   
   p = p + theme_all
+  p = p + theme(  legend.justification = c(0.5, 0.5),
+                  legend.position = c(1/4, 1/6 - 0.04))
   
   p = convert_axis(p)
   

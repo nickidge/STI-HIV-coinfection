@@ -7,8 +7,8 @@ scenarios = list(list(sheet = 'scen_1',
                       short = 'no_prep',
                       long = 'Everyone stops using PrEP'),
                  list(sheet = 'scen_2',
-                      short = 'less_test',
-                      long = 'Testing less often'))
+                      short = 'more_test',
+                      long = 'Testing more often'))
 
 # bulk of code
 source("init.R", echo = F)

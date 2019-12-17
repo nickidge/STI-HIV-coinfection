@@ -93,12 +93,12 @@ HIV_main_data$HIV_group = "HIV_plus"
 # sti_main_data$N = factor("data")
 
 
-PLHIV_dat = data.frame(t = PLHIV0$Year, value = PLHIV0$`Total PLHIV`, type='pop', dt=1,
+PLHIV_dat = data.frame(t = PLHIV0$Year, value = PLHIV0$`Total PLHIV`, type='pop', dt=1, pid = 'PLHIV_tot',
                        sti_pop='all', risk_pop='all', HIV_pop='PLHIV', source='data', scen='')
-HIV_diag_dat = data.frame(t = diagnoses0$Year, value = diagnoses0$`New diagnoses`, type='trans', dt=1,
+HIV_diag_dat = data.frame(t = diagnoses0$Year, value = diagnoses0$`New diagnoses`, type='trans', dt=1, pid='HIV_diag_tot',
                           sti_pop='all', risk_pop='all', HIV_pop='HIV_diag', source='data', scen='')
-prop_diag_dat = data.frame(t = cascade0$Year, value = cascade0$`Prop HIV diagnosed`, type='pop', dt=1,
-                          sti_pop='all', risk_pop='all', HIV_pop='prop_diag', source='data', scen='', plot='care_cascade')
+prop_diag_dat = data.frame(t = cascade0$Year, value = cascade0$`Prop HIV diagnosed`, type='pop', dt=1, pid='num_diag_prop',
+                          sti_pop='all', risk_pop='all', HIV_pop='num_diag', source='data', scen='', plot='care_cascade')
 
 all_dat = rbind.fill(PLHIV_dat, HIV_diag_dat, prop_diag_dat)
 all_dat$plot[is.na(all_dat$plot)] = all_dat$HIV_pop[is.na(all_dat$plot)]

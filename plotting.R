@@ -5,11 +5,38 @@ plot_index = c(PLHIV = 'PLHIV',
                HIV_prev = 'HIV_prev',
                prop_diag = 'care_cascade',
                prop_treat = 'care_cascade',
-               prop_suppr = 'care_cascade')
+               prop_suppr = 'care_cascade',
+               num_und = 'num_cascade',
+               num_d1 = 'num_cascade',
+               num_d2 = 'num_cascade',
+               num_d3 = 'num_cascade'
+               )
 
-plot_keys = c('PLHIV', 'HIV_diag', 'HIV_inf', 'HIV_prev', 'care_cascade', 'prop_diag')
-plot_long = c('Total PLHIV', 'Annual HIV diagnoses', 'Annual HIV incidence', 'Prevalence of HIV', 'Care cascade', 'Proportion diagnosed')
+plot_index = rbind(
+  c('PLHIV_tot', 'PLHIV'),
+  c('HIV_diag_tot', 'HIV_diag'),
+  c('HIV_inf_tot', 'HIV_inf'),
+  c('HIV_prev_prop', 'HIV_prev'),
+  c('num_diag_prop', 'care_cascade'),
+  c('num_treat_prop', 'care_cascade'),
+  c('num_suppr_prop', 'care_cascade'),
+  c('num_und_tot', 'num_cascade'),
+  c('num_diag_tot', 'num_cascade'),
+  c('num_treat_tot', 'num_cascade'),
+  c('num_suppr_tot', 'num_cascade')
+)
+colnames(plot_index) = c('pid', 'plot')
+plot_index = data.frame(plot_index)
 
+plot_keys = c('PLHIV', 'HIV_diag', 'HIV_inf', 'HIV_prev', 'care_cascade', 'num_diag', 'num_cascade')
+plot_long = c('Total PLHIV', 'Annual HIV diagnoses', 'Annual HIV incidence', 'Prevalence of HIV', 'Care cascade', 'Proportion diagnosed', 'PLHIV by care cascade')
+
+max_df_base = data.frame(
+  plot = c('PLHIV', 'HIV_diag', 'HIV_inf', 'HIV_prev', 'care_cascade', 'num_diag', 'num_cascade'),
+  lowerlim = 0,
+  # upperlim = c(20000, 1500, 1500, 0.2, 1, 1, 20000)
+  upperlim = c(25000, 2500, 3000, 0.25, 1, 1, 25000)
+)
 
 saveopen = function(p, fname='untitled', fdir='/', ext='png', open=T, ...){
   pdfname = paste0(fname, '.', ext)
