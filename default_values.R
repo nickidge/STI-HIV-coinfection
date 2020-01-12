@@ -9,6 +9,7 @@ defaultlist[['num_prep']] = 0
 defaultlist[['risk_mat']] = c(1, 10, 0.05)
 defaultlist[['test_wait']] = c(Inf, 2)
 defaultlist[['treatment_eff']] = c(1, 0.5, 0.1)
+defaultlist[['medimix']] = 1
 
 defaultlist[['f_infect_HIV']] = 6.5e-6
 defaultlist[['init_diag_prop']] = 0.7

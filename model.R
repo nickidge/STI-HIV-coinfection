@@ -74,7 +74,7 @@ run_model = function(y0=NULL, tvec=tvec_base, modelpars=list(), options=list(), 
       # initialise temp
       if(t==1){
         prevdt = y0
-        prevdt["S_lo", "S", "lo"] = thispopsize - sum(y0)
+        prevdt[1, 1, 1] = thispopsize - sum(y0)
       } else {
         prevdt = SID[t-1,,,]
       }
@@ -268,7 +268,7 @@ run_model = function(y0=NULL, tvec=tvec_base, modelpars=list(), options=list(), 
       if(popgrowth < 0){
         print('Negative population growth?!')
       } else {
-        prevdt[c("S_lo", "S_hi"), "S", "lo"] = prevdt[c("S_lo", "S_hi"), "S", "lo"] + popgrowth * c((1-prop_high_risk), prop_high_risk)
+        prevdt[c("S_lo", "S_hi"), 1, 1] = prevdt[c("S_lo", "S_hi"), 1, 1] + popgrowth * c((1-prop_high_risk), prop_high_risk)
       }
       
       ###################

@@ -6,7 +6,7 @@ HIV_labs = c("S_lo", "S_hi", "S_pr",
              "I_pr_new", "I_pr_mid", "I_pr_old",
              "D1", "D2", "D3")
 STI_labs = c("S", "E", "I_s", "I_a", "T")
-RISK_labs = c("lo", "hi")
+RISK_labs = c("aus", "int")
 
 # compartment array
 # dim 1: HIV status -- only this one is in use at the moment
