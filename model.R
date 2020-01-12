@@ -114,10 +114,13 @@ run_model = function(y0=NULL, tvec=tvec_base, modelpars=list(), options=list(), 
       
       # calculate force of infections
       totalppl = sum(prevdt)
-      rel_inc_HIV = sum(prevdt[sHIV$I,,]) + sum(treatment_eff[1]*prevdt["D1",,]) + sum(treatment_eff[2]*prevdt["D2",,]) + sum(treatment_eff[3]*prevdt["D3",,])
+      # rel_inc_HIV = sum(prevdt[sHIV$I,,]) + sum(treatment_eff[1]*prevdt["D1",,]) + sum(treatment_eff[2]*prevdt["D2",,]) + sum(treatment_eff[3]*prevdt["D3",,])
+      rel_inc_HIV = apply(prevdt[sHIV$I,,], c(2,3), sum) + treatment_eff[1]*prevdt["D1",,] + treatment_eff[2]*prevdt["D2",,] + treatment_eff[3]*prevdt["D3",,]
+      rel_inc_HIV = apply(rel_inc_HIV, 2, sum)
+      rel_inc_HIV = c(rel_inc_HIV[1] + medimix * rel_inc_HIV[2], rel_inc_HIV[2] + medimix * rel_inc_HIV[1])
       rel_inc_STI = sum(prevdt[,sSTI$I,])
       
-      foi_HIV = risk_mat * condom_thru * f_infect_HIV * rel_inc_HIV / totalppl
+      foi_HIV = outer(risk_mat * condom_thru * f_infect_HIV / totalppl, rel_inc_HIV)
       foi_HIV = fixnan(foi_HIV)
       
       foi_STI = f_infect_STI * rel_inc_STI / totalppl
@@ -139,7 +142,7 @@ run_model = function(y0=NULL, tvec=tvec_base, modelpars=list(), options=list(), 
       HIV_p = setNames(numeric(nrow(HIV_transitions)), HIV_transitions[,'trans'])
       
       # infections
-      HIV_p[tHIV$inf] = apply(prevdt[sHIV$S,,], MARGIN=1, FUN=sum) * foi_HIV
+      HIV_p[tHIV$inf] = as.vector(apply(prevdt[sHIV$S,,], MARGIN=c(1,3), FUN=sum) * foi_HIV)
       
       # waiting undiagnosed
       HIV_p[tHIV$wait_1] = 1/test_wait[1]
@@ -170,8 +173,14 @@ run_model = function(y0=NULL, tvec=tvec_base, modelpars=list(), options=list(), 
       HIV_p = vapply(HIV_p, function(x) median(c(0, x, 1)), 1)
 
       # functions to calculate number of people moving for each transition
-      getppl = function(from, prop) (prevdt[from,,] * as.numeric(prop))
-      trans_i = function(i) getppl(HIV_transitions[i,'from'], HIV_p[i])
+      getppl = function(from, med, prop){
+        this = prevdt[from,,] * as.numeric(prop)
+        if(as.numeric(med) != 0){
+          this[,-as.numeric(med)] = 0
+        }
+        return(this)
+      }
+      trans_i = function(i) getppl(HIV_transitions[i,'from'], HIV_transitions[i, 'med'], HIV_p[i])
       
       # calculate transitions in absolute numbers
       HIV_trans = lapply(1:length(HIV_p), FUN=trans_i)

@@ -28,30 +28,33 @@ sHIV[['D3plus']] = c("D3")
 sHIV[['PLHIV']] = union(sHIV[['I']], sHIV[['D']])
 
 # HIV transitions -- e.g. infection, diagnosis, starting treatment, etc.
-HIV_transitions = rbind(c("S_lo_inf", "S_lo", "I_lo_new"),
-                        c("S_hi_inf", "S_hi", "I_hi_new"),
-                        c("S_pr_inf","S_pr", "I_pr_new"),
-                        c("I_lo_wait_1", "I_lo_new", "I_lo_mid"),
-                        c("I_lo_wait_2","I_lo_mid", "I_lo_old"),
-                        c("I_hi_wait_1", "I_hi_new", "I_hi_mid"),
-                        c("I_hi_wait_2", "I_hi_mid", "I_hi_old"),
-                        c("I_pr_wait_1", "I_pr_new", "I_pr_mid"),
-                        c("I_pr_wait_2", "I_pr_mid", "I_pr_old"),
-                        c("I_lo_new_d", "I_lo_new", "D1"),
-                        c("I_lo_mid_d", "I_lo_mid", "D1"),
-                        c("I_lo_old_d", "I_lo_old", "D1"),
-                        c("I_hi_new_d", "I_hi_new", "D1"),
-                        c("I_hi_mid_d", "I_hi_mid", "D1"),
-                        c("I_hi_old_d", "I_hi_old", "D1"),
-                        c("I_pr_new_d", "I_pr_new", "D1"),
-                        c("I_pr_mid_d", "I_pr_mid", "D1"),
-                        c("I_pr_old_d", "I_pr_old", "D1"),
-                        c("treat", "D1", "D2"),
-                        c("viral_supp", "D2", "D3"),
-                        c("become_high_risk", "S_lo", "S_hi"),
-                        c("start_prep", "S_hi", "S_pr")
+HIV_transitions = rbind(c("S_lo_inf_aus", "S_lo", "I_lo_new", 1),
+                        c("S_hi_inf_aus", "S_hi", "I_hi_new", 1),
+                        c("S_pr_inf_aus","S_pr", "I_pr_new", 1),
+                        c("S_lo_inf_int", "S_lo", "I_lo_new", 2),
+                        c("S_hi_inf_int", "S_hi", "I_hi_new", 2),
+                        c("S_pr_inf_int","S_pr", "I_pr_new", 2),
+                        c("I_lo_wait_1", "I_lo_new", "I_lo_mid", 0),
+                        c("I_lo_wait_2","I_lo_mid", "I_lo_old", 0),
+                        c("I_hi_wait_1", "I_hi_new", "I_hi_mid", 0),
+                        c("I_hi_wait_2", "I_hi_mid", "I_hi_old", 0),
+                        c("I_pr_wait_1", "I_pr_new", "I_pr_mid", 0),
+                        c("I_pr_wait_2", "I_pr_mid", "I_pr_old", 0),
+                        c("I_lo_new_d", "I_lo_new", "D1", 0),
+                        c("I_lo_mid_d", "I_lo_mid", "D1", 0),
+                        c("I_lo_old_d", "I_lo_old", "D1", 0),
+                        c("I_hi_new_d", "I_hi_new", "D1", 0),
+                        c("I_hi_mid_d", "I_hi_mid", "D1", 0),
+                        c("I_hi_old_d", "I_hi_old", "D1", 0),
+                        c("I_pr_new_d", "I_pr_new", "D1", 0),
+                        c("I_pr_mid_d", "I_pr_mid", "D1", 0),
+                        c("I_pr_old_d", "I_pr_old", "D1", 0),
+                        c("treat", "D1", "D2", 0),
+                        c("viral_supp", "D2", "D3", 0),
+                        c("become_high_risk", "S_lo", "S_hi", 0),
+                        c("start_prep", "S_hi", "S_pr", 0)
 )
-colnames(HIV_transitions) = c("trans", "from", "to")
+colnames(HIV_transitions) = c("trans", "from", "to", "med")
 
 # HIV transition label index
 tHIV = list()
