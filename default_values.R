@@ -10,6 +10,7 @@ defaultlist[['risk_mat']] = c(1, 10, 0.03) # relative force of infection for low
 defaultlist[['test_wait']] = c(Inf, 2) # defines length that people stay in each undiagnosed compartment (provided they don't get diagnosed)
 defaultlist[['treatment_eff']] = c(1, 0.5, 0.1) # force of infection multiplier when diagnosed, on treatment, virally suppressed
 defaultlist[['medimix']] = 1 # amount of mixing between medicare eligibility compartments
+defaultlist[['prop_medi']] = 1 # what proportion of people are medicare eligible
 
 defaultlist[['f_infect_HIV']] = 6.5e-6 # initial guess for HIV force of infection
 defaultlist[['init_diag_prop']] = 0.7 # initial guess for proportion of PLHIV who are diagnosed

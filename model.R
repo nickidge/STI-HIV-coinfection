@@ -48,8 +48,8 @@ run_model = function(y0=NULL, tvec=tvec_base, modelpars=list(), options=list(), 
   SID = aperm(SID, c(4,1,2,3))
   dimnames(SID)[[1]] = tvec
   
-  HIV_trans_log = makearray(list(tvec, HIV_transitions[,"trans"], STI_labs, RISK_labs))
-  deaths_log = makearray(list(tvec, HIV_labs, STI_labs, RISK_labs))
+  HIV_trans_log = makearray(list(tvec, HIV_transitions[,"trans"], STI_labs, med_labs))
+  deaths_log = makearray(list(tvec, HIV_labs, STI_labs, med_labs))
   popgrowth_log = setNames(numeric(length(tvec)), tvec)
 
 

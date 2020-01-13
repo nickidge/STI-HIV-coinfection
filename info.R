@@ -6,13 +6,13 @@ HIV_labs = c("S_lo", "S_hi", "S_pr",
              "I_pr_new", "I_pr_mid", "I_pr_old",
              "D1", "D2", "D3")
 STI_labs = c("S", "E", "I_s", "I_a", "T")
-RISK_labs = c("aus", "int")
+med_labs = c("aus", "int")
 
 # compartment array
 # dim 1: HIV status -- only this one is in use at the moment
 # dim 2: STI status
-# dim 3: risk status # not really sure how to interpret this
-SID_mat = array(0, dim = c(length(HIV_labs), length(STI_labs), length(RISK_labs)), dimnames = list(HIV_labs, STI_labs, RISK_labs))
+# dim 3: medicare status
+SID_mat = array(0, dim = c(length(HIV_labs), length(STI_labs), length(med_labs)), dimnames = list(HIV_labs, STI_labs, med_labs))
 
 # HIV compartment label index
 sHIV = list()
