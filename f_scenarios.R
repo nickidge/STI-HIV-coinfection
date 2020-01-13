@@ -1,5 +1,5 @@
 
-gen_scenarios = function(scen_df=NULL, scenarios = list(), ntrials=3, basevar=0.2, base_uncertainty=FALSE){
+gen_scenarios = function(scen_df=NULL, scenarios = list(), ntrials=3, basevar=0.2){
   
   dat = all_dat
   dat$scen = 'data'
@@ -19,9 +19,6 @@ gen_scenarios = function(scen_df=NULL, scenarios = list(), ntrials=3, basevar=0.
     scen_df = widen_sources(scen_df)
     scen_df$scen = 'base'
     scen_df$scen_long = 'Base'
-  } else if(!base_uncertainty){
-    scen_df$lower_ci = scen_df$model
-    scen_df$upper_ci = scen_df$model
   }
   
   scen_df = rbind.fill(dat, scen_df)
@@ -48,11 +45,15 @@ gen_scenarios = function(scen_df=NULL, scenarios = list(), ntrials=3, basevar=0.
   
 }
 
-plot_scens = function(df){
+plot_scens = function(df, base_uncertainty=F){
   
   scen_colours = c('black', 'red', 'green')
   
   scen_keys = c('PLHIV', 'HIV_diag', 'HIV_inf', 'HIV_prev', 'num_diag')
+  if(!base_uncertainty){
+    baserows = df$scen == 'Base'
+    df[baserows, c('lower_ci', 'upper_ci')] = df$model[baserows]
+  }
   df = subset(df, HIV_pop %in% scen_keys)
   df = subset(df, plot != 'num_cascade')
   
