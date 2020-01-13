@@ -235,7 +235,6 @@ add_data_col = function(thislist, t_dat, data_col, deflist = baselist, syear = N
                   method = 'constant',
                   f=1)
       vm = setNames(vm$y, vm$x)
-      # names(vm) = tvec_m
       
       v = c(vl, vm, vh)
       thisentrycol = v

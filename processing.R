@@ -52,13 +52,11 @@ make_annual = function(df){
 
 # extract data frame of values from model output
 extr = function(output, keys, tvec=tvec_base){
+  
   SID = output$SID
   HIV_trans_log = output$HIV_trans_log
-  tvec = as.character(tvec)
-  tvec = intersect(tvec, dimnames(SID)[[1]])
-  if(any(is.na(SID))){
-    print('')
-  }
+  tvec = intersect(as.character(tvec), dimnames(SID)[[1]])
+  
   df = data.frame()
   for(key in unique(keys)){
     
@@ -67,6 +65,7 @@ extr = function(output, keys, tvec=tvec_base){
       this = apply(this, 1, sum)
       thisdf = data.frame(t = names(this), value = this, type = 'pop', dt = 1, pid='PLHIV_tot',
                           sti_pop = 'all', risk_pop = 'all', HIV_pop = 'PLHIV')
+      
     } else if(key == 'HIV_diag'){
       this = HIV_trans_log
       this = this[tvec,tHIV$test,,]
@@ -74,15 +73,7 @@ extr = function(output, keys, tvec=tvec_base){
       thisdf = data.frame(t = names(this), value = this, type = 'trans', dt = 1/12, pid='HIV_diag_tot',
                           sti_pop = 'all', risk_pop = 'all', HIV_pop = 'HIV_diag')
       thisdf = make_annual(thisdf)
-      # thisdf = thisdf %>% 
-      #   mutate(floort = floor(as.numeric(t))) %>% 
-      #   group_by(floort) %>%
-      #   mutate(value = mean(value) * 12) %>% 
-      #   ungroup() %>% 
-      #   filter(as.numeric(t) == floort) %>% 
-      #   mutate(dt = 1) %>% 
-      #   select(-floort) %>% 
-      #   as.data.frame()
+      
     } else if(key == 'HIV_inf'){
       this = HIV_trans_log
       this = this[tvec,tHIV$inf,,]
@@ -90,15 +81,7 @@ extr = function(output, keys, tvec=tvec_base){
       thisdf = data.frame(t = names(this), value = this, type = 'trans', dt = 1/12, pid='HIV_inf_tot',
                           sti_pop = 'all', risk_pop = 'all', HIV_pop = 'HIV_inf')
       thisdf = make_annual(thisdf)
-      # thisdf = thisdf %>% 
-      #   mutate(floort = floor(as.numeric(t))) %>% 
-      #   group_by(floort) %>%
-      #   mutate(value = mean(value) * 12) %>% 
-      #   ungroup() %>% 
-      #   filter(as.numeric(t) == floort) %>% 
-      #   mutate(dt = 1) %>% 
-      #   select(-floort) %>% 
-      #   as.data.frame()
+      
     } else if(key == 'care_cascade'){
       
       get_num_ppl = function(comp_key) apply(SID[tvec,sHIV[[comp_key]],,], 1, sum)
@@ -115,20 +98,13 @@ extr = function(output, keys, tvec=tvec_base){
       thisD2plus_df = data.frame(this_df_template, value = thisD2plus / thisD1plus, pid='num_treat_prop', HIV_pop = 'num_treat')
       thisD3plus_df = data.frame(this_df_template, value = thisD3plus / thisD2plus, pid='num_suppr_prop', HIV_pop = 'num_suppr')
       
-      # thisD1plus_df = data.frame(t = tvec, value = thisD1plus_prop, type = 'pop', dt = 1, pid='num_diag_prop',
-      #                            sti_pop = 'all', risk_pop = 'all', HIV_pop = 'num_diag', plot='care_cascade')
-      # thisD2plus_df = data.frame(t = tvec, value = thisD2plus_prop, type = 'pop', dt = 1, pid='num_treat_prop',
-      #                            sti_pop = 'all', risk_pop = 'all', HIV_pop = 'num_treat', plot='care_cascade')
-      # thisD3plus_df = data.frame(t = tvec, value = thisD3plus_prop, type = 'pop', dt = 1, pid='num_suppr_prop',
-      #                            sti_pop = 'all', risk_pop = 'all', HIV_pop = 'num_suppr', plot='care_cascade')
       thisdf = rbind.fill(thisD1plus_df, thisD2plus_df, thisD3plus_df)
       
     } else if(key == 'HIV_prev'){
+      
       this = SID[tvec,,,]
-      thisPLHIV = this[,sHIV$PLHIV,,]
-      thisPLHIV = apply(thisPLHIV, 1, sum)
-      thistotpop = this[,,,]
-      thistotpop = apply(thistotpop, 1, sum)
+      thisPLHIV = apply(this[,sHIV$PLHIV,,], 1, sum)
+      thistotpop = apply(this, 1, sum)
       
       thisprev = thisPLHIV / thistotpop
       
@@ -146,32 +122,12 @@ extr = function(output, keys, tvec=tvec_base){
       thisD2 = get_num_ppl('D2')
       thisD3 = get_num_ppl('D3')
       
-      # thisund = SID[tvec,sHIV$I,,]
-      # thisund = apply(thisund, 1, sum)
-      # thisD1 = SID[tvec,'D1',,]
-      # thisD1 = apply(thisD1, 1, sum)
-      # thisD2 = SID[tvec,'D2',,]
-      # thisD2 = apply(thisD2, 1, sum)
-      # thisD3 = SID[tvec,'D3',,]
-      # thisD3 = apply(thisD3, 1, sum)
-      
-      tvec = names(thisund)
-      
       this_df_template = data.frame(t = names(thisund), type='pop', dt = 1/12, sti_pop = 'all', risk_pop = 'all', plot='num_cascade')
       
       thisund_df = data.frame(this_df_template, value = thisund, pid='num_und_tot', HIV_pop = 'num_und')
       thisd1_df = data.frame(this_df_template, value = thisD1, pid='num_diag_tot', HIV_pop = 'num_diag')
       thisd2_df = data.frame(this_df_template, value = thisD2, pid='num_treat_tot', HIV_pop = 'num_treat')
       thisd3_df = data.frame(this_df_template, value = thisD3, pid='num_suppr_tot', HIV_pop = 'num_suppr')
-      
-      # thisund_df = data.frame(t = tvec, value = thisund, type = 'pop', dt = 1/12, pid='num_und_tot',
-      #                         sti_pop = 'all', risk_pop = 'all', HIV_pop = 'num_und', plot='num_cascade')
-      # thisd1_df = data.frame(t = tvec, value = thisD1, type = 'pop', dt = 1/12, pid='num_diag_tot',
-      #                        sti_pop = 'all', risk_pop = 'all', HIV_pop = 'num_diag', plot='num_cascade')
-      # thisd2_df = data.frame(t = tvec, value = thisD2, type = 'pop', dt = 1/12, pid='num_treat_tot',
-      #                        sti_pop = 'all', risk_pop = 'all', HIV_pop = 'num_treat', plot='num_cascade')
-      # thisd3_df = data.frame(t = tvec, value = thisD3, type = 'pop', dt = 1/12, pid='num_suppr_tot',
-      #                        sti_pop = 'all', risk_pop = 'all', HIV_pop = 'num_suppr', plot='num_cascade')
 
       thisdf = rbind.fill(thisund_df, thisd1_df, thisd2_df, thisd3_df)
       
