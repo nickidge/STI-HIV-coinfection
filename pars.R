@@ -81,6 +81,10 @@ modelpar = function(t=t_dat, y=NULL, parname=NA, pop=NA, subpop=NA, tvec=tvec_ba
     col = 1
     refvar = 'prop_high_risk'
     maxcol = 1
+  } else if(parname == 'prop_medi'){
+    col = 1
+    refvar = 'prop_medi'
+    maxcol = 1
   } else if(parname == 'medimix'){
     col = 1
     refvar = 'medimix'

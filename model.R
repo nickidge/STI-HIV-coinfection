@@ -165,17 +165,17 @@ run_model = function(y0=NULL, tvec=tvec_base, modelpars=list(), options=list(), 
       HIV_p = vapply(HIV_p, function(x) median(c(0, x, 1)), 1)
 
       # functions to calculate number of people moving for each transition
-      getppl = function(from, med, prop){
+      getppl_HIV = function(from, med, prop){
         this = prevdt[from,,] * as.numeric(prop)
         if(as.numeric(med) != 0){
           this[,-as.numeric(med)] = 0
         }
         return(this)
       }
-      trans_i = function(i) getppl(HIV_transitions[i,'from'], HIV_transitions[i, 'med'], HIV_p[i])
+      trans_i_HIV = function(i) getppl_HIV(HIV_transitions[i,'from'], HIV_transitions[i, 'med'], HIV_p[i])
       
       # calculate transitions in absolute numbers
-      HIV_trans = lapply(1:length(HIV_p), FUN=trans_i)
+      HIV_trans = lapply(1:length(HIV_p), FUN=trans_i_HIV)
       HIV_trans = abind(HIV_trans, along=0, new.names=names(HIV_p))
       
       # if(any(!is.finite(HIV_trans)) | any(!is.finite(prevdt))){
@@ -255,6 +255,21 @@ run_model = function(y0=NULL, tvec=tvec_base, modelpars=list(), options=list(), 
       ### STI ###
       
       
+      # 
+      ### medi transitions ###
+      
+      num_aus = sum(prevdt[,,"aus"])
+      num_int = sum(prevdt[,,"int"])
+      
+      if(num_aus > 0){
+        num_to_int = ((num_aus + num_int) * (1 - prop_medi) - num_int) / num_aus * prevdt[,,"aus"]
+      } else if(num_int > 0){
+        num_to_int = -prop_medi * prevdt[,,"int"]
+      } else {
+        num_to_int = 0
+      }
+      prevdt[,,"aus"] = prevdt[,,"aus"] - num_to_int
+      prevdt[,,"int"] = prevdt[,,"int"] + num_to_int
       
       ###########
       
@@ -269,7 +284,8 @@ run_model = function(y0=NULL, tvec=tvec_base, modelpars=list(), options=list(), 
       if(popgrowth < 0){
         print('Negative population growth?!')
       } else {
-        prevdt[c("S_lo", "S_hi"), 1, 1] = prevdt[c("S_lo", "S_hi"), 1, 1] + popgrowth * c((1-prop_high_risk), prop_high_risk)
+        # prevdt[c("S_lo", "S_hi"), 1, 1] = prevdt[c("S_lo", "S_hi"), 1, 1] + popgrowth * c((1-prop_high_risk), prop_high_risk)
+        prevdt[c("S_lo", "S_hi"), 1,] = prevdt[c("S_lo", "S_hi"), 1,] + popgrowth * outer(c((1-prop_high_risk), prop_high_risk), c(prop_medi, 1-prop_medi))
       }
       
       ###################
