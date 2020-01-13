@@ -40,7 +40,7 @@ make_interp = function(v, tvec=tvec_base){
 make_annual = function(df){
   df = df %>% 
     mutate(floort = floor(as.numeric(t))) %>% 
-    group_by(floort) %>%
+    group_by(floort, risk_pop) %>%
     mutate(value = mean(value) * 12) %>% 
     ungroup() %>% 
     filter(as.numeric(t) == floort) %>% 
@@ -72,6 +72,18 @@ extr = function(output, keys, tvec=tvec_base){
       this = apply(this, 1, sum)
       thisdf = data.frame(t = names(this), value = this, type = 'trans', dt = 1/12, pid='HIV_diag_tot',
                           sti_pop = 'all', risk_pop = 'all', HIV_pop = 'HIV_diag')
+      thisdf = make_annual(thisdf)
+      
+    } else if(key == 'HIV_diag_by_pop'){
+      this = HIV_trans_log
+      this = this[tvec,tHIV$test,,]
+      # this = apply(this, 1, sum)
+      this = apply(this, c(1,2), sum)
+      this = melt(this, varnames = c("t", "I_group"), variable.name="value")
+      this$risk_pop = substr(this$I_group, 3, 8)
+      this$risk_pop = substr(this$risk_pop, 1, 2)
+      thisdf = data.frame(this %>% select(-I_group), type = 'trans', dt = 1/12, pid='HIV_diag_by_pop',
+                          sti_pop = 'all', HIV_pop = 'HIV_diag_by_pop')
       thisdf = make_annual(thisdf)
       
     } else if(key == 'HIV_inf'){

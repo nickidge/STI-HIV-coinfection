@@ -15,8 +15,8 @@ plot_index = rbind(
 colnames(plot_index) = c('pid', 'plot')
 plot_index = data.frame(plot_index)
 
-plot_keys = c('PLHIV', 'HIV_diag', 'HIV_inf', 'HIV_prev', 'care_cascade', 'num_diag', 'num_cascade')
-plot_long = c('Total PLHIV', 'Annual HIV diagnoses', 'Annual HIV incidence', 'Prevalence of HIV', 'Care cascade', 'Proportion diagnosed', 'PLHIV by care cascade')
+plot_keys = c('PLHIV', 'HIV_diag', 'HIV_inf', 'HIV_prev', 'care_cascade', 'num_diag', 'num_cascade', 'HIV_diag_by_pop')
+plot_long = c('Total PLHIV', 'Annual HIV diagnoses', 'Annual HIV incidence', 'Prevalence of HIV', 'Care cascade', 'Proportion diagnosed', 'PLHIV by care cascade', 'Annual HIV diagnoses by pop')
 
 max_df_base = data.frame(
   plot = c('PLHIV', 'HIV_diag', 'HIV_inf', 'HIV_prev', 'care_cascade', 'num_diag', 'num_cascade'),
