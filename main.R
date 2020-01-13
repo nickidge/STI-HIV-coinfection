@@ -25,7 +25,8 @@ source("model.R", echo = F)
 # function scripts
 source("f_calibrate.R", echo = F)
 source("f_uncertainty.R", echo = F)
-source("f_scenarios.R", echo = T)
+source("f_scenarios.R", echo = F)
+source("f_table.R", echo = F)
 
 # calibrate model
 if(!exists('cal')){
@@ -41,4 +42,7 @@ saveopen(plot_uncertainty(base_df), 'calibration', 'plots')
 # run all scenarios (with uncertainty)
 scen_df = gen_scenarios(scen_df=base_df, scenarios=scenarios, ntrials=30)
 saveopen(plot_scens(scen_df), 'scenarios', 'plots')
+
+# create table of scenario results
+t_results = make_tab(tab_row_funcs, allscens)
 
