@@ -125,17 +125,6 @@ run_model = function(y0=NULL, tvec=tvec_base, modelpars=list(), options=list(), 
       
       foi_STI = f_infect_STI * rel_inc_STI / totalppl
       
-      # # pr_infect_sti[1] =  f_infect_sti[1] * ((1-mix1) * sum(prevdt[8,3:4,3]) / prevdt[8,"pop_sti",3] + # HIV-
-      # #                                            mix1 * sum(prevdt[9,3:4,3]) / prevdt[9,"pop_sti",3]) # HIV+
-      # # pr_infect_sti[2] =  f_infect_sti[1] * ((1-mix2) * sum(prevdt[8,3:4,3]) / prevdt[8,"pop_sti",3] + # HIV-
-      # #                                            mix2 * sum(prevdt[9,3:4,3]) / prevdt[9,"pop_sti",3]) # HIV+
-      # # pr_infect_sti[3] =  f_infect_sti[2] * (mix3 * sum(prevdt[8,3:4,3]) / prevdt[8,"pop_sti",3] + # HIV-
-      # #                                            (1-mix3) * sum(prevdt[9,3:4,3]) / prevdt[9,"pop_sti",3]) # HIV+
-      # 
-      # pr_infect_sti = pr_infect_sti * cond_sti
-      # 
-      
-      
       ###### TRANSITIONS ######
       
       # HIV #
@@ -573,19 +562,13 @@ run_model = function(y0=NULL, tvec=tvec_base, modelpars=list(), options=list(), 
     # 
     # }
     # 
-    # y_adj <<- SID[dim(SID)[1],,,3]
-    # 
-  # for (t in 1:(length(tvec_de)-1)){
-  
-  # }
       
     }
   
   if('only_cal_outs' %in% names(options)){
     if(options$only_cal_outs){
       return(list('SID' = SID,
-                  'HIV_trans_log' = HIV_trans_log,
-                  NULL))
+                  'HIV_trans_log' = HIV_trans_log))
     }
   }
   
