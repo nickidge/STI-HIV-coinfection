@@ -115,15 +115,18 @@ run_model = function(y0=NULL, tvec=tvec_base, modelpars=list(), options=list(), 
       # calculate force of infections
       totalppl = sum(prevdt)
       # rel_inc_HIV = sum(prevdt[sHIV$I,,]) + sum(treatment_eff[1]*prevdt["D1",,]) + sum(treatment_eff[2]*prevdt["D2",,]) + sum(treatment_eff[3]*prevdt["D3",,])
-      rel_inc_HIV = apply(prevdt[sHIV$I,,], c(2,3), sum) + treatment_eff[1]*prevdt["D1",,] + treatment_eff[2]*prevdt["D2",,] + treatment_eff[3]*prevdt["D3",,]
-      rel_inc_HIV = apply(rel_inc_HIV, 2, sum)
-      rel_inc_HIV = c(rel_inc_HIV[1] + medimix * rel_inc_HIV[2], rel_inc_HIV[2] + medimix * rel_inc_HIV[1])
-      rel_inc_STI = sum(prevdt[,sSTI$I,])
+      inf_HIV = apply(prevdt[sHIV$I,,], c(2,3), sum) + treatment_eff[1]*prevdt["D1",,] + treatment_eff[2]*prevdt["D2",,] + treatment_eff[3]*prevdt["D3",,]
+      rel_inf_HIV = apply(inf_HIV, 2, sum)
+      rel_inf_HIV = c(rel_inf_HIV[1] + medimix * rel_inf_HIV[2], rel_inf_HIV[2] + medimix * rel_inf_HIV[1])
+      rel_inf_STI = sum(prevdt[,sSTI$I,])
       
-      foi_HIV = outer(risk_mat * condom_thru * f_infect_HIV / totalppl, rel_inc_HIV)
+      pop_by_med = apply(prevdt, 3, sum)
+      rel_pop_HIV = c(pop_by_med[1] + medimix * pop_by_med[2], pop_by_med[2] + medimix * pop_by_med[1])
+      
+      foi_HIV = outer(risk_mat * condom_thru * f_infect_HIV, rel_inf_HIV / rel_pop_HIV)
       foi_HIV = fixnan(foi_HIV)
       
-      foi_STI = f_infect_STI * rel_inc_STI / totalppl
+      foi_STI = f_infect_STI * rel_inf_STI / totalppl
       
       ###### TRANSITIONS ######
       
