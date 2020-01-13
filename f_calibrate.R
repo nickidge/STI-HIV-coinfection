@@ -4,6 +4,16 @@ l2 = function(x, y){
   return(sum(v, na.rm=T))
 }
 
+prob = function(x) {
+  if(x <= 0){
+    return(FALSE)
+  } else if(x >= 1){
+    return(TRUE)
+  } else {
+    return(runif(1) < x)
+  }
+}
+
 distance_given_cal_vec = function(x, keys, norm=l2){
   callist = baselist
   for(i in 1:length(x)){
@@ -17,8 +27,7 @@ distance_given_cal_vec = function(x, keys, norm=l2){
   
   distance = norm(df$data, df$model)
   
-  saveprob = 0
-  if(runif(1) < saveprob){
+  if(prob(0)){
     p = plot_uncertainty(df)
     saveopen(p, paste0('calplots/', round(distance * 1e7)), open=FALSE)
   }
@@ -28,16 +37,10 @@ distance_given_cal_vec = function(x, keys, norm=l2){
 
 compare_model_to_data = function(output){
   
-  # res = extr(output, cal_keys)
-  res = extr(output, plot_keys[1:5])
+  res = extr(output, unique(all_dat$plot))
   
-  dat = all_dat
-  dat$scen = ""
-  dat$scen_long = ""
-  res$scen = ""
-  res$scen_long = ""
+  df_wide = widen_sources(all_dat %>% select(-contains('scen')), res %>% select(-contains('scen')))
   
-  df_wide = widen_sources(dat, res)
   return(df_wide)
 }
 
