@@ -9,21 +9,23 @@ data_raw = read_excel("data_sti.xlsx", sheet="data")
 # this is only necessary for PLHIV0 and prop_diag0 for now
 
 data_years = data_raw[,1]
-cascade0 = data_raw[,c(1,4,5,6)]
+data_cols = colnames(data_raw)
+
+cascade0 = data_raw[,c(1,which(data_cols %in% c("prop_HIV_diagnosed", "prop_HIV_treated", "prop_HIV_virally_suppressed")))]
 cascade0 = cascade0[!is.na(cascade0[,2]),]
-diagnoses0 = data_raw[,c(1,2)]
+diagnoses0 = data_raw[,c(1,which(data_cols=="HIV_diag_tot"))]
 diagnoses0 = diagnoses0[!is.na(diagnoses0[,2]),];
-PLHIV0 =  data_raw[,c(1,3)]
+PLHIV0 =  data_raw[,c(1,which(data_cols=="PLHIV_tot"))]
 PLHIV0_index = !is.na(PLHIV0[,2]) # [1:max(which(!is.na(PLHIV0[,2])==TRUE))]
 PLHIV0 = PLHIV0[!is.na(PLHIV0[,2]),]
-prop_diag0 =  data_raw[,c(1,4)]
+prop_diag0 =  data_raw[,c(1,which(data_cols=="prop_HIV_diagnosed"))]
 prop_diag0_index = !is.na(prop_diag0[,2]) # [1:max(which(!is.na(prop_diag0[,2])==TRUE))]
 prop_diag0 = prop_diag0[!is.na(prop_diag0[,2]),]
-prop_treat0 =  data_raw[,c(1,5)]
+prop_treat0 =  data_raw[,c(1,which(data_cols=="prop_HIV_treated"))]
 prop_treat0 = prop_treat0[!is.na(prop_treat0[,2]),]
-prop_suppressed0 =  data_raw[,c(1,6)]
+prop_suppressed0 =  data_raw[,c(1,which(data_cols=="prop_HIV_virally_suppressed"))]
 prop_suppressed0 = prop_suppressed0[!is.na(prop_suppressed0[,2]),]
-totalpop0 =  data_raw[,c(1,7)] 
+totalpop0 =  data_raw[,c(1,which(data_cols=="pop_tot"))] 
 totalpop0 = totalpop0[!is.na(totalpop0[,2]),]
 
 
@@ -43,18 +45,18 @@ diagnoses_sti0_index = !is.na(diagnoses_sti0[,2])
 diagnoses_sti0 = diagnoses_sti0[diagnoses_sti0_index[,1],]
 
 
-# HIV_main_data = as.data.frame(data_raw[,1:3])
-HIV_main_data = as.data.frame(data_raw[,grepl("Year", colnames(data_raw)) | grepl("New diagnoses", colnames(data_raw), fixed=T) | grepl("Total PLHIV", colnames(data_raw), fixed=T)])
-colnames(HIV_main_data) = c("year", "diagnoses_HIV", "value")
-HIV_main_data$N = factor("data")
-HIV_main_data$HIV_group = "HIV_plus"
+# # HIV_main_data = as.data.frame(data_raw[,1:3])
+# HIV_main_data = as.data.frame(data_raw[,grepl("Year", colnames(data_raw)) | grepl("New diagnoses", colnames(data_raw), fixed=T) | grepl("Total PLHIV", colnames(data_raw), fixed=T)])
+# colnames(HIV_main_data) = c("year", "diagnoses_HIV", "value")
+# HIV_main_data$N = factor("data")
+# HIV_main_data$HIV_group = "HIV_plus"
 
 
-PLHIV_dat = data.frame(t = PLHIV0$Year, value = PLHIV0$`Total PLHIV`, type='pop', dt=1, pid = 'PLHIV_tot',
+PLHIV_dat = data.frame(t = PLHIV0$Year, value = PLHIV0$PLHIV_tot, type='pop', dt=1, pid = 'PLHIV_tot',
                        sti_pop='all', risk_pop='all', HIV_pop='PLHIV', source='data', scen='')
-HIV_diag_dat = data.frame(t = diagnoses0$Year, value = diagnoses0$`New diagnoses`, type='trans', dt=1, pid='HIV_diag_tot',
+HIV_diag_dat = data.frame(t = diagnoses0$Year, value = diagnoses0$HIV_diag_tot, type='trans', dt=1, pid='HIV_diag_tot',
                           sti_pop='all', risk_pop='all', HIV_pop='HIV_diag', source='data', scen='')
-prop_diag_dat = data.frame(t = cascade0$Year, value = cascade0$`Prop HIV diagnosed`, type='pop', dt=1, pid='num_diag_prop',
+prop_diag_dat = data.frame(t = cascade0$Year, value = cascade0$prop_HIV_diagnosed, type='pop', dt=1, pid='num_diag_prop',
                           sti_pop='all', risk_pop='all', HIV_pop='num_diag', source='data', scen='', plot='care_cascade')
 
 all_dat = rbind.fill(PLHIV_dat, HIV_diag_dat, prop_diag_dat)
@@ -72,7 +74,7 @@ data = list(diagnoses0, PLHIV0, prop_diag0, prop_treat0, prop_suppressed0, total
 # end_year = 2040
 
 # cascade0 = data_raw[,c(1,4,5,6)]
-cascade0 = data_raw[,grepl("Year", colnames(data_raw)) | grepl("Prop HIV", colnames(data_raw), fixed=T)]
+cascade0 = data_raw[,grepl("Year", colnames(data_raw)) | grepl("prop_HIV", colnames(data_raw), fixed=T)]
 cascade0 = cascade0[!is.na(cascade0[,2]),]
 
 # HIV care cascade
