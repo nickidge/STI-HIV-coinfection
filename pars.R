@@ -46,7 +46,7 @@ modelpar = function(t=t_dat, y=NULL, parname=NA, pop=NA, subpop=NA, tvec=tvec_ba
     refvar = 'test_wait'
     maxcol = 1
   } else if(parname == 'condom_usage'){
-    col = -3 + 1*match(pop, popindex) + 3*match(subpop, c('aus', 'int'))
+    col = -3 + 1*match(pop, popindex) + 3*match(subpop, med_labs)
     refvar = 'condom_usage'
     maxcol = 6
   } else if(parname == 'gel_up'){
@@ -70,7 +70,7 @@ modelpar = function(t=t_dat, y=NULL, parname=NA, pop=NA, subpop=NA, tvec=tvec_ba
     refvar = 'eff_condom'
     maxcol = 1
   } else if(parname == 'relative_foi'){
-    col = -3 + 1*match(pop, popindex) + 3*match(subpop, c('aus', 'int'))
+    col = -3 + 1*match(pop, popindex) + 3*match(subpop, med_labs)
     refvar = 'risk_mat'
     maxcol = 6
   } else if(parname == 'num_prep'){

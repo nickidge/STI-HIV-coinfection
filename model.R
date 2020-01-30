@@ -272,18 +272,18 @@ run_model = function(y0=NULL, tvec=tvec_base, modelpars=list(), options=list(), 
       # 
       ### medi transitions ###
       
-      num_aus = sum(prevdt[,,"aus"])
-      num_int = sum(prevdt[,,"int"])
+      num_aus = sum(prevdt[,,med_labs[1]])
+      num_int = sum(prevdt[,,med_labs[2]])
       
       if(num_aus > 0){
-        num_to_int = ((num_aus + num_int) * (1 - prop_medi) - num_int) / num_aus * prevdt[,,"aus"]
+        num_to_int = ((num_aus + num_int) * (1 - prop_medi) - num_int) / num_aus * prevdt[,,med_labs[1]]
       } else if(num_int > 0){
-        num_to_int = -prop_medi * prevdt[,,"int"]
+        num_to_int = -prop_medi * prevdt[,,med_labs[2]]
       } else {
         num_to_int = 0
       }
-      prevdt[,,"aus"] = prevdt[,,"aus"] - num_to_int
-      prevdt[,,"int"] = prevdt[,,"int"] + num_to_int
+      prevdt[,,med_labs[1]] = prevdt[,,med_labs[1]] - num_to_int
+      prevdt[,,med_labs[2]] = prevdt[,,med_labs[2]] + num_to_int
       
       ###########
       
