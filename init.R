@@ -31,3 +31,7 @@ library(grid)
 label_years = unique(c(plot_years, seq(2000, 2050, by=5)))
 
 options(stringsAsFactors = FALSE)
+
+makearray = function(dimnames){
+  return(array(0, dim=lengths(dimnames), dimnames=dimnames))
+}

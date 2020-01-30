@@ -74,7 +74,7 @@ run_model = function(y0=NULL, tvec=tvec_base, modelpars=list(), options=list(), 
       # initialise temp
       if(t==1){
         prevdt = y0
-        prevdt[1, 1, 1] = thispopsize - sum(y0)
+        prevdt[1, 1, 1] = thispopsize - sum(y0) + prevdt[1, 1, 1]
       } else {
         prevdt = SID[t-1,,,]
       }
@@ -107,7 +107,7 @@ run_model = function(y0=NULL, tvec=tvec_base, modelpars=list(), options=list(), 
       # cond_HIV = mult_condom_means[1]
       # cond_sti = mult_condom[,2]
       
-      condom_thru = 1 - condom_usage
+      condom_thru = 1 - condom_usage * eff_condom
       
       #########################
       
@@ -121,9 +121,26 @@ run_model = function(y0=NULL, tvec=tvec_base, modelpars=list(), options=list(), 
       rel_inf_STI = sum(prevdt[,sSTI$I,])
       
       pop_by_med = apply(prevdt, 3, sum)
-      rel_pop_HIV = c(pop_by_med[1] + medimix * pop_by_med[2], pop_by_med[2] + medimix * pop_by_med[1])
       
-      foi_HIV = outer(risk_mat * condom_thru * f_infect_HIV, rel_inf_HIV / rel_pop_HIV)
+      mix_pops = makearray(list(c('inf', 'pop'), medi_states))
+      for(mix_i in 1:nrow(mixing)){
+        mix_to = medi_states[mix_i]
+        mix_to_split = strsplit(mix_to, "_")[[1]]
+        mix_pops['inf', mix_to] = sum(prevdt[sHIV[[paste0('I_', mix_to_split[1])]],,mix_to_split[2]])
+        mix_pops['pop', mix_to] = sum(prevdt[sHIV[[mix_to_split[1]]],,mix_to_split[2]])
+        if(mix_to_split[1] == 'lo'){
+          mix_pops['inf', mix_to] = mix_pops['inf', mix_to] + sum(treatment_eff[1]*prevdt["D1",,mix_to_split[2]] + treatment_eff[2]*prevdt["D2",,mix_to_split[2]] + treatment_eff[3]*prevdt["D3",,mix_to_split[2]])
+          mix_pops['pop', mix_to] = mix_pops['pop', mix_to] + sum(prevdt[sHIV[['D']],,mix_to_split[2]])
+        }
+      }
+
+      foi_mix = mix_pops['inf',] %*% mixing / mix_pops['pop',] %*% mixing
+      foi_mix = fixnan(foi_mix)
+      
+      # rel_pop_HIV = c(pop_by_med[1] + medimix * pop_by_med[2], pop_by_med[2] + medimix * pop_by_med[1])
+      
+      # foi_HIV = outer(risk_mat * condom_thru * f_infect_HIV, rel_inf_HIV / rel_pop_HIV)
+      foi_HIV = risk_mat * condom_thru * f_infect_HIV * foi_mix
       foi_HIV = fixnan(foi_HIV)
       
       foi_STI = f_infect_STI * rel_inf_STI / totalppl
@@ -134,22 +151,19 @@ run_model = function(y0=NULL, tvec=tvec_base, modelpars=list(), options=list(), 
       HIV_p = setNames(numeric(nrow(HIV_transitions)), HIV_transitions[,'trans'])
       
       # infections
-      HIV_p[tHIV$inf] = as.vector(apply(prevdt[sHIV$S,,], MARGIN=c(1,3), FUN=sum) * foi_HIV)
+      HIV_p[tHIV$inf] = as.vector(apply(prevdt[sHIV$S,,], MARGIN=c(1,3), FUN=sum)) * foi_HIV
       
       # waiting undiagnosed
       HIV_p[tHIV$wait_1] = 1/test_wait[1]
-      HIV_p[tHIV$wait_2] = 1/test_wait[2]
+      # HIV_p[tHIV$wait_2] = 1/test_wait[2]
 
       # diagnoses
       HIV_p["I_lo_new_d"] = 1/t_testing[1]
-      HIV_p["I_lo_mid_d"] = 1/t_testing[2]
-      HIV_p["I_lo_old_d"] = 1/t_testing[3]
-      HIV_p["I_hi_new_d"] = 1/t_testing[4]
-      HIV_p["I_hi_mid_d"] = 1/t_testing[5]
-      HIV_p["I_hi_old_d"] = 1/t_testing[6]
-      HIV_p["I_pr_new_d"] = 1/t_testing[7]
-      HIV_p["I_pr_mid_d"] = 1/t_testing[8]
-      HIV_p["I_pr_old_d"] = 1/t_testing[9]
+      HIV_p["I_lo_old_d"] = 1/t_testing[2]
+      HIV_p["I_hi_new_d"] = 1/t_testing[3]
+      HIV_p["I_hi_old_d"] = 1/t_testing[4]
+      HIV_p["I_pr_new_d"] = 1/t_testing[5]
+      HIV_p["I_pr_old_d"] = 1/t_testing[6]
       
       # multiply by dt
       HIV_p = HIV_p * dt

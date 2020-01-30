@@ -1,13 +1,14 @@
 
 defaultlist = list()
 
-defaultlist[['t_testing']] = c(c(1, 3, 10), c(0.5, 1.5, 5), c(3/12, 3/12, 3/12)) # testing for i_lo_new, i_lo_mid, i_lo_old, i_hi_new, i_hi_mid, i_hi_old
-defaultlist[['condom_usage']] = c(0.42, 0.3, 0.1) # condom use for low risk hiv-, high risk hiv-, hiv+
+defaultlist[['t_testing']] = c(c(1, 3), c(0.5, 1.5), c(3/12, 3/12)) # testing for i_lo_new, i_lo_old, i_hi_new, i_hi_old
+# defaultlist[['condom_usage']] = c(0.42, 0.3, 0.1) # condom use for low risk hiv-, high risk hiv-, hiv+
+defaultlist[['condom_usage']] = c(1, 0, 0, 1, 0, 0) # condom use for low risk hiv-, high risk hiv-, hiv+
 defaultlist[['gel_mat']] = c(c(0, 0, 0), c(0, 0, 0)) # gel up for low risk hiv-, high risk hiv-, hiv+, and gel down for same groups
 defaultlist[['eff_condom']] = 0.7 # effectiveness of condoms for HIV
 defaultlist[['num_prep']] = 0 # number of people on PrEP
 defaultlist[['risk_mat']] = c(1, 10, 0.03) # relative force of infection for low risk, high risk not on PrEP, high risk on PrEP
-defaultlist[['test_wait']] = c(Inf, 2) # defines length that people stay in each undiagnosed compartment (provided they don't get diagnosed)
+defaultlist[['test_wait']] = c(1) # defines length that people stay in each undiagnosed compartment (provided they don't get diagnosed)
 defaultlist[['treatment_eff']] = c(1, 0.5, 0.1) # force of infection multiplier when diagnosed, on treatment, virally suppressed
 defaultlist[['medimix']] = 1 # amount of mixing between medicare eligibility compartments
 defaultlist[['prop_medi']] = 1 # what proportion of people are medicare eligible

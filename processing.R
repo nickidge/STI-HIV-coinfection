@@ -11,10 +11,6 @@ fixnan = function(x){
   return(x)
 }
 
-makearray = function(dimnames){
-  return(array(0, dim=lengths(dimnames), dimnames=dimnames))
-}
-
 widen_sources = function(...){
   df = rbind.fill(...)
   df$source = factor(df$source, levels=c('model', 'data'))

@@ -38,17 +38,17 @@ modelpar = function(t=t_dat, y=NULL, parname=NA, pop=NA, subpop=NA, tvec=tvec_ba
   popindex = c("HIV_low_risk", "HIV_high_risk", "HIV_prep")
   careindex = c("diagnosed", "diagnosed_treated", "treated_virally_suppressed")
   if(parname == 't_testing'){
-    col = -3 + 3*match(pop, popindex) + match(subpop, c("new_infection", "mid_infection", "old_infection"))
+    col = -2 + 2*match(pop, popindex) + match(subpop, c("new_infection", "old_infection"))
     refvar = 't_testing'
-    maxcol = 9
+    maxcol = 6
   } else if(parname == 'test_wait'){
     col = match(subpop, c("new_to_mid", "mid_to_old"))
     refvar = 'test_wait'
-    maxcol = 2
+    maxcol = 1
   } else if(parname == 'condom_usage'){
-    col = match(pop, popindex)
+    col = -3 + 1*match(pop, popindex) + 3*match(subpop, c('aus', 'int'))
     refvar = 'condom_usage'
-    maxcol = 3
+    maxcol = 6
   } else if(parname == 'gel_up'){
     col = match(pop, popindex)
     refvar = 'gel_mat'
@@ -70,9 +70,9 @@ modelpar = function(t=t_dat, y=NULL, parname=NA, pop=NA, subpop=NA, tvec=tvec_ba
     refvar = 'eff_condom'
     maxcol = 1
   } else if(parname == 'relative_foi'){
-    col = match(pop, popindex)
+    col = -3 + 1*match(pop, popindex) + 3*match(subpop, c('aus', 'int'))
     refvar = 'risk_mat'
-    maxcol = 3
+    maxcol = 6
   } else if(parname == 'num_prep'){
     col = 1
     refvar = 'num_prep'

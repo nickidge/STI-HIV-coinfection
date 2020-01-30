@@ -50,49 +50,6 @@ HIV_main_data$N = factor("data")
 HIV_main_data$HIV_group = "HIV_plus"
 
 
-# # sti_main_data_1 = as.data.frame(data_raw[,c(1,7)])
-# sti_main_data_1 = as.data.frame(data_raw[,grepl("Year", colnames(data_raw)) | grepl("Total MSM", colnames(data_raw), fixed=T)])
-# sti_main_data_1[,2] = (sti_main_data_1[,2] - HIV_main_data[,3]) *  data_raw[,grepl("Gon prev: HIV-", colnames(data_raw), fixed=T)]
-# colnames(sti_main_data_1) = c("year", "value")
-# sti_main_data_1$sti_group = "sti_plus"
-# sti_main_data_1$HIV_group = "HIV_minus"
-# 
-# # sti_main_data_2 = as.data.frame(data_raw[,c(1,3)])
-# sti_main_data_2 = HIV_main_data[,c(1,3)]
-# sti_main_data_2[,2] = sti_main_data_2[,2] * data_raw[,grepl("Gon prev: HIV+", colnames(data_raw), fixed=T)]
-# colnames(sti_main_data_2) = c("year", "value")
-# sti_main_data_2$sti_group = "sti_plus"
-# sti_main_data_2$HIV_group = "HIV_plus"
-# 
-# 
-# # sti_main_data_3 = as.data.frame(data_raw[,c(1,19)])
-# sti_main_data_3 = diagnoses_sti0[,c(1,2)]
-# colnames(sti_main_data_3) = c("year", "value")
-# sti_main_data_3$sti_group = "diagnoses_sti"
-# sti_main_data_3$HIV_group = "HIV_minus"
-# 
-# # sti_main_data_4 = as.data.frame(data_raw[,c(1,20)])
-# sti_main_data_4 = diagnoses_sti0[,c(1,3)]
-# colnames(sti_main_data_4) = c("year", "value")
-# sti_main_data_4$sti_group = "diagnoses_sti"
-# sti_main_data_4$HIV_group = "HIV_plus"
-# 
-# # sti_main_data_5 = as.data.frame(data_raw[,c(1,8)])
-# sti_main_data_5 = prev_sti0[,c(1,2)]
-# colnames(sti_main_data_5) = c("year", "value")
-# sti_main_data_5$sti_group = "prev_sti"
-# sti_main_data_5$HIV_group = "HIV_minus"
-# 
-# # sti_main_data_6 = as.data.frame(data_raw[,c(1,9)])
-# sti_main_data_6 = prev_sti0[,c(1,3)]
-# colnames(sti_main_data_6) = c("year", "value")
-# sti_main_data_6$sti_group = "prev_sti"
-# sti_main_data_6$HIV_group = "HIV_plus"
-# 
-# sti_main_data = rbind(sti_main_data_1, sti_main_data_2, sti_main_data_3, sti_main_data_4, sti_main_data_5, sti_main_data_6)
-# sti_main_data$N = factor("data")
-
-
 PLHIV_dat = data.frame(t = PLHIV0$Year, value = PLHIV0$`Total PLHIV`, type='pop', dt=1, pid = 'PLHIV_tot',
                        sti_pop='all', risk_pop='all', HIV_pop='PLHIV', source='data', scen='')
 HIV_diag_dat = data.frame(t = diagnoses0$Year, value = diagnoses0$`New diagnoses`, type='trans', dt=1, pid='HIV_diag_tot',
