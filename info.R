@@ -36,6 +36,10 @@ sHIV[['PLHIV']] = union(sHIV[['I']], sHIV[['D']])
 sHIV[['lo']] = grep("lo", HIV_labs, value=TRUE)
 sHIV[['hi']] = grep("hi", HIV_labs, value=TRUE)
 sHIV[['pr']] = grep("pr", HIV_labs, value=TRUE)
+sHIV[['und']] = setdiff(HIV_labs, sHIV$D)
+sHIV[['S_pr']] = 'S_pr'
+sHIV[['S_lo']] = 'S_lo'
+sHIV[['S_hi']] = 'S_hi'
 
 # HIV transitions -- e.g. infection, diagnosis, starting treatment, etc.
 HIV_transitions = rbind(c("S_lo_inf_aus", "S_lo", "I_lo_new", 1),
@@ -64,8 +68,10 @@ HIV_transitions = rbind(c("S_lo_inf_aus", "S_lo", "I_lo_new", 1),
                         c("I_pr_old_d", "I_pr_old", "D1", 0),
                         c("treat", "D1", "D2", 0),
                         c("viral_supp", "D2", "D3", 0),
-                        c("become_high_risk", "S_lo", "S_hi", 0),
-                        c("start_prep", "S_hi", "S_pr", 0)
+                        c("become_high_risk", "S_lo", "S_hi", 1),
+                        c("start_prep_aus", "S_hi", "S_pr", 1),
+                        c("start_prep_int", "S_hi", "S_pr", 2)
+                        
 )
 colnames(HIV_transitions) = c("trans", "from", "to", "med")
 
@@ -95,5 +101,8 @@ STI_transitions = rbind(c('exp', 'S', 'E'),
 colnames(STI_transitions) = c("trans", "from", "to")
 
 medi_states = do.call(paste0, expand.grid(c('lo', 'hi', 'pr'), '_', med_labs))
-mixing = makearray(list(medi_states, medi_states))
-mixing[,] = 1
+mixing_raw = read_excel('data_sti.xlsx', sheet='mixing', range=cell_limits(c(2,2), c(7,7)), col_names = medi_states)
+mixing = as.matrix(mixing_raw)
+rownames(mixing) = medi_states
+# mixing = makearray(list(medi_states, medi_states))
+# mixing[,] = 1

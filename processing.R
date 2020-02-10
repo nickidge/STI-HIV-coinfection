@@ -34,9 +34,11 @@ make_interp = function(v, tvec=tvec_base){
 }
 
 make_annual = function(df){
+  whichcols = c('floort', c('risk_pop', 'med_pop')[c('risk_pop', 'med_pop') %in% colnames(df)])
   df = df %>% 
     mutate(floort = floor(as.numeric(t))) %>% 
-    group_by(floort, risk_pop) %>%
+    # group_by(floort, risk_pop, med_pop) %>%
+    group_by_at(vars(whichcols)) %>%
     mutate(value = mean(value) * 12) %>% 
     ungroup() %>% 
     filter(as.numeric(t) == floort) %>% 
@@ -58,16 +60,40 @@ extr = function(output, keys, tvec=tvec_base){
     
     if(key == 'PLHIV'){
       this = SID[tvec,sHIV$PLHIV,,]
-      this = apply(this, 1, sum)
-      thisdf = data.frame(t = names(this), value = this, type = 'pop', dt = 1, pid='PLHIV_tot',
-                          sti_pop = 'all', risk_pop = 'all', HIV_pop = 'PLHIV')
+      this = apply(this, c(1,4), sum)
+      this = as.data.frame(this)
+      this$tot = rowSums(this)
+      this = melt(as.matrix(this))
+      colnames(this) = c('t', 'med_pop', 'value')
+      thisdf = data.frame(this, type = 'pop', dt = 1, pid='PLHIV_tot',
+                          sti_pop = 'all', HIV_pop = 'PLHIV', risk_pop = 'all')
+      # thisdf = data.frame(t = names(this), value = this, type = 'pop', dt = 1, pid='PLHIV_tot',
+      #                     sti_pop = 'all', risk_pop = 'all', HIV_pop = 'PLHIV')
       
+    } else if(key == 'pop'){
+      this = SID[tvec,,,]
+      this = apply(this, c(1,4), sum)
+      this = as.data.frame(this)
+      this$tot = rowSums(this)
+      this = melt(as.matrix(this))
+      colnames(this) = c('t', 'med_pop', 'value')
+      thisdf = data.frame(this, type = 'pop', dt = 1, pid='pop_tot', plot='pop',
+                          sti_pop = 'all', HIV_pop = 'all', risk_pop = 'all')
+    } else if(key == 'popsize') {
+      thisdf = melt(SID, varnames = c('t', 'HIV_pop', 'sti_pop', 'med_pop'))
+      thisdf$type = 'popsize'
     } else if(key == 'HIV_diag'){
       this = HIV_trans_log
       this = this[tvec,tHIV$test,,]
-      this = apply(this, 1, sum)
-      thisdf = data.frame(t = names(this), value = this, type = 'trans', dt = 1/12, pid='HIV_diag_tot',
+      this = apply(this, c(1,4), sum)
+      this = as.data.frame(this)
+      this$tot = rowSums(this) 
+      this = melt(as.matrix(this))
+      colnames(this) = c('t', 'med_pop', 'value')
+      thisdf = data.frame(this, type = 'trans', dt = 1/12, pid='HIV_diag_tot',
                           sti_pop = 'all', risk_pop = 'all', HIV_pop = 'HIV_diag')
+      # thisdf = data.frame(t = names(this), value = this, type = 'trans', dt = 1/12, pid='HIV_diag_tot',
+      #                     sti_pop = 'all', risk_pop = 'all', HIV_pop = 'HIV_diag')
       thisdf = make_annual(thisdf)
       
     } else if(key == 'HIV_diag_by_pop'){
@@ -85,9 +111,15 @@ extr = function(output, keys, tvec=tvec_base){
     } else if(key == 'HIV_inf'){
       this = HIV_trans_log
       this = this[tvec,tHIV$inf,,]
-      this = apply(this, 1, sum)
-      thisdf = data.frame(t = names(this), value = this, type = 'trans', dt = 1/12, pid='HIV_inf_tot',
+      this = apply(this, c(1,4), sum)
+      this = as.data.frame(this)
+      this$tot = rowSums(this) 
+      this = melt(as.matrix(this))
+      colnames(this) = c('t', 'med_pop', 'value')
+      thisdf = data.frame(this, type = 'trans', dt = 1/12, pid='HIV_inf_tot',
                           sti_pop = 'all', risk_pop = 'all', HIV_pop = 'HIV_inf')
+      # thisdf = data.frame(t = names(this), value = this, type = 'trans', dt = 1/12, pid='HIV_inf_tot',
+      #                     sti_pop = 'all', risk_pop = 'all', HIV_pop = 'HIV_inf')
       thisdf = make_annual(thisdf)
       
     } else if(key == 'care_cascade'){
@@ -113,13 +145,44 @@ extr = function(output, keys, tvec=tvec_base){
       this = SID[tvec,,,]
       thisPLHIV = apply(this[,sHIV$PLHIV,,], 1, sum)
       thistotpop = apply(this, 1, sum)
-      
       thisprev = thisPLHIV / thistotpop
+      
+      thisPLHIVall = apply(this[,sHIV$PLHIV,,], c(1,4), sum)
+      thistotpopall = apply(this, c(1,4), sum)
+      thisprevall = thisPLHIVall / thistotpopall
+      thisprevall = melt(as.matrix(thisprevall))
+      colnames(thisprevall) = c('t', 'med_pop', 'value')
       
       tvec = names(thistotpop)
       
       thisdf = data.frame(t = tvec, value = thisprev, type = 'pop', dt = 1, pid = 'HIV_prev_prop',
-                          sti_pop = 'all', risk_pop = 'all', HIV_pop = 'HIV_prev', plot='HIV_prev')
+                          sti_pop = 'all', risk_pop = 'all', HIV_pop = 'HIV_prev', plot='HIV_prev', med_pop='tot')
+      thisdfall = data.frame(thisprevall, type = 'pop', dt = 1, pid = 'HIV_prev_prop',
+                             sti_pop = 'all', risk_pop = 'all', HIV_pop = 'HIV_prev', plot='HIV_prev')
+      thisdf = rbind.fill(thisdf, thisdfall)
+      thisdf = thisdf[is.finite(thisdf$value),]
+      
+    } else if(key == 'prop_prep'){
+      
+      this = SID[tvec,,,]
+      thisprep = apply(this[,sHIV$S_pr,,], 1, sum)
+      thistotpop = apply(this[,sHIV$S,,], 1, sum)
+      thisprev = thisprep / thistotpop
+      
+      thisprepall = apply(this[,sHIV$S_pr,,], c(1,3), sum)
+      thistotpopall = apply(this[,sHIV$S,,], c(1,4), sum)
+      thisprevall = thisprepall / thistotpopall
+      thisprevall = melt(as.matrix(thisprevall))
+      colnames(thisprevall) = c('t', 'med_pop', 'value')
+      
+      tvec = names(thistotpop)
+      
+      thisdf = data.frame(t = tvec, value = thisprev, type = 'pop', dt = 1, pid = 'num_prep_prop',
+                          sti_pop = 'all', risk_pop = 'pr', HIV_pop = 'S', plot='prop_prep', med_pop='tot')
+      thisdfall = data.frame(thisprevall, type = 'pop', dt = 1, pid = 'num_prep_prop',
+                             sti_pop = 'all', risk_pop = 'pr', HIV_pop = 'S', plot='prop_prep')
+      thisdf = rbind.fill(thisdf, thisdfall)
+      thisdf = thisdf[is.finite(thisdf$value),]
       
     } else if(key == 'num_cascade'){
       
@@ -152,9 +215,12 @@ extr = function(output, keys, tvec=tvec_base){
   return(df)
 }
 
-get_movement = function(HIV_compartments, HIV_trans){
+get_movement = function(HIV_compartments, HIV_trans, med=0){
   l = lapply(1:nrow(HIV_transitions), function(x) HIV_trans[x,,] * ((HIV_transitions[x, "to"] %in% HIV_compartments) - (HIV_transitions[x, "from"] %in% HIV_compartments)))
   d = Reduce('+', l)
+  if(med != 0){
+    d = d[,med]
+  }
   # if(any(is.na(d))){
   #   print('')
   # }

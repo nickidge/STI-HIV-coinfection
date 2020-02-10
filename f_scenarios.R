@@ -56,7 +56,8 @@ plot_scens = function(df, base_uncertainty=F){
   }
   df = subset(df, HIV_pop %in% scen_keys)
   df = subset(df, plot != 'num_cascade')
-  
+  df = subset(df, med_pop %nin% med_labs)
+
   # df$plot[df$HIV_pop == 'prop_diag'] = 'prop_diag'
   
   # max_df = df %>%

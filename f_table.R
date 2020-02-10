@@ -1,6 +1,8 @@
 
 allscens = c("Base", sapply(scenarios, function(x) x$long))
 
+# df = subset(scen_df, pid = 'HIV_diag_by_pop')
+
 tab_inc = function(df) subset(df, HIV_pop == 'HIV_inf' & type == 'trans' & t >= 2017 & t < 2025)
 tab_prev = function(df) subset(df, HIV_pop == 'HIV_prev' & plot == 'HIV_prev' & t == 2025)
 tab_PLHIV = function(df) subset(df, HIV_pop == 'PLHIV' & plot == 'PLHIV' & t == 2025)

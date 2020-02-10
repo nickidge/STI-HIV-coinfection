@@ -14,20 +14,24 @@ defaultlist[['medimix']] = 1 # amount of mixing between medicare eligibility com
 defaultlist[['prop_medi']] = 1 # what proportion of people are medicare eligible
 
 defaultlist[['f_infect_HIV']] = 6.5e-6 # initial guess for HIV force of infection
+defaultlist[['int_factor']] = 2.5
 defaultlist[['init_diag_prop']] = 0.7 # initial guess for proportion of PLHIV who are diagnosed
-defaultlist[['init_prev_HIV']] = 0.1 # initial guess for proportion of people who are living with HIV
+# defaultlist[['init_prev_HIV']] = 0.1 # initial guess for proportion of people who are living with HIV
+defaultlist[['init_prev_HIV_aus']] = 0.1 # initial guess for proportion of people who are living with HIV
+defaultlist[['init_prev_HIV_int']] = 0.12 # initial guess for proportion of people who are living with HIV
 
 defaultlist[['f_infect_STI']] = 0 # foi for STI
 defaultlist[['init_prev_STI']] = 0 # initial prevalence of STI
 
 # calculate population size at each time step
-population_value = static_pars$population_value$v
-growth = static_pars$growth$v
-population_year = static_pars$population_year$v
-
-population_est = function(years) setNames(population_value * (1 + growth)^( 12 * (years - population_year)), years)
+population_values = data.frame(data_raw[1:2,c('pop_aus', 'pop_int')])
+growth = population_values[2,] / population_values[1,]
+population_year = as.numeric(data_years[1,1])
 
 popsize_t = seq(1990, 2050, by=1/12)
-popsize = population_est(popsize_t)
+popsize = makearray(list(popsize_t, colnames(population_values)))
+for(j in 1:ncol(popsize)){
+  popsize[,j] = population_values[1,j] * (growth[1,j]) ^ (1 * (popsize_t - population_year))
+}
 
 dt = static_pars$dt$v

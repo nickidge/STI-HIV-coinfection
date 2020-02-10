@@ -74,9 +74,9 @@ modelpar = function(t=t_dat, y=NULL, parname=NA, pop=NA, subpop=NA, tvec=tvec_ba
     refvar = 'risk_mat'
     maxcol = 6
   } else if(parname == 'num_prep'){
-    col = 1
+    col = match(subpop, med_labs)
     refvar = 'num_prep'
-    maxcol = 1
+    maxcol = 2
   } else if(parname == 'prop_high_risk'){
     col = 1
     refvar = 'prop_high_risk'

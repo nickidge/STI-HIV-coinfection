@@ -46,13 +46,13 @@ compare_model_to_data = function(output){
 
 gen_calibration = function(cal_vars = c('f_infect_HIV', 'init_diag_prop'), control=list()){
   
-  bes = c('f_infect_HIV' = 6e-6, 'init_diag_prop' = 0.7, 'init_prev_HIV' = 0.07)
-  ubs = c('f_infect_HIV' = 1e-4, 'init_diag_prop' = 0.9, 'init_prev_HIV' = 0.3)
-  ncal_vars = length(cal_vars)
+  lbs = c('f_infect_HIV' = 0, 'int_factor' = 1, 'init_diag_prop' = 0, 'init_prev_HIV_aus' = 0, 'init_prev_HIV_int' = 0)
+  bes = c('f_infect_HIV' = 6e-6, 'int_factor' = 1.2, 'init_diag_prop' = 0.7, 'init_prev_HIV_aus' = 0.07, 'init_prev_HIV_int' = 0.07)
+  ubs = c('f_infect_HIV' = 1e-4, 'int_factor' = 3, 'init_diag_prop' = 0.9, 'init_prev_HIV_aus' = 0.3, 'init_prev_HIV_int' = 0.3)
   
   optim_result <<- nmkb(par=bes[cal_vars],
                         fn=distance_given_cal_vec,
-                        lower=numeric(ncal_vars),
+                        lower=lbs[cal_vars],
                         upper=ubs[cal_vars],
                         control=control,
                         keys=cal_vars)
@@ -67,4 +67,11 @@ gen_calibration = function(cal_vars = c('f_infect_HIV', 'init_diag_prop'), contr
   tvec_split <<- tvec_base[tvec_base >= split_year]
   y0_split <<- cal$SID[as.character(split_year),,,]
   
+}
+
+plot_cals = function(){
+  p1 = plot_uncertainty(base_df, toplot=c('pop', 'PLHIV', 'HIV_diag', 'HIV_inf', 'HIV_prev', 'prop_prep'), colour_strat = 'med')
+  p2 = plot_uncertainty(base_df, toplot=c('num_cascade', 'care_cascade', 'HIV_diag_by_pop'))
+  p = arrangeGrob(p1, p2, nrow=1)
+  return(p)
 }

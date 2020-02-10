@@ -3,6 +3,7 @@
 # import data
 
 data_raw = read_excel("data_sti.xlsx", sheet="data")
+# data_raw = data.frame(data_raw)
 
 # create matrices from data and omit absent values,
 # but create an index for which values thes are.
@@ -11,23 +12,46 @@ data_raw = read_excel("data_sti.xlsx", sheet="data")
 data_years = data_raw[,1]
 data_cols = colnames(data_raw)
 
-cascade0 = data_raw[,c(1,which(data_cols %in% c("prop_HIV_diagnosed", "prop_HIV_treated", "prop_HIV_virally_suppressed")))]
-cascade0 = cascade0[!is.na(cascade0[,2]),]
-diagnoses0 = data_raw[,c(1,which(data_cols=="HIV_diag_tot"))]
-diagnoses0 = diagnoses0[!is.na(diagnoses0[,2]),];
+# cascade0 = data_raw[,c(1,which(data_cols %in% c("prop_HIV_diagnosed", "prop_HIV_treated", "prop_HIV_virally_suppressed")))]
+# cascade0 = cascade0[!is.na(cascade0[,2]),]
+# diagnoses0 = data_raw[,c(1,which(data_cols=="HIV_diag_tot"))]
+# diagnoses0 = diagnoses0[!is.na(diagnoses0[,2]),]
 PLHIV0 =  data_raw[,c(1,which(data_cols=="PLHIV_tot"))]
 PLHIV0_index = !is.na(PLHIV0[,2]) # [1:max(which(!is.na(PLHIV0[,2])==TRUE))]
 PLHIV0 = PLHIV0[!is.na(PLHIV0[,2]),]
 prop_diag0 =  data_raw[,c(1,which(data_cols=="prop_HIV_diagnosed"))]
 prop_diag0_index = !is.na(prop_diag0[,2]) # [1:max(which(!is.na(prop_diag0[,2])==TRUE))]
 prop_diag0 = prop_diag0[!is.na(prop_diag0[,2]),]
-prop_treat0 =  data_raw[,c(1,which(data_cols=="prop_HIV_treated"))]
-prop_treat0 = prop_treat0[!is.na(prop_treat0[,2]),]
-prop_suppressed0 =  data_raw[,c(1,which(data_cols=="prop_HIV_virally_suppressed"))]
-prop_suppressed0 = prop_suppressed0[!is.na(prop_suppressed0[,2]),]
+# prop_treat0 =  data_raw[,c(1,which(data_cols=="prop_HIV_treated"))]
+# prop_treat0 = prop_treat0[!is.na(prop_treat0[,2]),]
+# prop_suppressed0 =  data_raw[,c(1,which(data_cols=="prop_HIV_virally_suppressed"))]
+# prop_suppressed0 = prop_suppressed0[!is.na(prop_suppressed0[,2]),]
 totalpop0 =  data_raw[,c(1,which(data_cols=="pop_tot"))] 
 totalpop0 = totalpop0[!is.na(totalpop0[,2]),]
 
+risk_data_to_frame = function(this_str){
+  diag_cols = which(grepl(paste0(this_str, '_'), data_cols))
+  df = data_raw[,c(1,diag_cols)]
+  colnames(df) = c('t', substring(colnames(df)[-1], nchar(this_str)+2))
+  df = reshape(data.frame(df),
+               direction = 'long',
+               varying = list(colnames(df)[-1]),
+               v.names = 'value',
+               idvar = 't',
+               timevar = 'med_pop',
+               times = colnames(df)[-1])
+  df = df[!is.na(df$value),]
+  rownames(df) = NULL
+  return(df)
+}
+
+HIV_diag_dat = data.frame(risk_data_to_frame('HIV_diag'),
+                       type='trans', dt=1, pid='HIV_diag_tot',
+                       sti_pop='all', risk_pop='all', HIV_pop='HIV_diag', source='data', scen='')
+PLHIV_dat = data.frame(risk_data_to_frame('PLHIV'),
+                       type='pop', dt=1, pid = 'PLHIV_tot',
+                       sti_pop='all', risk_pop='all', HIV_pop='PLHIV', source='data', scen='')
+data_pop = data.frame(risk_data_to_frame('pop'))
 
 # prev_sti0 = data_raw[,c(1,8,9)]
 prev_sti0 = data_raw[,grepl("Year", colnames(data_raw)) | grepl("Gon prev", colnames(data_raw))]
@@ -45,18 +69,7 @@ diagnoses_sti0_index = !is.na(diagnoses_sti0[,2])
 diagnoses_sti0 = diagnoses_sti0[diagnoses_sti0_index[,1],]
 
 
-# # HIV_main_data = as.data.frame(data_raw[,1:3])
-# HIV_main_data = as.data.frame(data_raw[,grepl("Year", colnames(data_raw)) | grepl("New diagnoses", colnames(data_raw), fixed=T) | grepl("Total PLHIV", colnames(data_raw), fixed=T)])
-# colnames(HIV_main_data) = c("year", "diagnoses_HIV", "value")
-# HIV_main_data$N = factor("data")
-# HIV_main_data$HIV_group = "HIV_plus"
-
-
-PLHIV_dat = data.frame(t = PLHIV0$Year, value = PLHIV0$PLHIV_tot, type='pop', dt=1, pid = 'PLHIV_tot',
-                       sti_pop='all', risk_pop='all', HIV_pop='PLHIV', source='data', scen='')
-HIV_diag_dat = data.frame(t = diagnoses0$Year, value = diagnoses0$HIV_diag_tot, type='trans', dt=1, pid='HIV_diag_tot',
-                          sti_pop='all', risk_pop='all', HIV_pop='HIV_diag', source='data', scen='')
-prop_diag_dat = data.frame(t = cascade0$Year, value = cascade0$prop_HIV_diagnosed, type='pop', dt=1, pid='num_diag_prop',
+prop_diag_dat = data.frame(t = prop_diag0$Year, value = prop_diag0$prop_HIV_diagnosed, type='pop', dt=1, pid='num_diag_prop',
                           sti_pop='all', risk_pop='all', HIV_pop='num_diag', source='data', scen='', plot='care_cascade')
 
 all_dat = rbind.fill(PLHIV_dat, HIV_diag_dat, prop_diag_dat)
@@ -66,28 +79,10 @@ all_dat$scen_long = 'Data'
 data_wide = widen_sources(all_dat)
 
 
-
-# compile data into list for convenience
-
-data = list(diagnoses0, PLHIV0, prop_diag0, prop_treat0, prop_suppressed0, totalpop0, prev_sti0, PLsti0, diagnoses_sti0)
-# start_year = as.numeric(data_raw[1,1])
-# end_year = 2040
-
-# cascade0 = data_raw[,c(1,4,5,6)]
-cascade0 = data_raw[,grepl("Year", colnames(data_raw)) | grepl("prop_HIV", colnames(data_raw), fixed=T)]
-cascade0 = cascade0[!is.na(cascade0[,2]),]
-
-# HIV care cascade
-cascade_goal = rbind(c(2030, 0.95, 0.95, 0.95), c(2035, 0.99, 0.99, 0.99))
-cascade_scenario = rbind(as.matrix(cascade0), cascade_goal)
-cascade_interp <<- array(0, dim = c(length(tvec_base), 3))
-for(i_base in 1:3){
-  cascade_interp[,i_base] = approx(cascade_scenario[,1], cascade_scenario[,(i_base+1)], xout=tvec_base, rule=2)$y
-}
-rownames(cascade_interp) = tvec_base
+# data = list(diagnoses0, PLHIV0, prop_diag0, prop_treat0, prop_suppressed0, totalpop0, prev_sti0, PLsti0, diagnoses_sti0)
+# data = list(PLHIV0, prop_diag0, prev_sti0, PLsti0, diagnoses_sti0)
 
 # import parameters, including upper and lower bounds (if they exist)
-
 pars_raw = read_excel("data_sti.xlsx", sheet="pars", col_names=TRUE)
 
 static_pars = list()

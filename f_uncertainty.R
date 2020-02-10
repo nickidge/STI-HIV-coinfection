@@ -10,23 +10,37 @@ gen_uncertainty = function(ntrials=10){
   return(cal_wide)
 }
 
-plot_uncertainty = function(df){
+plot_uncertainty = function(df, colour_strat='cascade', toplot=NULL){
   
-  # define colour scale for care cascade
-  colour_scale = data.frame(HIV_pop = c('num_und', 'num_diag', 'num_treat', 'num_suppr'),
-                            long = c('Proportion undiagnosed', 'Proportion diagnosed', 'Proportion diagnosed on treatment', 'Proportion on treatment virally suppressed'),
-                            risk_pop = 'all',
-                            col = c('red', 'orange', 'yellow', 'green'))
-  black_colour_scale = data.frame(HIV_pop = unique(df$HIV_pop)[!(unique(df$HIV_pop) %in% colour_scale$HIV_pop)],
-                                  col = 'black',
-                                  risk_pop = 'all',
-                                  long = 'na')
-  risk_colour_scale = data.frame(HIV_pop = 'HIV_diag_by_pop',
-                                 long = c('Low risk', 'High risk not on PrEP', 'High risk on PrEP'),
-                                 risk_pop = c('lo', 'hi', 'pr'),
-                                 col = c('darkgreen', 'darkred', 'darkorange'))
-  both_colour_scale = rbind(colour_scale, black_colour_scale, risk_colour_scale)
-  both_colour_scale$col_pop = paste0(both_colour_scale$HIV_pop, '_', both_colour_scale$risk_pop)
+  if(colour_strat == 'cascade'){
+    legend_name = 'Care cascade'
+    # define colour scale for care cascade
+    colour_scale = data.frame(HIV_pop = c('num_und', 'num_diag', 'num_treat', 'num_suppr'),
+                              long = c('Proportion undiagnosed', 'Proportion diagnosed', 'Proportion diagnosed on treatment', 'Proportion on treatment virally suppressed'),
+                              risk_pop = 'all',
+                              col = c('red', 'orange', 'yellow', 'green'))
+    black_colour_scale = data.frame(HIV_pop = unique(df$HIV_pop)[!(unique(df$HIV_pop) %in% colour_scale$HIV_pop)],
+                                    col = 'black',
+                                    risk_pop = 'all',
+                                    long = 'na')
+    risk_colour_scale = data.frame(HIV_pop = 'HIV_diag_by_pop',
+                                   long = c('Low risk', 'High risk not on PrEP', 'High risk on PrEP'),
+                                   risk_pop = c('lo', 'hi', 'pr'),
+                                   col = c('darkgreen', 'darkred', 'darkorange'))
+    final_cs = rbind(colour_scale, black_colour_scale, risk_colour_scale)
+    final_cs$col_pop = paste0(final_cs$HIV_pop, '_', final_cs$risk_pop)
+    df$col_pop = factor(paste0(df$HIV_pop, '_', df$risk_pop), levels=rev(final_cs$col_pop))
+  } else if(colour_strat == 'med'){
+    legend_name = 'Medicare eligibility'
+    final_cs = data.frame(HIV_pop = 'all',
+                          long = c('Total', 'Medicare eligible', 'Medicare ineligible'),
+                          med_pop = c('tot', med_labs),
+                          col = c('black', 'red', 'blue'))
+    df$col_pop = df$med_pop
+    final_cs$col_pop = final_cs$med_pop
+  }
+  
+
   
   # max_df = df %>%
   #   group_by(plot) %>%
@@ -38,21 +52,24 @@ plot_uncertainty = function(df){
   max_df = max_df_base[max_df_base$plot %in% df$plot,]
   max_df$plot = factor(max_df$plot)
   
-  # df$HIV_pop = factor(df$HIV_pop, levels=rev(both_colour_scale$HIV_pop))
-  df$col_pop = factor(paste0(df$HIV_pop, '_', df$risk_pop), levels=rev(both_colour_scale$col_pop))
+  if(!is.null(toplot)){
+    df = subset(df, plot %in% toplot)
+    max_df = subset(max_df, plot %in% toplot)
+  }
   
   # initialise plot
-  # p = ggplot(subset(df, plot!='num_cascade'), aes(x=t, group=HIV_pop, colour=HIV_pop, fill=HIV_pop))
-  p = ggplot(subset(df, plot!='num_cascade'), aes(x=t, group=col_pop, colour=col_pop, fill=col_pop))
+  p = ggplot(subset(df, plot != 'num_cascade'), aes(x=t, group=col_pop, colour=col_pop, fill=col_pop))
   p = p + facet_wrap(.~plot, scales="free", ncol=2, labeller = labeller(plot = setNames(plot_long, plot_keys)))
   
   # plot information
   p = p + geom_point(aes(y = data), na.rm=T, size=1.3) # data points
   p = p + geom_path(aes(y = model), na.rm=T, lwd=1.3) # best estimate line
   if('lower_ci' %in% names(df)){
-    p = p + geom_ribbon(aes(ymin = lower_ci, ymax = upper_ci, x=t), alpha=0.2, colour=NA, na.rm=T) # 95% confidence interval
+    p = p + geom_ribbon(data=subset(df, med_pop %in% med_labs), aes(ymin = lower_ci, ymax = upper_ci, x=t), alpha=0.2, colour=NA, na.rm=T) # 95% confidence interval
   }
-  p = p + geom_area(data=subset(df, plot=='num_cascade'), aes(y = model), alpha=0.8, na.rm=T) # stacked care cascade
+  if(colour_strat == 'cascade'){
+    p = p + geom_area(data=subset(df, plot=='num_cascade'), aes(y = model), alpha=0.8, na.rm=T) # stacked care cascade
+  }
   
   # define axes scales
   p = p + geom_blank(data=max_df, aes(y=upperlim), inherit.aes = F)
@@ -79,14 +96,14 @@ plot_uncertainty = function(df){
   #                             aesthetics = c('colour', 'fill'),
   #                             name = 'Care cascade')
   p = p + scale_colour_manual(na.value = NA,
-                              limits = both_colour_scale$col_pop,
-                              values = both_colour_scale$col,
+                              limits = final_cs$col_pop,
+                              values = final_cs$col,
                               # breaks = colour_scale$HIV_pop,
                               # labels = colour_scale$long,
-                              breaks = both_colour_scale$col_pop[both_colour_scale$long != 'na'],
-                              labels = both_colour_scale$long[both_colour_scale$long != 'na'],
+                              breaks = final_cs$col_pop[final_cs$long != 'na'],
+                              labels = final_cs$long[final_cs$long != 'na'],
                               aesthetics = c('colour', 'fill'),
-                              name = 'Care cascade')
+                              name = legend_name)
   
   p = p + coord_cartesian(xlim = c(min(df$t), max(df$t)))
   
@@ -94,10 +111,17 @@ plot_uncertainty = function(df){
   p = p + theme_all
   p = p + theme(legend.justification = c(0.5, 0.5),
                 # legend.position = c(1/4, 3/8 - 0.04))
-                legend.position = c(3/4, 1/8 - 0.02))
+                legend.position = c(3/4, 1/6 - 0.02))
   
   # add percentages
-  p = convert_axis(p, c('axis-l-3-1', 'axis-l-2-2'))
+  if(colour_strat == 'cascade'){
+    perc_axes = c('1-1')
+  } else if(colour_strat == 'med'){
+    perc_axes = c('2-1', '3-2')
+  } else {perc_axes = NULL}
+  if(!is.null(perc_axes)){
+    p = convert_axis(p, paste0('axis-l-', perc_axes))
+  }
   
   return(p)
 }
