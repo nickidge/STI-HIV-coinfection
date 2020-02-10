@@ -58,9 +58,9 @@ modelpar = function(t=t_dat, y=NULL, parname=NA, pop=NA, subpop=NA, tvec=tvec_ba
     refvar = 'gel_mat'
     maxcol = 6
   } else if(parname == 'care_cascade'){
-    col = match(subpop, careindex)
+    col = match(subpop, careindex[2:3])
     refvar = 'care_cascade'
-    maxcol = 3
+    maxcol = 2
   } else if(parname == 'treatment_eff'){
     col = match(subpop, careindex)
     refvar = 'treatment_eff'
@@ -77,6 +77,10 @@ modelpar = function(t=t_dat, y=NULL, parname=NA, pop=NA, subpop=NA, tvec=tvec_ba
     col = match(subpop, med_labs)
     refvar = 'num_prep'
     maxcol = 2
+  } else if(parname == 'eff_prep'){
+    col = 1
+    refvar = 'eff_prep'
+    maxcol = 1
   } else if(parname == 'prop_high_risk'){
     col = 1
     refvar = 'prop_high_risk'

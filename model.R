@@ -149,7 +149,8 @@ run_model = function(y0=NULL, tvec=tvec_base, modelpars=list(), options=list(), 
     # rel_pop_HIV = c(pop_by_med[1] + medimix * pop_by_med[2], pop_by_med[2] + medimix * pop_by_med[1])
     
     # foi_HIV = outer(risk_mat * condom_thru * f_infect_HIV, rel_inf_HIV / rel_pop_HIV)
-    foi_HIV = risk_mat * condom_thru * f_infect_HIV * foi_mix
+    foi_HIV = condom_thru * f_infect_HIV * foi_mix
+    foi_HIV[grepl('pr_', colnames(foi_HIV))] = foi_HIV[grepl('pr_', colnames(foi_HIV))] * (1 - eff_prep)
     foi_HIV[5] = foi_HIV[5] * int_factor
     foi_HIV = fixnan(foi_HIV)
     
@@ -240,11 +241,11 @@ run_model = function(y0=NULL, tvec=tvec_base, modelpars=list(), options=list(), 
     
     # calculate care cascade transitions
     
-    prop1_to_2 = (care_cascade[2] * (d1plus) - d2plus) / d1 
+    prop1_to_2 = (care_cascade[1] * (d1plus) - d2plus) / d1 
     if(d2 == 0){
       prop2_to_3 = 0
     } else {
-      prop2_to_3 = (care_cascade[3] * (d2plus) - d3) / d2 
+      prop2_to_3 = (care_cascade[2] * (d2plus) - d3) / d2 
     }
     if(prop1_to_2 < -1e-6 | prop1_to_2 > 1) {print('Prop 1 to 2 not between 0 and 1!!')}
     if(prop2_to_3 < -1e-6 | prop2_to_3 > 1) {print('Prop 2 to 3 not between 0 and 1!!')}
@@ -253,7 +254,7 @@ run_model = function(y0=NULL, tvec=tvec_base, modelpars=list(), options=list(), 
     HIV_p['viral_supp'] = prop2_to_3
     
     num1_to_2 = prop1_to_2 * (prevdt["D1",,] + apply(HIV_trans[tHIV$test,,], c(2,3), sum))
-    num2_to_3 = prop2_to_3 * prevdt["D2",,] + care_cascade[3] * num1_to_2
+    num2_to_3 = prop2_to_3 * prevdt["D2",,] + care_cascade[2] * num1_to_2
     
     i1 = grep("^treat$", names(HIV_p))      
     i2 = grep("^viral_supp$", names(HIV_p))
