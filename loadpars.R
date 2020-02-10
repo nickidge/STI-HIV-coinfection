@@ -3,29 +3,18 @@
 # import data
 
 data_raw = read_excel("data_sti.xlsx", sheet="data")
-# data_raw = data.frame(data_raw)
 
 # create matrices from data and omit absent values,
-# but create an index for which values thes are.
-# this is only necessary for PLHIV0 and prop_diag0 for now
 
 data_years = data_raw[,1]
 data_cols = colnames(data_raw)
 
-# cascade0 = data_raw[,c(1,which(data_cols %in% c("prop_HIV_diagnosed", "prop_HIV_treated", "prop_HIV_virally_suppressed")))]
-# cascade0 = cascade0[!is.na(cascade0[,2]),]
-# diagnoses0 = data_raw[,c(1,which(data_cols=="HIV_diag_tot"))]
-# diagnoses0 = diagnoses0[!is.na(diagnoses0[,2]),]
 PLHIV0 =  data_raw[,c(1,which(data_cols=="PLHIV_tot"))]
 PLHIV0_index = !is.na(PLHIV0[,2]) # [1:max(which(!is.na(PLHIV0[,2])==TRUE))]
 PLHIV0 = PLHIV0[!is.na(PLHIV0[,2]),]
 prop_diag0 =  data_raw[,c(1,which(data_cols=="prop_HIV_diagnosed"))]
 prop_diag0_index = !is.na(prop_diag0[,2]) # [1:max(which(!is.na(prop_diag0[,2])==TRUE))]
 prop_diag0 = prop_diag0[!is.na(prop_diag0[,2]),]
-# prop_treat0 =  data_raw[,c(1,which(data_cols=="prop_HIV_treated"))]
-# prop_treat0 = prop_treat0[!is.na(prop_treat0[,2]),]
-# prop_suppressed0 =  data_raw[,c(1,which(data_cols=="prop_HIV_virally_suppressed"))]
-# prop_suppressed0 = prop_suppressed0[!is.na(prop_suppressed0[,2]),]
 totalpop0 =  data_raw[,c(1,which(data_cols=="pop_tot"))] 
 totalpop0 = totalpop0[!is.na(totalpop0[,2]),]
 
@@ -78,9 +67,17 @@ all_dat$scen = 'data'
 all_dat$scen_long = 'Data'
 data_wide = widen_sources(all_dat)
 
+# load mixing matrix
+medi_states = do.call(paste0, expand.grid(c('lo', 'hi', 'pr'), '_', med_labs))
+mixing_raw = read_excel('data_sti.xlsx', sheet='mixing', range=cell_limits(c(2,2), c(7,7)), col_names = medi_states)
+mixing = as.matrix(mixing_raw)
+rownames(mixing) = medi_states
+mixing[!is.finite(suppressWarnings(as.numeric(mixing)))] = 0
+class(mixing) = 'numeric'
+# mixing = makearray(list(medi_states, medi_states))
+# mixing[,] = 1
 
-# data = list(diagnoses0, PLHIV0, prop_diag0, prop_treat0, prop_suppressed0, totalpop0, prev_sti0, PLsti0, diagnoses_sti0)
-# data = list(PLHIV0, prop_diag0, prev_sti0, PLsti0, diagnoses_sti0)
+
 
 # import parameters, including upper and lower bounds (if they exist)
 pars_raw = read_excel("data_sti.xlsx", sheet="pars", col_names=TRUE)
@@ -99,9 +96,6 @@ for(i in 1:nrow(pars_raw)){
     thislb = thisval
     thisub = thisval
   }
-  # assign(thisname, thisval, envir = .GlobalEnv)
-  # assign(paste0(thisname, "_lb"), thislb, envir = .GlobalEnv)
-  # assign(paste0(thisname, "_ub"), thisub, envir = .GlobalEnv)
   thispar = list('name' = thisname,
                  'v' = thisval,
                  'lb' = thislb,

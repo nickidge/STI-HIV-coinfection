@@ -99,10 +99,3 @@ STI_transitions = rbind(c('exp', 'S', 'E'),
                         c('recov', 'T', 'S')
 )
 colnames(STI_transitions) = c("trans", "from", "to")
-
-medi_states = do.call(paste0, expand.grid(c('lo', 'hi', 'pr'), '_', med_labs))
-mixing_raw = read_excel('data_sti.xlsx', sheet='mixing', range=cell_limits(c(2,2), c(7,7)), col_names = medi_states)
-mixing = as.matrix(mixing_raw)
-rownames(mixing) = medi_states
-# mixing = makearray(list(medi_states, medi_states))
-# mixing[,] = 1
