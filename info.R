@@ -29,9 +29,12 @@ sHIV[['I_pr']] = grep("^I_pr.*", HIV_labs, value=TRUE)
 # sHIV[['eff_I_lo']] = union(sHIV[['I_lo']], sHIV[['D']])
 # sHIV[['eff_I_hi']] = sHIV[['I_hi']]
 # sHIV[['eff_I_pr']] = sHIV[['I_pr']]
-sHIV[['D1plus']] = c("D1", "D2", "D3")
-sHIV[['D2plus']] = c("D2", "D3")
-sHIV[['D3plus']] = c("D3")
+sHIV[['D1']] = c("D1")
+sHIV[['D2']] = c("D2")
+sHIV[['D3']] = c("D3")
+sHIV[['D1plus']] = unique(c(sHIV$D1, sHIV$D2, sHIV$D3))
+sHIV[['D2plus']] = unique(c(sHIV$D2, sHIV$D3))
+sHIV[['D3plus']] = sHIV$D3
 sHIV[['PLHIV']] = union(sHIV[['I']], sHIV[['D']])
 sHIV[['lo']] = grep("lo", HIV_labs, value=TRUE)
 sHIV[['hi']] = grep("hi", HIV_labs, value=TRUE)

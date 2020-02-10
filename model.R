@@ -124,7 +124,9 @@ run_model = function(y0=NULL, tvec=tvec_base, modelpars=list(), options=list(), 
       mix_to_split = strsplit(mix_to, "_")[[1]]
       mix_pops['inf', mix_to] = sum(prevdt[sHIV[[paste0('I_', mix_to_split[1])]],,mix_to_split[2]])
       mix_pops['pop', mix_to] = sum(prevdt[sHIV[[mix_to_split[1]]],,mix_to_split[2]])
-      if(mix_to_split[1] == 'lo'){
+      # count diagnosed plhiv as low risk for medicare eligible, and as high risk for medicare ineligible (as there are no medicare ineligible low risk)
+      if(all(mix_to_split == c('lo', medi_states[1])) |
+         all(mix_to_split == c('hi', medi_states[2]))){
         mix_pops['inf', mix_to] = mix_pops['inf', mix_to] + sum(treatment_eff[1]*prevdt["D1",,mix_to_split[2]] + treatment_eff[2]*prevdt["D2",,mix_to_split[2]] + treatment_eff[3]*prevdt["D3",,mix_to_split[2]])
         mix_pops['pop', mix_to] = mix_pops['pop', mix_to] + sum(prevdt[sHIV[['D']],,mix_to_split[2]])
       }
@@ -219,9 +221,9 @@ run_model = function(y0=NULL, tvec=tvec_base, modelpars=list(), options=list(), 
 
     
     # care cascade info
-    d1 = sum(prevdt["D1",,] + apply(HIV_trans[tHIV$test,,], c(2,3), sum))
-    d2 = sum(prevdt["D2",,])
-    d3 = sum(prevdt["D3",,])
+    d1 = sum(prevdt[sHIV$D1,,]) + sum(apply(HIV_trans[tHIV$test,,], c(2,3), sum))
+    d2 = sum(prevdt[sHIV$D2,,])
+    d3 = sum(prevdt[sHIV$D3,,])
     d1plus = d1 + d2 + d3
     d2plus = d2 + d3
     
@@ -239,8 +241,8 @@ run_model = function(y0=NULL, tvec=tvec_base, modelpars=list(), options=list(), 
     HIV_p['treat'] = prop1_to_2
     HIV_p['viral_supp'] = prop2_to_3
     
-    num1_to_2 = prop1_to_2 * (prevdt["D1",,] + apply(HIV_trans[tHIV$test,,], c(2,3), sum))
-    num2_to_3 = prop2_to_3 * prevdt["D2",,] + care_cascade[2] * num1_to_2
+    num1_to_2 = prop1_to_2 * (apply(prevdt[sHIV$D1,,, drop = FALSE], c(2,3), sum) + apply(HIV_trans[tHIV$test,,], c(2,3), sum))
+    num2_to_3 = prop2_to_3 * apply(prevdt[sHIV$D2,,, drop = FALSE], c(2,3), sum) + care_cascade[2] * num1_to_2
     
     i1 = grep("^treat$", names(HIV_p))      
     i2 = grep("^viral_supp$", names(HIV_p))
