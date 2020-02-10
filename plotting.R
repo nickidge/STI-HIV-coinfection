@@ -6,6 +6,7 @@ plot_index = rbind(
   c('HIV_diag_tot', 'HIV_diag'),
   c('HIV_inf_tot', 'HIV_inf'),
   c('HIV_prev_prop', 'HIV_prev'),
+  # c('HIV_prev_by_risk_prop', 'HIV_prev_by_risk'),
   c('num_diag_prop', 'care_cascade'),
   c('num_treat_prop', 'care_cascade'),
   c('num_suppr_prop', 'care_cascade'),
@@ -17,8 +18,22 @@ plot_index = rbind(
 colnames(plot_index) = c('pid', 'plot')
 plot_index = data.frame(plot_index)
 
-plot_keys = c('pop', 'PLHIV', 'prop_prep', 'HIV_diag', 'HIV_inf', 'HIV_prev', 'care_cascade', 'num_diag', 'num_cascade', 'HIV_diag_by_pop')
-plot_long = c('Population', 'Total PLHIV', 'Proportion HIV- on PrEP', 'Annual HIV diagnoses', 'Annual HIV incidence', 'Prevalence of HIV', 'Care cascade', 'Proportion diagnosed', 'PLHIV by care cascade', 'Annual HIV diagnoses by pop')
+plot_key_index = rbind(
+  c('pop', 'Population'),
+  c('PLHIV','Total PLHIV'),
+  c('prop_prep', 'Proportion HIV- on PrEP'),
+  c('HIV_diag', 'Annual HIV diagnoses'),
+  c('HIV_inf', 'Annual HIV incidence'),
+  c('HIV_prev', 'Prevalence of HIV'),
+  # c('HIV_prev_by_risk', 'HIV prevalence by risk population'),
+  c('care_cascade', 'Care cascade'),
+  c('num_diag', 'Proportion diagnosed'),
+  c('num_cascade', 'PLHIV by care cascade'),
+  c('HIV_diag_by_pop', 'Annual HIV diagnoses by pop')
+)
+
+plot_keys = plot_key_index[,1]
+plot_long = plot_key_index[,2]
 
 max_df_base = data.frame(
   plot = c('pop', 'PLHIV', 'HIV_diag', 'HIV_inf', 'HIV_prev', 'care_cascade', 'num_diag', 'num_cascade'),
