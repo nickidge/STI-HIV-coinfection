@@ -30,7 +30,8 @@ run_model = function(y0=NULL, tvec=tvec_base, modelpars=list(), options=list(), 
     y0[1,1,] = popsize[as.character(tvec[1]),]
     
     # risk
-    prop_high_risk = modelpars$prop_high_risk[as.character(tvec[1]),1]
+    # prop_high_risk = modelpars$prop_high_risk[as.character(tvec[1]),1]
+    prop_high_risk = modelpars$prop_high_risk[1,1]
     y0[sHIV$S_hi,,2] = y0[sHIV$S_hi,,2] + y0[sHIV$S_lo,,2]
     y0[sHIV$S_lo,,2] = 0
     num_high_risk = y0[sHIV$S_lo,,1] * prop_high_risk
@@ -124,12 +125,12 @@ run_model = function(y0=NULL, tvec=tvec_base, modelpars=list(), options=list(), 
     # calculate force of infections
     totalppl = sum(prevdt)
     # rel_inc_HIV = sum(prevdt[sHIV$I,,]) + sum(treatment_eff[1]*prevdt["D1",,]) + sum(treatment_eff[2]*prevdt["D2",,]) + sum(treatment_eff[3]*prevdt["D3",,])
-    inf_HIV = apply(prevdt[sHIV$I,,], c(2,3), sum) + treatment_eff[1]*prevdt["D1",,] + treatment_eff[2]*prevdt["D2",,] + treatment_eff[3]*prevdt["D3",,]
-    rel_inf_HIV = apply(inf_HIV, 2, sum)
-    rel_inf_HIV = c(rel_inf_HIV[1] + medimix * rel_inf_HIV[2], rel_inf_HIV[2] + medimix * rel_inf_HIV[1])
+    # inf_HIV = apply(prevdt[sHIV$I,,], c(2,3), sum) + treatment_eff[1]*prevdt["D1",,] + treatment_eff[2]*prevdt["D2",,] + treatment_eff[3]*prevdt["D3",,]
+    # rel_inf_HIV = apply(inf_HIV, 2, sum)
+    # rel_inf_HIV = c(rel_inf_HIV[1] + medimix * rel_inf_HIV[2], rel_inf_HIV[2] + medimix * rel_inf_HIV[1])
     rel_inf_STI = sum(prevdt[,sSTI$I,])
     
-    pop_by_med = apply(prevdt, 3, sum)
+    # pop_by_med = apply(prevdt, 3, sum)
     
     mix_pops = makearray(list(c('inf', 'pop'), medi_states))
     for(mix_i in 1:nrow(mixing)){

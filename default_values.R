@@ -11,8 +11,14 @@ defaultlist[['num_prep']] = 0 # number of people on PrEP
 defaultlist[['eff_prep']] = 0.97
 defaultlist[['test_wait']] = c(1) # defines length that people stay in each undiagnosed compartment (provided they don't get diagnosed)
 defaultlist[['treatment_eff']] = c(1, 0.5, 0.1) # force of infection multiplier when diagnosed, on treatment, virally suppressed
-defaultlist[['medimix']] = 1 # amount of mixing between medicare eligibility compartments
-defaultlist[['prop_medi']] = 1 # what proportion of people are medicare eligible
+# defaultlist[['medimix']] = 1 # amount of mixing between medicare eligibility compartments
+# defaultlist[['prop_medi']] = 1 # what proportion of people are medicare eligible
+defaultlist[['care_cascade']] = c(0.8, 0.8)
+for(thisname in names(defaultlist)){
+  if(length(DIM(defaultlist[[thisname]])) == 1){
+    defaultlist[[thisname]] = matrix(defaultlist[[thisname]], nrow=1)
+  }
+}
 
 defaultlist[['f_infect_HIV']] = 6.5e-6 # initial guess for HIV force of infection
 defaultlist[['int_factor']] = 2.5

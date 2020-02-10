@@ -158,6 +158,13 @@ fill_list = function(parlist, deflist=baselist){
     # } else {
     #   thismat = matrix(apply(thispar, 2, function(x) ifelse(length(which(!is.na(x))) == 0, NA, x[which(!is.na(x))])), nrow=1)
     # }
+    
+    if(all(apply(thismat, 2, function(x) length(unique(x)) == 1) == TRUE)){
+      thisuniquerow = thismat[1,,drop=FALSE]
+      rownames(thisuniquerow) = NULL
+      thismat = thisuniquerow
+    }
+      
     outlist[[parname]] = thismat
   }
   # for(parname in optvarkeys){
@@ -187,6 +194,8 @@ add_data_col = function(thislist, t_dat, data_col, deflist = baselist, syear = N
   thisname = thispar$refvar
   thiscol = thispar$col
   
+  tvec_m = tvec_base[(syear < tvec_base) & (tvec_base < (syear + 1))]
+  
   if(!(thisname %in% names(thislist))){
     thisentry = matrix(NA, nrow = length(tvec_base), ncol = thispar$maxcol,
                        dimnames = list(tvec_base, 1:thispar$maxcol))
@@ -200,6 +209,10 @@ add_data_col = function(thislist, t_dat, data_col, deflist = baselist, syear = N
     if(thisname %in% names(deflist)){
       if(is.matrix(deflist[[thisname]])){
         baseentry = deflist[[thisname]][,thiscol]
+        if(nrow(deflist[[thisname]]) == 1){
+          thisentrycol[] = baseentry
+          baseentry = thisentrycol
+        }
       } else {
         baseentry = deflist[[thisname]][thiscol]
         thisentrycol[1] = baseentry
@@ -216,6 +229,7 @@ add_data_col = function(thislist, t_dat, data_col, deflist = baselist, syear = N
     
     if(baseentrylen == 1){
       thisentrycolindex = 1
+      print(thisname)
       print('this probably shouldnt be happening anymore')
     } else if(baseentrylen == thisentrycollen){
       thisentrycolindex = 1:baseentrylen
@@ -232,8 +246,6 @@ add_data_col = function(thislist, t_dat, data_col, deflist = baselist, syear = N
     } else {
       vl = baseentry[tvec_base <= syear]
       vh = thispar$v[tvec_base >= (syear + 1)]
-      
-      tvec_m = tvec_base[(syear < tvec_base) & (tvec_base < (syear + 1))]
       
       vm = approx(x = c(syear, syear + 1), y=c(vl[as.character(syear)], vh[as.character(syear + 1)]), xout=tvec_m,
                   method = 'constant',

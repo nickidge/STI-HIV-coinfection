@@ -35,3 +35,10 @@ options(stringsAsFactors = FALSE)
 makearray = function(dimnames){
   return(array(0, dim=lengths(dimnames), dimnames=dimnames))
 }
+
+DIM <- function( ... ){
+  args <- list(...)
+  lapply( args , function(x) { if( is.null( dim(x) ) )
+    return( length(x) )
+    dim(x) } )
+}
