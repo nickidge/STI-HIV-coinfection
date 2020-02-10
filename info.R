@@ -11,11 +11,14 @@ HIV_labs = c("S_lo", "S_hi", "S_pr",
 STI_labs = c("S", "E", "I_s", "I_a", "T")
 med_labs = c("aus", "int")
 
+# secondary labels
+HIV_risk_labs = c("lo", "hi", "pr")
+
 # compartment array
 # dim 1: HIV status -- only this one is in use at the moment
 # dim 2: STI status
 # dim 3: medicare status
-SID_mat = array(0, dim = c(length(HIV_labs), length(STI_labs), length(med_labs)), dimnames = list(HIV_labs, STI_labs, med_labs))
+SID_mat = makearray(list(HIV_labs, STI_labs, med_labs))
 
 # HIV compartment label index
 sHIV = list()
@@ -40,9 +43,9 @@ sHIV[['lo']] = grep("lo", HIV_labs, value=TRUE)
 sHIV[['hi']] = grep("hi", HIV_labs, value=TRUE)
 sHIV[['pr']] = grep("pr", HIV_labs, value=TRUE)
 sHIV[['und']] = setdiff(HIV_labs, sHIV$D)
-sHIV[['S_pr']] = 'S_pr'
 sHIV[['S_lo']] = 'S_lo'
 sHIV[['S_hi']] = 'S_hi'
+sHIV[['S_pr']] = 'S_pr'
 
 # HIV transitions -- e.g. infection, diagnosis, starting treatment, etc.
 HIV_transitions = rbind(c("S_lo_inf_aus", "S_lo", "I_lo_new", 1),
