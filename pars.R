@@ -26,7 +26,6 @@ modelpar = function(t=t_dat, y=NULL, parname=NA, pop=NA, subpop=NA, tvec=tvec_ba
     } else {
       v = approx(x = thist, y = thisy, rule = 2, xout = tvec)
       v = setNames(v$y, v$x)
-      # names(v) = tvec
     }
   } else {
     v = NULL
@@ -153,16 +152,12 @@ fill_list = function(parlist, deflist=baselist){
       }
     }
     notnas = apply(thispar, 2, function(x) length(which(!is.na(x))))
-    # if(any(notnas > 1)){
-      thismat = apply(thispar, 2, function(y) fill_vec(x=thist, y=y))
-    # } else {
-    #   thismat = matrix(apply(thispar, 2, function(x) ifelse(length(which(!is.na(x))) == 0, NA, x[which(!is.na(x))])), nrow=1)
-    # }
+    
+    thismat = apply(thispar, 2, function(y) fill_vec(x=thist, y=y))
     
     if(all(apply(thismat, 2, function(x) length(unique(x)) == 1) == TRUE)){
-      thisuniquerow = thismat[1,,drop=FALSE]
-      rownames(thisuniquerow) = NULL
-      thismat = thisuniquerow
+      thismat = thismat[1,,drop=FALSE]
+      rownames(thismat) = NULL
     }
       
     outlist[[parname]] = thismat
@@ -170,7 +165,6 @@ fill_list = function(parlist, deflist=baselist){
   # for(parname in optvarkeys){
   for(parname in names(deflist)){
     if(!(parname %in% names(outlist))){
-      # print(paste0(parname, ' not in timepars sheet'))
       if(parname %in% names(deflist)){
         outlist[[parname]] = deflist[[parname]]
       } else if(paste0(parname, '_interp') %in% names(deflist)){

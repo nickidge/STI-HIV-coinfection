@@ -30,7 +30,6 @@ run_model = function(y0=NULL, tvec=tvec_base, modelpars=list(), options=list(), 
     y0[1,1,] = popsize[as.character(tvec[1]),]
     
     # risk
-    # prop_high_risk = modelpars$prop_high_risk[as.character(tvec[1]),1]
     prop_high_risk = modelpars$prop_high_risk[1,1]
     y0[sHIV$S_hi,,2] = y0[sHIV$S_hi,,2] + y0[sHIV$S_lo,,2]
     y0[sHIV$S_lo,,2] = 0
@@ -67,13 +66,6 @@ run_model = function(y0=NULL, tvec=tvec_base, modelpars=list(), options=list(), 
     
     # TT is the time counter - the actual year
     TT = as.character(tvec[t])
-    
-    # for(key in optvarkeys){
-    #   if(grepl('_interp', key)){
-    #     # assign(paste0(key, '_this'), asub(get(key), TT, 1))
-    #     assign(gsub('.{7}$', '', key), asub(get(key), TT, 1))
-    #   }
-    # }
     
     for(key in interpvars){
       assign(key, asub(modelpars[[key]], TT, 1))
@@ -124,13 +116,7 @@ run_model = function(y0=NULL, tvec=tvec_base, modelpars=list(), options=list(), 
     
     # calculate force of infections
     totalppl = sum(prevdt)
-    # rel_inc_HIV = sum(prevdt[sHIV$I,,]) + sum(treatment_eff[1]*prevdt["D1",,]) + sum(treatment_eff[2]*prevdt["D2",,]) + sum(treatment_eff[3]*prevdt["D3",,])
-    # inf_HIV = apply(prevdt[sHIV$I,,], c(2,3), sum) + treatment_eff[1]*prevdt["D1",,] + treatment_eff[2]*prevdt["D2",,] + treatment_eff[3]*prevdt["D3",,]
-    # rel_inf_HIV = apply(inf_HIV, 2, sum)
-    # rel_inf_HIV = c(rel_inf_HIV[1] + medimix * rel_inf_HIV[2], rel_inf_HIV[2] + medimix * rel_inf_HIV[1])
     rel_inf_STI = sum(prevdt[,sSTI$I,])
-    
-    # pop_by_med = apply(prevdt, 3, sum)
     
     mix_pops = makearray(list(c('inf', 'pop'), medi_states))
     for(mix_i in 1:nrow(mixing)){
@@ -167,7 +153,6 @@ run_model = function(y0=NULL, tvec=tvec_base, modelpars=list(), options=list(), 
     
     # waiting undiagnosed
     HIV_p[tHIV$wait_1] = 1/test_wait[1]
-    # HIV_p[tHIV$wait_2] = 1/test_wait[2]
     
     # diagnoses
     HIV_p["I_lo_new_d"] = 1/t_testing[1]
@@ -289,21 +274,6 @@ run_model = function(y0=NULL, tvec=tvec_base, modelpars=list(), options=list(), 
     ### STI ###
     
     
-    # 
-    ### medi transitions ###
-    
-    num_aus = sum(prevdt[,,med_labs[1]])
-    num_int = sum(prevdt[,,med_labs[2]])
-    
-    # if(num_aus > 0 & prop_medi != 1){
-    #   num_to_int = ((num_aus + num_int) * (1 - prop_medi) - num_int) / num_aus * prevdt[,,med_labs[1]]
-    # } else if(num_int > 0 | prop_medi == 1){
-    #   num_to_int = -prop_medi * prevdt[,,med_labs[2]]
-    # } else {
-    #   num_to_int = 0
-    # }
-    # prevdt[,,med_labs[1]] = prevdt[,,med_labs[1]] - num_to_int
-    # prevdt[,,med_labs[2]] = prevdt[,,med_labs[2]] + num_to_int
     
     ###########
     
