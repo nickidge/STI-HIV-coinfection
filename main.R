@@ -13,7 +13,7 @@ if(!exists('cal')){
 # run base scenario (with uncertainty)
 base_df = gen_uncertainty(30)
 # saveopen(plot_uncertainty(base_df, toplot=c('pop', 'PLHIV', 'HIV_diag', 'HIV_inf', 'HIV_prev', 'prop_prep'), colour_strat = 'med'), 'calibration1', 'plots')
-saveopen(plot_cals(), 'calibration', 'plots', width=2*0.9*page_width)
+saveopen(plot_cals(base_df), 'calibration', 'plots', width=2*0.9*page_width)
 
 # # run all scenarios (with uncertainty)
 # scen_df = gen_scenarios(scen_df=base_df, scenarios=scenarios, ntrials=30)

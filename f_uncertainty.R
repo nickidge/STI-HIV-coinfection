@@ -23,13 +23,14 @@ plot_uncertainty = function(df, colour_strat='cascade', toplot=NULL){
                                     col = 'black',
                                     risk_pop = 'all',
                                     long = 'na')
-    risk_colour_scale = data.frame(HIV_pop = 'HIV_diag_by_pop',
+    risk_colour_scale = data.frame(HIV_pop = 'all',
                                    long = c('Low risk', 'High risk not on PrEP', 'High risk on PrEP'),
                                    risk_pop = c('lo', 'hi', 'pr'),
                                    col = c('darkgreen', 'darkred', 'darkorange'))
     final_cs = rbind(colour_scale, black_colour_scale, risk_colour_scale)
     final_cs$col_pop = paste0(final_cs$HIV_pop, '_', final_cs$risk_pop)
-    df$col_pop = factor(paste0(df$HIV_pop, '_', df$risk_pop), levels=rev(final_cs$col_pop))
+    df$col_pop = factor(paste0(ifelse(df$HIV_pop %in% c('HIV_diag_by_pop', 'HIV_prev'), 'all', df$HIV_pop), '_', df$risk_pop),
+                        levels=rev(final_cs$col_pop))
   } else if(colour_strat == 'med'){
     legend_name = 'Medicare eligibility'
     final_cs = data.frame(HIV_pop = 'all',
@@ -115,7 +116,7 @@ plot_uncertainty = function(df, colour_strat='cascade', toplot=NULL){
   
   # add percentages
   if(colour_strat == 'cascade'){
-    perc_axes = c('1-1')
+    perc_axes = c('1-1', '1-2')
   } else if(colour_strat == 'med'){
     perc_axes = c('2-1', '3-2')
   } else {perc_axes = NULL}
@@ -206,8 +207,8 @@ summarise_trials = function(df, value='value', lbfunc=lower_ci, ubfunc=upper_ci,
     summarise(smean = mean(!!sym(value), na.rm = TRUE),
               ssd = sd(!!sym(value), na.rm = TRUE),
               count = n(),
-              lower_ci = quantile(!!sym(value), probs=(1-conf_level)/2),
-              upper_ci = quantile(!!sym(value), probs=1 - (1-conf_level)/2),
+              lower_ci = quantile(!!sym(value), probs=(1-conf_level)/2, na.rm=TRUE),
+              upper_ci = quantile(!!sym(value), probs=1 - (1-conf_level)/2, na.rm=TRUE),
               value = first(!!sym(value))) %>%
     # mutate(se = ssd / sqrt(count),
     #        lower_ci = lbfunc(smean, se, count),

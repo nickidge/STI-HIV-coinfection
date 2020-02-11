@@ -157,21 +157,55 @@ extr = function(output, keys, tvec=tvec_base){
       thisPLHIV = apply(this[,sHIV$PLHIV,,], 1, sum)
       thistotpop = apply(this, 1, sum)
       thisprev = thisPLHIV / thistotpop
-      
+
       thisPLHIVall = apply(this[,sHIV$PLHIV,,], c(1,4), sum)
       thistotpopall = apply(this, c(1,4), sum)
       thisprevall = thisPLHIVall / thistotpopall
       thisprevall = melt(as.matrix(thisprevall))
       colnames(thisprevall) = c('t', 'med_pop', 'value')
-      
+
       tvec = names(thistotpop)
-      
+
       thisdf = data.frame(t = tvec, value = thisprev, type = 'pop', dt = 1, pid = 'HIV_prev_prop',
                           sti_pop = 'all', risk_pop = 'all', HIV_pop = 'HIV_prev', plot='HIV_prev', med_pop='tot')
       thisdfall = data.frame(thisprevall, type = 'pop', dt = 1, pid = 'HIV_prev_prop',
                              sti_pop = 'all', risk_pop = 'all', HIV_pop = 'HIV_prev', plot='HIV_prev')
       thisdf = rbind.fill(thisdf, thisdfall)
       thisdf = thisdf[is.finite(thisdf$value),]
+
+    }  else if(key == 'HIV_prev_by_risk'){
+
+      this = apply(SID[tvec,,,], c(1,2,4), sum)
+      thisPLHIV = this[,sHIV$PLHIV,]
+      dimnames(thisPLHIV)[[2]] = HIV_risk_index[dimnames(thisPLHIV)[[2]]]
+      # thisPLHIV = apply(this[,sHIV$PLHIV,,], 1, sum)
+      thistotpop = this
+      dimnames(thistotpop)[[2]] = HIV_risk_index[dimnames(thistotpop)[[2]]]
+      
+      
+      thisPLHIV = acast(melt(thisPLHIV), Var1 ~ Var2 ~ Var3, fun.aggregate = sum)
+      thistotpop = acast(melt(thistotpop), Var1 ~ Var2 ~ Var3, fun.aggregate = sum)
+      
+      # sum along aus/int dimension
+      for(thisdim in 2:3){
+        thisPLHIV = abind(thisPLHIV, apply(thisPLHIV, setdiff(c(1,2,3), thisdim), sum), along=thisdim)
+        last(dimnames(thisPLHIV)[[thisdim]]) = 'tot'
+        
+        thistotpop = abind(thistotpop, apply(thistotpop, setdiff(c(1,2,3), thisdim), sum), along=thisdim)
+        last(dimnames(thistotpop)[[thisdim]]) = 'tot'
+      }
+      thisprev = thisPLHIV / thistotpop
+
+      thisprevall = melt(thisprev)
+      colnames(thisprevall) = c('t', 'risk_pop', 'med_pop', 'value')
+      
+      thisprevall = subset(thisprevall, med_pop == 'tot')
+
+      thisdf = data.frame(thisprevall, type = 'pop', dt = 1, pid = 'HIV_prev_by_risk_prop',
+                          sti_pop = 'all', HIV_pop = 'HIV_prev', plot='HIV_prev_by_risk')
+      # thisdf = thisdf[is.finite(thisdf$value),]
+      
+      
       
     } else if(key == 'prop_prep'){
       

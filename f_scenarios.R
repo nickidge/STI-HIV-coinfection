@@ -54,7 +54,7 @@ plot_scens = function(df, base_uncertainty=F){
     baserows = df$scen == 'Base'
     df[baserows, c('lower_ci', 'upper_ci')] = df$model[baserows]
   }
-  df = subset(df, HIV_pop %in% scen_keys)
+  df = subset(df, HIV_pop %in% scen_keys & plot != 'HIV_prev_by_risk')
   df = subset(df, plot != 'num_cascade')
   df = subset(df, med_pop %nin% med_labs)
 
