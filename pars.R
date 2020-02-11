@@ -148,7 +148,7 @@ fill_list = function(parlist, deflist=baselist){
     notnas = apply(thispar, 2, function(x) length(which(!is.na(x))))
     for(i in 1:ncol(thispar)){
       if(notnas[i] == 0){
-        thispar[,i] = deflist[[parname]][,i]
+        thispar[,i][] = deflist[[parname]][,i]
       }
     }
     notnas = apply(thispar, 2, function(x) length(which(!is.na(x))))
