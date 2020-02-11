@@ -45,7 +45,9 @@ run_model = function(y0=NULL, tvec=tvec_base, modelpars=list(), options=list(), 
     
     ndiag_HIV = y0[sHIV$I,,] * init_diag_prop
     y0[sHIV$I,,] = y0[sHIV$I,,] - ndiag_HIV
-    y0["D1",,] = y0["D1",,] + apply(ndiag_HIV, c(2,3), sum)
+    dimnames(ndiag_HIV)[[1]] = paste0('D1_', substr(dimnames(ndiag_HIV)[[1]], 3, 4))
+    ndiag_HIV = acast(melt(ndiag_HIV), Var1 ~ Var2 ~ Var3, fun.aggregate = sum)
+    y0[sHIV$D1,,] = y0[sHIV$D1,,] + ndiag_HIV
     
     # STI
     ninf_STI = y0[,'S',] * init_prev_STI
@@ -125,11 +127,11 @@ run_model = function(y0=NULL, tvec=tvec_base, modelpars=list(), options=list(), 
       mix_pops['inf', mix_to] = sum(prevdt[sHIV[[paste0('I_', mix_to_split[1])]],,mix_to_split[2]])
       mix_pops['pop', mix_to] = sum(prevdt[sHIV[[mix_to_split[1]]],,mix_to_split[2]])
       # count diagnosed plhiv as low risk for medicare eligible, and as high risk for medicare ineligible (as there are no medicare ineligible low risk)
-      if(all(mix_to_split == c('lo', medi_states[1])) |
-         all(mix_to_split == c('hi', medi_states[2]))){
-        mix_pops['inf', mix_to] = mix_pops['inf', mix_to] + sum(treatment_eff[1]*prevdt["D1",,mix_to_split[2]] + treatment_eff[2]*prevdt["D2",,mix_to_split[2]] + treatment_eff[3]*prevdt["D3",,mix_to_split[2]])
-        mix_pops['pop', mix_to] = mix_pops['pop', mix_to] + sum(prevdt[sHIV[['D']],,mix_to_split[2]])
-      }
+      # if(all(mix_to_split == c('lo', medi_states[1])) |
+      #    all(mix_to_split == c('hi', medi_states[2]))){
+        mix_pops['inf', mix_to] = mix_pops['inf', mix_to] + sum(treatment_eff[1]*prevdt[paste0('D1_', mix_to_split[1]),,mix_to_split[2]] + treatment_eff[2]*prevdt[paste0('D2_', mix_to_split[1]),,mix_to_split[2]] + treatment_eff[3]*prevdt[paste0('D3_', mix_to_split[1]),,mix_to_split[2]])
+        mix_pops['pop', mix_to] = mix_pops['pop', mix_to] + sum(prevdt[sHIV[[paste0('D_', mix_to_split[1])]],,mix_to_split[2]])
+      # }
     }
     
     foi_mix = mix_pops['inf',] %*% mixing / mix_pops['pop',] %*% mixing
@@ -221,35 +223,46 @@ run_model = function(y0=NULL, tvec=tvec_base, modelpars=list(), options=list(), 
     }
 
     for(i_med in 1:length(med_labs)){
-      # care cascade info
-      d1 = sum(prevdt[sHIV$D1,,i_med]) + sum(apply(HIV_trans[tHIV$test,,], c(2,3), sum)[,i_med])
-      d2 = sum(prevdt[sHIV$D2,,i_med])
-      d3 = sum(prevdt[sHIV$D3,,i_med])
-      d1plus = d1 + d2 + d3
-      d2plus = d2 + d3
-      
-      # calculate care cascade transitions
-      
-      prop1_to_2 = (care_cascade[1] * (d1plus) - d2plus) / d1 
-      if(d2 == 0){
-        prop2_to_3 = 0
-      } else {
-        prop2_to_3 = (care_cascade[2] * (d2plus) - d3) / d2 
+      for(j_risk in 1:length(HIV_risk_labs)){
+        risk_lab = HIV_risk_labs[j_risk]
+        
+        # care cascade info
+        d1 = sum(prevdt[sHIV[[paste0('D1_', risk_lab)]],,i_med]) + sum(apply(HIV_trans[tHIV[[paste0('test_', risk_lab)]],,], c(2,3), sum)[,i_med])
+        d2 = sum(prevdt[sHIV[[paste0('D2_', risk_lab)]],,i_med])
+        d3 = sum(prevdt[sHIV[[paste0('D3_', risk_lab)]],,i_med])
+        d1plus = d1 + d2 + d3
+        d2plus = d2 + d3
+        
+        # calculate care cascade transitions
+        
+        if(d1plus > 0){
+          prop1_to_2 = (care_cascade[1] * (d1plus) - d2plus) / d1
+          eff_d2 = d2 + prop1_to_2 * d1
+          if(eff_d2 == 0){
+            prop2_to_3 = 0
+          } else {
+            prop2_to_3 = (care_cascade[2] * (d2 + d3) - d3) / eff_d2
+          }
+          if(prop1_to_2 < -1e-6 | prop1_to_2 > 1) {print('Prop 1 to 2 not between 0 and 1!!')}
+          if(prop2_to_3 < -1e-6 | prop2_to_3 > 1) {
+            print('Prop 2 to 3 not between 0 and 1!!')
+          }
+          
+          HIV_p[paste0('treat_', risk_lab)] = prop1_to_2
+          HIV_p[paste0('viral_supp_', risk_lab)] = prop2_to_3
+          
+          num1_to_2 = prop1_to_2 * (apply(prevdt[sHIV[[paste0('D1_', risk_lab)]],,, drop = FALSE], c(2,3), sum)[,i_med] + apply(HIV_trans[tHIV[[paste0('test_', risk_lab)]],,], c(2,3), sum)[,i_med])
+          num2_to_3 = prop2_to_3 * apply(prevdt[sHIV[[paste0('D2_', risk_lab)]],,, drop = FALSE], c(2,3), sum)[,i_med] + care_cascade[2] * num1_to_2
+          
+          # i1 = grep("^treat$", names(HIV_p))      
+          # i2 = grep("^viral_supp$", names(HIV_p))
+          
+          HIV_trans[paste0('treat_', risk_lab),,i_med] = num1_to_2
+          HIV_trans[paste0('viral_supp_', risk_lab),,i_med] = num2_to_3
+        } else if(c(i_med)) {
+          # print('')
+        }
       }
-      if(prop1_to_2 < -1e-6 | prop1_to_2 > 1) {print('Prop 1 to 2 not between 0 and 1!!')}
-      if(prop2_to_3 < -1e-6 | prop2_to_3 > 1) {print('Prop 2 to 3 not between 0 and 1!!')}
-      
-      HIV_p['treat'] = prop1_to_2
-      HIV_p['viral_supp'] = prop2_to_3
-      
-      num1_to_2 = prop1_to_2 * (apply(prevdt[sHIV$D1,,, drop = FALSE], c(2,3), sum)[,i_med] + apply(HIV_trans[tHIV$test,,], c(2,3), sum)[,i_med])
-      num2_to_3 = prop2_to_3 * apply(prevdt[sHIV$D2,,, drop = FALSE], c(2,3), sum)[,i_med] + care_cascade[2] * num1_to_2
-      
-      i1 = grep("^treat$", names(HIV_p))      
-      i2 = grep("^viral_supp$", names(HIV_p))
-      
-      HIV_trans[i1,,i_med] = num1_to_2
-      HIV_trans[i2,,i_med] = num2_to_3
     }
 
     # apply transitions

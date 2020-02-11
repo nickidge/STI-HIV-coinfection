@@ -200,9 +200,9 @@ extr = function(output, keys, tvec=tvec_base){
       get_num_ppl = function(HIV_ppl) apply(SID[tvec,HIV_ppl,,], 1, sum)
       
       thisund = get_num_ppl(sHIV$I)
-      thisD1 = get_num_ppl('D1')
-      thisD2 = get_num_ppl('D2')
-      thisD3 = get_num_ppl('D3')
+      thisD1 = get_num_ppl(sHIV$D1)
+      thisD2 = get_num_ppl(sHIV$D2)
+      thisD3 = get_num_ppl(sHIV$D3)
       
       this_df_template = data.frame(t = names(thisund), type='pop', dt = 1/12, sti_pop = 'all', risk_pop = 'all', plot='num_cascade')
       

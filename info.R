@@ -7,7 +7,10 @@ HIV_labs = c("S_lo", "S_hi", "S_pr",
              "I_lo_new", "I_lo_old",
              "I_hi_new", "I_hi_old",
              "I_pr_new", "I_pr_old",
-             "D1", "D2", "D3")
+             "D1_lo", "D2_lo", "D3_lo",
+             "D1_hi", "D2_hi", "D3_hi",
+             "D1_pr", "D2_pr", "D3_pr")
+             # "D1", "D2", "D3")
 STI_labs = c("S", "E", "I_s", "I_a", "T")
 med_labs = c("aus", "int")
 
@@ -20,28 +23,42 @@ HIV_risk_labs = c("lo", "hi", "pr")
 # dim 3: medicare status
 SID_mat = makearray(list(HIV_labs, STI_labs, med_labs))
 
+HIV_labs_get = function(x) grep(x, HIV_labs, value=TRUE)
+
 # HIV compartment label index
 sHIV = list()
-sHIV[['S']] = grep("^S.*", HIV_labs, value=TRUE)
-sHIV[['I']] = grep("^I.*", HIV_labs, value=TRUE)
-sHIV[['D']] = grep("^D.*", HIV_labs, value=TRUE)
-sHIV[['I_new']] = grep("I_.._new", HIV_labs, value=TRUE)
-sHIV[['I_lo']] = grep("^I_lo.*", HIV_labs, value=TRUE)
-sHIV[['I_hi']] = grep("^I_hi.*", HIV_labs, value=TRUE)
-sHIV[['I_pr']] = grep("^I_pr.*", HIV_labs, value=TRUE)
-# sHIV[['eff_I_lo']] = union(sHIV[['I_lo']], sHIV[['D']])
-# sHIV[['eff_I_hi']] = sHIV[['I_hi']]
-# sHIV[['eff_I_pr']] = sHIV[['I_pr']]
-sHIV[['D1']] = c("D1")
-sHIV[['D2']] = c("D2")
-sHIV[['D3']] = c("D3")
+sHIV[['S']] = HIV_labs_get("^S.*")
+sHIV[['I']] = HIV_labs_get("^I.*")
+sHIV[['D']] = HIV_labs_get("^D.*")
+sHIV[['I_new']] = HIV_labs_get("I_.._new")
+sHIV[['I_lo']] = HIV_labs_get("^I_lo.*")
+sHIV[['I_hi']] = HIV_labs_get("^I_hi.*")
+sHIV[['I_pr']] = HIV_labs_get("^I_pr.*")
+sHIV[['D1']] = HIV_labs_get("D1")
+sHIV[['D2']] = HIV_labs_get("D2")
+sHIV[['D3']] = HIV_labs_get("D3")
 sHIV[['D1plus']] = unique(c(sHIV$D1, sHIV$D2, sHIV$D3))
 sHIV[['D2plus']] = unique(c(sHIV$D2, sHIV$D3))
 sHIV[['D3plus']] = sHIV$D3
+sHIV[['D_lo']] = HIV_labs_get("^D._lo")
+sHIV[['D_hi']] = HIV_labs_get("^D._hi")
+sHIV[['D_pr']] = HIV_labs_get("^D._pr")
+sHIV[['D1_lo']] = HIV_labs_get("^D1_lo")
+sHIV[['D2_lo']] = HIV_labs_get("^D2_lo")
+sHIV[['D3_lo']] = HIV_labs_get("^D3_lo")
+sHIV[['D1_hi']] = HIV_labs_get("^D1_hi")
+sHIV[['D2_hi']] = HIV_labs_get("^D2_hi")
+sHIV[['D3_hi']] = HIV_labs_get("^D3_hi")
+sHIV[['D1_pr']] = HIV_labs_get("^D1_pr")
+sHIV[['D2_pr']] = HIV_labs_get("^D2_pr")
+sHIV[['D3_pr']] = HIV_labs_get("^D3_pr")
+sHIV[['eff_I_lo']] = union(sHIV$I_lo, sHIV$D_lo)
+sHIV[['eff_I_hi']] = union(sHIV$I_hi, sHIV$D_hi)
+sHIV[['eff_I_pr']] = union(sHIV$I_pr, sHIV$D_pr)
 sHIV[['PLHIV']] = union(sHIV[['I']], sHIV[['D']])
-sHIV[['lo']] = grep("lo", HIV_labs, value=TRUE)
-sHIV[['hi']] = grep("hi", HIV_labs, value=TRUE)
-sHIV[['pr']] = grep("pr", HIV_labs, value=TRUE)
+sHIV[['lo']] = HIV_labs_get("lo")
+sHIV[['hi']] = HIV_labs_get("hi")
+sHIV[['pr']] = HIV_labs_get("pr")
 sHIV[['und']] = setdiff(HIV_labs, sHIV$D)
 sHIV[['S_lo']] = 'S_lo'
 sHIV[['S_hi']] = 'S_hi'
@@ -63,17 +80,21 @@ HIV_transitions = rbind(c("S_lo_inf_aus", "S_lo", "I_lo_new", 1),
                         c("I_lo_wait_1", "I_lo_new", "I_lo_old", 0),
                         c("I_hi_wait_1", "I_hi_new", "I_hi_old", 0),
                         c("I_pr_wait_1", "I_pr_new", "I_pr_old", 0),
-                        c("I_lo_new_d", "I_lo_new", "D1", 0),
+                        c("I_lo_new_d", "I_lo_new", "D1_lo", 0),
                         # c("I_lo_mid_d", "I_lo_mid", "D1", 0),
-                        c("I_lo_old_d", "I_lo_old", "D1", 0),
-                        c("I_hi_new_d", "I_hi_new", "D1", 0),
+                        c("I_lo_old_d", "I_lo_old", "D1_lo", 0),
+                        c("I_hi_new_d", "I_hi_new", "D1_hi", 0),
                         # c("I_hi_mid_d", "I_hi_mid", "D1", 0),
-                        c("I_hi_old_d", "I_hi_old", "D1", 0),
-                        c("I_pr_new_d", "I_pr_new", "D1", 0),
+                        c("I_hi_old_d", "I_hi_old", "D1_hi", 0),
+                        c("I_pr_new_d", "I_pr_new", "D1_pr", 0),
                         # c("I_pr_mid_d", "I_pr_mid", "D1", 0),
-                        c("I_pr_old_d", "I_pr_old", "D1", 0),
-                        c("treat", "D1", "D2", 0),
-                        c("viral_supp", "D2", "D3", 0),
+                        c("I_pr_old_d", "I_pr_old", "D1_pr", 0),
+                        c("treat_lo", "D1_lo", "D2_lo", 0),
+                        c("treat_hi", "D1_hi", "D2_hi", 0),
+                        c("treat_pr", "D1_pr", "D2_pr", 0),
+                        c("viral_supp_lo", "D2_lo", "D3_lo", 0),
+                        c("viral_supp_hi", "D2_hi", "D3_hi", 0),
+                        c("viral_supp_pr", "D2_pr", "D3_pr", 0),
                         c("become_high_risk", "S_lo", "S_hi", 1),
                         c("start_prep_aus", "S_hi", "S_pr", 1),
                         c("start_prep_int", "S_hi", "S_pr", 2)
@@ -91,6 +112,9 @@ tHIV[['test_new']] = grep("I_.._new_d", HIV_transitions, value=TRUE)
 # tHIV[['test_mid']] = grep("I_.._mid_d", HIV_transitions, value=TRUE)
 tHIV[['test_old']] = grep("I_.._old_d", HIV_transitions, value=TRUE)
 tHIV[['test']] = grep("I_.._..._d", HIV_transitions, value=TRUE)
+tHIV[['test_lo']] = grep("I_lo_..._d", HIV_transitions, value=TRUE)
+tHIV[['test_hi']] = grep("I_hi_..._d", HIV_transitions, value=TRUE)
+tHIV[['test_pr']] = grep("I_pr_..._d", HIV_transitions, value=TRUE)
 
 
 # STI compartment label index
