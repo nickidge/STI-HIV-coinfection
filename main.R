@@ -1,4 +1,4 @@
-source("pre_load.R", echo = T)
+source("init.R", echo = T)
 
 # calibrate model
 if(!exists('cal')){
