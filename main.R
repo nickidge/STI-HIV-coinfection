@@ -1,3 +1,4 @@
+setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
 source("init.R", echo = T)
 
 # calibrate model
