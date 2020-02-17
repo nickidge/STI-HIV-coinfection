@@ -19,9 +19,11 @@ totalpop0 =  data_raw[,c(1,which(data_cols=="pop_tot"))]
 totalpop0 = totalpop0[!is.na(totalpop0[,2]),]
 
 risk_data_to_frame = function(this_str){
-  diag_cols = which(grepl(paste0(this_str, '_'), data_cols))
+  diag_cols = which(grepl(paste0(this_str), data_cols))
   df = data_raw[,c(1,diag_cols)]
-  colnames(df) = c('t', substring(colnames(df)[-1], nchar(this_str)+2))
+  # colnames(df) = c('t', substring(colnames(df)[-1], nchar(this_str)+2))
+  dot_positions = unlist(str_locate_all(this_str, '\\.\\.\\.'))
+  colnames(df) = c('t', substring(colnames(df)[-1], dot_positions[1], dot_positions[2]))
   df = reshape(data.frame(df),
                direction = 'long',
                varying = list(colnames(df)[-1]),
@@ -34,13 +36,26 @@ risk_data_to_frame = function(this_str){
   return(df)
 }
 
-HIV_diag_dat = data.frame(risk_data_to_frame('HIV_diag'),
+HIV_diag_dat = data.frame(risk_data_to_frame('HIV_diag_..._all'),
                        type='trans', dt=1, pid='HIV_diag_tot',
                        sti_pop='all', risk_pop='all', HIV_pop='HIV_diag', source='data', scen='')
-PLHIV_dat = data.frame(risk_data_to_frame('PLHIV'),
+PLHIV_dat = data.frame(risk_data_to_frame('PLHIV_...'),
                        type='pop', dt=1, pid = 'PLHIV_tot',
                        sti_pop='all', risk_pop='all', HIV_pop='PLHIV', source='data', scen='')
-data_pop = data.frame(risk_data_to_frame('pop'))
+data_pop = data.frame(risk_data_to_frame('pop_...'))
+
+HIV_diag_new = risk_data_to_frame('HIV_diag_new_...')
+if(nrow(HIV_diag_new) > 0){
+  HIV_diag_new = data.frame(HIV_diag_new,
+                            diag_time = 'new',
+                            type='trans', dt=1, pid='HIV_diag_new',
+                            sti_pop='all', risk_pop='all', HIV_pop='HIV_diag_new', source='data', scen='')}
+HIV_diag_old = risk_data_to_frame('HIV_diag_old_...')
+if(nrow(HIV_diag_old) > 0){
+  HIV_diag_old = data.frame(HIV_diag_old,
+                            diag_time = 'old',
+                            type='trans', dt=1, pid='HIV_diag_old',
+                            sti_pop='all', risk_pop='all', HIV_pop='HIV_diag_old', source='data', scen='')}
 
 # prev_sti0 = data_raw[,c(1,8,9)]
 prev_sti0 = data_raw[,grepl("Year", colnames(data_raw)) | grepl("Gon prev", colnames(data_raw))]
@@ -62,6 +77,7 @@ prop_diag_dat = data.frame(t = prop_diag0$Year, value = prop_diag0$prop_HIV_diag
                           sti_pop='all', risk_pop='all', HIV_pop='num_diag', source='data', scen='', plot='care_cascade')
 
 all_dat = rbind.fill(PLHIV_dat, HIV_diag_dat, prop_diag_dat)
+all_dat = rbind.fill(all_dat, HIV_diag_new, HIV_diag_old)
 all_dat$plot[is.na(all_dat$plot)] = all_dat$HIV_pop[is.na(all_dat$plot)]
 all_dat$scen = 'data'
 all_dat$scen_long = 'Data'

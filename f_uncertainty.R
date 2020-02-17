@@ -10,7 +10,7 @@ gen_uncertainty = function(ntrials=10){
   return(cal_wide)
 }
 
-plot_uncertainty = function(df, colour_strat='cascade', toplot=NULL){
+plot_uncertainty = function(thisdf, colour_strat='cascade', toplot=NULL){
   
   if(colour_strat == 'cascade'){
     legend_name = 'Care cascade'
@@ -19,7 +19,7 @@ plot_uncertainty = function(df, colour_strat='cascade', toplot=NULL){
                               long = c('Proportion undiagnosed', 'Proportion diagnosed', 'Proportion diagnosed on treatment', 'Proportion on treatment virally suppressed'),
                               risk_pop = 'all',
                               col = c('red', 'orange', 'yellow', 'green'))
-    black_colour_scale = data.frame(HIV_pop = unique(df$HIV_pop)[!(unique(df$HIV_pop) %in% colour_scale$HIV_pop)],
+    black_colour_scale = data.frame(HIV_pop = unique(thisdf$HIV_pop)[!(unique(thisdf$HIV_pop) %in% colour_scale$HIV_pop)],
                                     col = 'black',
                                     risk_pop = 'all',
                                     long = 'na')
@@ -29,7 +29,7 @@ plot_uncertainty = function(df, colour_strat='cascade', toplot=NULL){
                                    col = c('darkgreen', 'darkred', 'darkorange'))
     final_cs = rbind(colour_scale, black_colour_scale, risk_colour_scale)
     final_cs$col_pop = paste0(final_cs$HIV_pop, '_', final_cs$risk_pop)
-    df$col_pop = factor(paste0(ifelse(df$HIV_pop %in% c('HIV_diag_by_pop', 'HIV_prev'), 'all', df$HIV_pop), '_', df$risk_pop),
+    thisdf$col_pop = factor(paste0(ifelse(thisdf$HIV_pop %in% c('HIV_diag_by_pop', 'HIV_prev'), 'all', thisdf$HIV_pop), '_', thisdf$risk_pop),
                         levels=rev(final_cs$col_pop))
   } else if(colour_strat == 'med'){
     legend_name = 'Medicare eligibility'
@@ -37,46 +37,47 @@ plot_uncertainty = function(df, colour_strat='cascade', toplot=NULL){
                           long = c('Total', 'Medicare eligible', 'Medicare ineligible'),
                           med_pop = c('tot', med_labs),
                           col = c('black', 'red', 'blue'))
-    df$col_pop = df$med_pop
+    thisdf$col_pop = thisdf$med_pop
     final_cs$col_pop = final_cs$med_pop
   }
   
 
   
-  # max_df = df %>%
+  # max_df = thisdf %>%
   #   group_by(plot) %>%
   #   filter(min(plot_years) <= t & t <= max(plot_years)) %>%
   #   summarise(max = max(model, data, upper_ci, na.rm=T)) %>%
   #   # mutate(upperlim = ifelse(plot %in% c('HIV_prev', 'care_cascade'), 1, 1.1 * max)) %>%
   #   mutate(upperlim = ifelse(plot %in% c('care_cascade'), 1, 1.1 * max)) %>%
   #   as.data.frame()
-  max_df = max_df_base[max_df_base$plot %in% df$plot,]
+  max_df = max_df_base[max_df_base$plot %in% thisdf$plot,]
   max_df$plot = factor(max_df$plot)
   
   if(!is.null(toplot)){
-    df = subset(df, plot %in% toplot)
+    thisdf = subset(thisdf, plot %in% toplot)
     max_df = subset(max_df, plot %in% toplot)
   }
   
   # initialise plot
-  p = ggplot(subset(df, plot != 'num_cascade'), aes(x=t, group=col_pop, colour=col_pop, fill=col_pop))
+  p = ggplot(subset(thisdf, plot != 'num_cascade'), aes(x=t, group=col_pop, colour=col_pop, fill=col_pop))
   p = p + facet_wrap(.~plot, scales="free", ncol=2, labeller = labeller(plot = setNames(plot_long, plot_keys)))
   
   # plot information
   p = p + geom_point(aes(y = data), na.rm=T, size=1.3) # data points
   p = p + geom_path(aes(y = model), na.rm=T, lwd=1.3) # best estimate line
-  if('lower_ci' %in% names(df)){
-    p = p + geom_ribbon(data=subset(df, med_pop %in% med_labs), aes(ymin = lower_ci, ymax = upper_ci, x=t), alpha=0.2, colour=NA, na.rm=T) # 95% confidence interval
+  # p = p + geom_line(aes(y = model), na.rm=T, lwd=1.3) # best estimate line
+  if('lower_ci' %in% names(thisdf)){
+    p = p + geom_ribbon(data=subset(thisdf, med_pop %in% med_labs), aes(ymin = lower_ci, ymax = upper_ci, x=t), alpha=0.2, colour=NA, na.rm=T) # 95% confidence interval
   }
   if(colour_strat == 'cascade'){
-    p = p + geom_area(data=subset(df, plot=='num_cascade'), aes(y = model), alpha=0.8, na.rm=T) # stacked care cascade
+    p = p + geom_area(data=subset(thisdf, plot=='num_cascade'), aes(y = model), alpha=0.8, na.rm=T) # stacked care cascade
   }
   
   # define axes scales
   p = p + geom_blank(data=max_df, aes(y=upperlim), inherit.aes = F)
   p = p + scale_x_continuous(breaks = label_years,
                              name = 'Year',
-                             limits = c(min(df$t), max(df$t)),
+                             limits = c(min(thisdf$t), max(thisdf$t)),
                              expand = c(0, 0))
   p = p + scale_y_continuous(expand = c(0,0))
   p = p + expand_limits(y = 0)
@@ -106,13 +107,17 @@ plot_uncertainty = function(df, colour_strat='cascade', toplot=NULL){
                               aesthetics = c('colour', 'fill'),
                               name = legend_name)
   
-  p = p + coord_cartesian(xlim = c(min(df$t), max(df$t)))
+  p = p + coord_cartesian(xlim = c(min(thisdf$t), max(thisdf$t)))
   
   # themes
   p = p + theme_all
-  p = p + theme(legend.justification = c(0.5, 0.5),
-                # legend.position = c(1/4, 3/8 - 0.04))
-                legend.position = c(3/4, 1/6 - 0.02))
+  # p = p + theme(legend.justification = c(0.5, 0.5),
+  #               # legend.position = c(1/4, 3/8 - 0.04))
+  #               legend.position = c(3/4, 1/6 - 0.02))
+  # p = p + theme(legend.justification = c(0, 0.5),
+  #               legend.position = c(1, 0.5))
+  p = p + theme(legend.position = 'right')
+  
   
   # add percentages
   if(colour_strat == 'cascade'){

@@ -158,13 +158,26 @@ run_model = function(y0=NULL, tvec=tvec_base, modelpars=list(), options=list(), 
     # waiting undiagnosed
     HIV_p[tHIV$wait_1] = 1/test_wait[1]
     
+    # t_testing = t_testing / 2
+    for(i_med in 1:length(med_labs)){
+      this_testing = t_testing[((6 * i_med) - 5) : ((6 * i_med))] / 2
+      med_lab = med_labs[i_med]
+      
+      HIV_p[paste0("I_lo_new_d_", med_lab)] = 1/this_testing[1]
+      HIV_p[paste0("I_lo_old_d_", med_lab)] = 1/this_testing[2]
+      HIV_p[paste0("I_hi_new_d_", med_lab)] = 1/this_testing[3]
+      HIV_p[paste0("I_hi_old_d_", med_lab)] = 1/this_testing[4]
+      HIV_p[paste0("I_pr_new_d_", med_lab)] = 1/this_testing[5]
+      HIV_p[paste0("I_pr_old_d_", med_lab)] = 1/this_testing[6]
+      
+    }
     # diagnoses
-    HIV_p["I_lo_new_d"] = 1/t_testing[1]
-    HIV_p["I_lo_old_d"] = 1/t_testing[2]
-    HIV_p["I_hi_new_d"] = 1/t_testing[3]
-    HIV_p["I_hi_old_d"] = 1/t_testing[4]
-    HIV_p["I_pr_new_d"] = 1/t_testing[5]
-    HIV_p["I_pr_old_d"] = 1/t_testing[6]
+    # HIV_p["I_lo_new_d"] = 1/t_testing[1]
+    # HIV_p["I_lo_old_d"] = 1/t_testing[2]
+    # HIV_p["I_hi_new_d"] = 1/t_testing[3]
+    # HIV_p["I_hi_old_d"] = 1/t_testing[4]
+    # HIV_p["I_pr_new_d"] = 1/t_testing[5]
+    # HIV_p["I_pr_old_d"] = 1/t_testing[6]
     
     # multiply by dt
     HIV_p = HIV_p * dt

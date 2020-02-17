@@ -16,6 +16,7 @@ med_labs = c("aus", "int")
 
 # secondary labels
 HIV_risk_labs = c("lo", "hi", "pr")
+timeindex = c("new", "old")
 
 # compartment array
 # dim 1: HIV status -- only this one is in use at the moment
@@ -82,15 +83,21 @@ HIV_transitions = rbind(c("S_lo_inf_aus", "S_lo", "I_lo_new", 1),
                         c("I_lo_wait_1", "I_lo_new", "I_lo_old", 0),
                         c("I_hi_wait_1", "I_hi_new", "I_hi_old", 0),
                         c("I_pr_wait_1", "I_pr_new", "I_pr_old", 0),
-                        c("I_lo_new_d", "I_lo_new", "D1_lo", 0),
-                        # c("I_lo_mid_d", "I_lo_mid", "D1", 0),
-                        c("I_lo_old_d", "I_lo_old", "D1_lo", 0),
-                        c("I_hi_new_d", "I_hi_new", "D1_hi", 0),
-                        # c("I_hi_mid_d", "I_hi_mid", "D1", 0),
-                        c("I_hi_old_d", "I_hi_old", "D1_hi", 0),
-                        c("I_pr_new_d", "I_pr_new", "D1_pr", 0),
-                        # c("I_pr_mid_d", "I_pr_mid", "D1", 0),
-                        c("I_pr_old_d", "I_pr_old", "D1_pr", 0),
+                        
+                        c("I_lo_new_d_aus", "I_lo_new", "D1_lo", 1),
+                        c("I_lo_old_d_aus", "I_lo_old", "D1_lo", 1),
+                        c("I_hi_new_d_aus", "I_hi_new", "D1_hi", 1),
+                        c("I_hi_old_d_aus", "I_hi_old", "D1_hi", 1),
+                        c("I_pr_new_d_aus", "I_pr_new", "D1_pr", 1),
+                        c("I_pr_old_d_aus", "I_pr_old", "D1_pr", 1),
+                        
+                        c("I_lo_new_d_int", "I_lo_new", "D1_lo", 2),
+                        c("I_lo_old_d_int", "I_lo_old", "D1_lo", 2),
+                        c("I_hi_new_d_int", "I_hi_new", "D1_hi", 2),
+                        c("I_hi_old_d_int", "I_hi_old", "D1_hi", 2),
+                        c("I_pr_new_d_int", "I_pr_new", "D1_pr", 2),
+                        c("I_pr_old_d_int", "I_pr_old", "D1_pr", 2),
+                        
                         c("treat_lo", "D1_lo", "D2_lo", 0),
                         c("treat_hi", "D1_hi", "D2_hi", 0),
                         c("treat_pr", "D1_pr", "D2_pr", 0),

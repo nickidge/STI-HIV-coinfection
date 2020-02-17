@@ -27,6 +27,8 @@ library(tidyr)
 library(dplyr)
 library(minpack.lm)
 library(grid)
+library(stringi)
+library(stringr)
 
 # base model information
 tvec_base = seq(2007, 2030, by=1/12)

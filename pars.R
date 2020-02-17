@@ -37,9 +37,11 @@ modelpar = function(t=t_dat, y=NULL, parname=NA, pop=NA, subpop=NA, tvec=tvec_ba
   popindex = c("HIV_low_risk", "HIV_high_risk", "HIV_prep")
   careindex = c("diagnosed", "diagnosed_treated", "treated_virally_suppressed")
   if(parname == 't_testing'){
-    col = -2 + 2*match(pop, popindex) + match(subpop, c("new_infection", "old_infection"))
+    col = -8 + 2*match(substr(pop, 1, 2), HIV_risk_labs) +
+      1*match(substr(pop, 4, 6), timeindex) +
+      6*match(subpop, med_labs)
     refvar = 't_testing'
-    maxcol = 6
+    maxcol = 12
   } else if(parname == 'test_wait'){
     col = match(subpop, c("new_to_mid", "mid_to_old"))
     refvar = 'test_wait'
@@ -278,6 +280,17 @@ load_time_par_sheet = function(sheetname, deflist = baselist, syear=NA){
   }
   
   thislist = fill_list(thislist, deflist = deflist)
+  
+  constant_prep = function(num_prep){
+    final_prep = tail(unique(num_prep), 1)
+    final_year = rownames(final_prep)
+    which_years = rownames(num_prep)[as.numeric(rownames(num_prep)) > as.numeric(final_year)]
+    num_prep[which_years,] = sweep(popsize[which_years,], 2, final_prep / popsize[final_year,], FUN="*")
+    return(num_prep)
+  }
+  thislist$num_prep = constant_prep(thislist$num_prep)
+  
+  return(thislist)
   
 }
 

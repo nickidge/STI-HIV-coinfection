@@ -1,7 +1,7 @@
 
 defaultlist = list()
 
-defaultlist[['t_testing']] = c(c(1, 3), c(0.5, 1.5), c(3/12, 3/12)) # testing for i_lo_new, i_lo_old, i_hi_new, i_hi_old
+defaultlist[['t_testing']] = rep(1, 12) # testing for i_lo_new, i_lo_old, i_hi_new, i_hi_old
 defaultlist[['condom_usage']] = c(1, 0, 0, 1, 0, 0) # condom use for low risk hiv-, high risk hiv-, hiv+
 defaultlist[['gel_mat']] = c(c(0, 0, 0), c(0, 0, 0)) # gel up for low risk hiv-, high risk hiv-, hiv+, and gel down for same groups
 defaultlist[['eff_condom']] = 0.7 # effectiveness of condoms for HIV
@@ -28,14 +28,16 @@ defaultlist[['f_infect_STI']] = 0 # foi for STI
 defaultlist[['init_prev_STI']] = 0 # initial prevalence of STI
 
 # calculate population size at each time step
-population_values = data.frame(data_raw[1:2,c('pop_aus', 'pop_int')])
-growth = population_values[2,] / population_values[1,]
+population_values = data.frame(data_raw[,c('Year','pop_aus', 'pop_int')])
+population_values_notna = population_values[!is.na(population_values[,2]) & !is.na(population_values[,3]),]
+population_values = rbind(head(population_values_notna, 1), tail(population_values_notna, 1))
+growth = population_values[2,2:3] / population_values[1,2:3]
 population_year = as.numeric(data_years[1,1])
 
 popsize_t = seq(1990, 2050, by=1/12)
-popsize = makearray(list(popsize_t, colnames(population_values)))
+popsize = makearray(list(popsize_t, colnames(population_values[,2:3])))
 for(j in 1:ncol(popsize)){
-  popsize[,j] = population_values[1,j] * (growth[1,j]) ^ (1 * (popsize_t - population_year))
+  popsize[,j] = population_values[1,j+1] * (growth[1,j]) ^ (1 / (population_values[2,1] - population_values[1,1]) * (popsize_t - population_year))
 }
 
 dt = static_pars$dt$v

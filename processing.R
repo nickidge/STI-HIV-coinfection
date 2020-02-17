@@ -45,7 +45,8 @@ make_interp = function(v, tvec=tvec_base){
 }
 
 make_annual = function(df){
-  whichcols = c('floort', c('risk_pop', 'med_pop')[c('risk_pop', 'med_pop') %in% colnames(df)])
+  allcols = c('risk_pop', 'med_pop', 'diag_time')
+  whichcols = c('floort', intersect(allcols, colnames(df)))
   df = df %>% 
     mutate(floort = floor(as.numeric(t))) %>% 
     # group_by(floort, risk_pop, med_pop) %>%
@@ -117,6 +118,22 @@ extr = function(output, keys, tvec=tvec_base){
       this$risk_pop = substr(this$risk_pop, 1, 2)
       thisdf = data.frame(this %>% select(-I_group), type = 'trans', dt = 1/12, pid='HIV_diag_by_pop',
                           sti_pop = 'all', HIV_pop = 'HIV_diag_by_pop')
+      thisdf = make_annual(thisdf)
+
+    } else if(key == 'HIV_diag_new'){
+      this = HIV_trans_log
+      this = this[tvec,tHIV$test,,]
+      # this = apply(this, 1, sum)
+      this = apply(this, c(1,2,4), sum)
+      
+      dimnames(this)[[2]] = substr(dimnames(this)[[2]], 6, 8)
+      # this = melt(acast(melt(this), Var1 ~ Var2 ~ Var3, fun.aggregate = sum))
+      this = aggregate(value~., data=melt(this), sum)
+      colnames(this) = c('t', 'diag_time', 'med_pop', 'value')
+      
+      thisdf = data.frame(this, type = 'trans', dt = 1/12,
+                          sti_pop = 'all')
+      thisdf[,c("pid", "HIV_pop", "plot")] = paste0('HIV_diag_', thisdf$diag_time)
       thisdf = make_annual(thisdf)
       
     } else if(key == 'HIV_inf'){
@@ -247,6 +264,8 @@ extr = function(output, keys, tvec=tvec_base){
 
       thisdf = rbind.fill(thisund_df, thisd1_df, thisd2_df, thisd3_df)
       
+    } else {
+      thisdf = data.frame()
     }
     df = rbind.fill(df, thisdf)
   }
