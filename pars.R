@@ -94,6 +94,14 @@ modelpar = function(t=t_dat, y=NULL, parname=NA, pop=NA, subpop=NA, tvec=tvec_ba
     col = 1
     refvar = 'medimix'
     maxcol = 1
+  } else if(parname == 'ineligibility_duration'){
+    col = 1
+    refvar = 'stay_time'
+    maxcol = 1
+  } else if(parname == 'proportion_stay'){
+    col = 1
+    refvar = 'stay_prop'
+    maxcol = 1
   } else {
     col = 0
     refvar = 'cant_find'

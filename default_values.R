@@ -11,6 +11,8 @@ defaultlist[['eff_prep']] = 0.97
 defaultlist[['test_wait']] = c(1) # defines length that people stay in each undiagnosed compartment (provided they don't get diagnosed)
 defaultlist[['treatment_eff']] = c(1, 0.5, 0.1) # force of infection multiplier when diagnosed, on treatment, virally suppressed
 defaultlist[['care_cascade']] = c(0.8, 0.8)
+defaultlist[['stay_time']] = 1/3
+defaultlist[['stay_prop']] = 0.2
 for(thisname in names(defaultlist)){
   if(length(DIM(defaultlist[[thisname]])) == 1){
     defaultlist[[thisname]] = matrix(defaultlist[[thisname]], nrow=1)

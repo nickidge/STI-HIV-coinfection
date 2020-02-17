@@ -142,7 +142,7 @@ run_model = function(y0=NULL, tvec=tvec_base, modelpars=list(), options=list(), 
     # foi_HIV = outer(risk_mat * condom_thru * f_infect_HIV, rel_inf_HIV / rel_pop_HIV)
     foi_HIV = condom_thru * f_infect_HIV * foi_mix
     foi_HIV[grepl('pr_', colnames(foi_HIV))] = foi_HIV[grepl('pr_', colnames(foi_HIV))] * (1 - eff_prep)
-    foi_HIV[5] = foi_HIV[5] * int_factor
+    foi_HIV[4:6] = foi_HIV[4:6] * int_factor
     foi_HIV = fixnan(foi_HIV)
     
     foi_STI = f_infect_STI * rel_inf_STI / totalppl
@@ -310,6 +310,14 @@ run_model = function(y0=NULL, tvec=tvec_base, modelpars=list(), options=list(), 
     # deaths
     deaths = mu * prevdt
     prevdt = prevdt - deaths
+    
+    # ineligibile become eligible or leave
+    num_no_longer_ineligible = prevdt[,,2] * dt / stay_time
+    num_stay = num_no_longer_ineligible * stay_prop
+    num_leave = num_no_longer_ineligible * (1 - stay_prop)
+    
+    prevdt[,,1] = prevdt[,,1] + num_stay
+    prevdt[,,2] = prevdt[,,2] - num_no_longer_ineligible
     
     # pop growth
     popgrowth = thispopsize - apply(prevdt, 3, sum)
