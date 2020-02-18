@@ -275,6 +275,7 @@ constant_prep = function(num_prep){
   final_year = rownames(final_prep)
   which_years = rownames(num_prep)[as.numeric(rownames(num_prep)) > as.numeric(final_year)]
   num_prep[which_years,] = sweep(popsize[which_years,], 2, final_prep / popsize[final_year,], FUN="*")
+  num_prep = fixnan(num_prep)
   return(num_prep)
 }
 

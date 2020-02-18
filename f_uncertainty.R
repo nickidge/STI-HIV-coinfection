@@ -12,6 +12,14 @@ gen_uncertainty = function(ntrials=10){
 
 plot_uncertainty = function(thisdf, colour_strat='cascade', toplot=NULL){
   
+  max_df = max_df_base[max_df_base$plot %in% thisdf$plot,]
+  max_df$plot = factor(max_df$plot)
+  if(!is.null(toplot)){
+    thisdf = subset(thisdf, plot %in% toplot)
+    max_df = subset(max_df, plot %in% toplot)
+    thisdf$plot = factor(thisdf$plot, levels = toplot)
+  }
+  
   if(colour_strat == 'cascade'){
     legend_name = 'Care cascade'
     # define colour scale for care cascade
@@ -39,43 +47,42 @@ plot_uncertainty = function(thisdf, colour_strat='cascade', toplot=NULL){
                           col = c('black', 'red', 'blue'))
     thisdf$col_pop = thisdf$med_pop
     final_cs$col_pop = final_cs$med_pop
+  } else if(colour_strat == 'prev'){
+    legend_name = 'Population group'
+    # thisdf$col_pop = paste(thisdf$HIV_pop, thisdf$risk_pop, thisdf$med_pop, sep='_')
+    thisdf$col_pop = paste(thisdf$HIV_pop, thisdf$risk_pop, thisdf$med_pop, sep='_')
+    final_cs = data.frame(col_pop = unique(thisdf$col_pop),
+                          long = unique(thisdf$col_pop))
+    # final_cs$col = rainbow(nrow(final_cs))
+    final_cs$col = rep(rainbow(4), 3)
   }
   
 
-  
-  # max_df = thisdf %>%
-  #   group_by(plot) %>%
-  #   filter(min(plot_years) <= t & t <= max(plot_years)) %>%
-  #   summarise(max = max(model, data, upper_ci, na.rm=T)) %>%
-  #   # mutate(upperlim = ifelse(plot %in% c('HIV_prev', 'care_cascade'), 1, 1.1 * max)) %>%
-  #   mutate(upperlim = ifelse(plot %in% c('care_cascade'), 1, 1.1 * max)) %>%
-  #   as.data.frame()
-  max_df = max_df_base[max_df_base$plot %in% thisdf$plot,]
-  max_df$plot = factor(max_df$plot)
-  
-  if(!is.null(toplot)){
-    thisdf = subset(thisdf, plot %in% toplot)
-    max_df = subset(max_df, plot %in% toplot)
-  }
-  thisdf$plot = factor(thisdf$plot, levels = toplot)
-  
   # initialise plot
   p = ggplot(subset(thisdf, plot != 'num_cascade'), aes(x=t, group=col_pop, colour=col_pop, fill=col_pop))
   p = p + facet_wrap(.~plot, scales="free", ncol=2, labeller = labeller(plot = setNames(plot_long, plot_keys)))
   
   # plot information
   p = p + geom_point(aes(y = data), na.rm=T, size=1.3) # data points
-  p = p + geom_path(aes(y = model), na.rm=T, lwd=1.3) # best estimate line
+  
+  if(colour_strat == 'prev'){
+    p = p + geom_path(aes(y = model, linetype = med_pop), na.rm=T, lwd=1.3, alpha=0.5) # best estimate line
+  } else {
+    p = p + geom_path(aes(y = model), na.rm=T, lwd=1.3) # best estimate line
+  }
+  
   # p = p + geom_line(aes(y = model), na.rm=T, lwd=1.3) # best estimate line
   if('lower_ci' %in% names(thisdf)){
-    p = p + geom_ribbon(data=subset(thisdf, med_pop %in% med_labs), aes(ymin = lower_ci, ymax = upper_ci, x=t), alpha=0.2, colour=NA, na.rm=T) # 95% confidence interval
+    p = p + geom_ribbon(data=subset(thisdf, med_pop %in% med_labs & is.finite(lower_ci)), aes(ymin = lower_ci, ymax = upper_ci, x=t), alpha=0.2, colour=NA, na.rm=T) # 95% confidence interval
   }
   if(colour_strat == 'cascade'){
     p = p + geom_area(data=subset(thisdf, plot=='num_cascade'), aes(y = model), alpha=0.8, na.rm=T) # stacked care cascade
   }
   
   # define axes scales
-  p = p + geom_blank(data=max_df, aes(y=upperlim), inherit.aes = F)
+  if(nrow(max_df) > 0){
+    p = p + geom_blank(data=max_df, aes(y=upperlim), inherit.aes = F)
+  }
   p = p + scale_x_continuous(breaks = label_years,
                              name = 'Year',
                              limits = c(min(thisdf$t), max(thisdf$t)),
@@ -122,7 +129,7 @@ plot_uncertainty = function(thisdf, colour_strat='cascade', toplot=NULL){
   
   # add percentages
   if(colour_strat == 'cascade'){
-    perc_axes = c('2-1', '1-2')
+    perc_axes = c('2-1', '2-2')
   } else if(colour_strat == 'med'){
     perc_axes = c('2-1', '2-2')
   } else {perc_axes = NULL}
@@ -208,6 +215,22 @@ upper_ci <- function(mean, se, n, conf_level = 0.95){
 }
 
 summarise_trials = function(df, value='value', lbfunc=lower_ci, ubfunc=upper_ci, conf_level=0.95){
+  # med_count = 0
+  # for(i_med in 1:length(med_labs)){
+  #   med_values = subset(df, med_pop == med_labs[i_med])$value
+  #   if(sum(is.finite(med_values) & med_values != 0) > 0){
+  #     med_count = med_count + 1
+  #   } else {
+  #     # df = subset(df, med_pop != med_labs[i_med])
+  #     # df[df$med_pop == med_labs[i_med],"value"] = NaN
+  #     df = df[df$med_pop != med_labs[i_med],]
+  #   }
+  # }
+  
+  # if(med_count == 1){
+  #   df = subset(df, med_pop %in% med_labs)
+  # }
+  
   df = df %>%
     group_by_at(vars(-!!sym(value), -trial)) %>%
     summarise(smean = mean(!!sym(value), na.rm = TRUE),
@@ -222,6 +245,8 @@ summarise_trials = function(df, value='value', lbfunc=lower_ci, ubfunc=upper_ci,
     ungroup() %>% 
     mutate(t = as.numeric(t)) %>% 
     as.data.frame()
+  
+  return(df)
 }
 
 ci_df = function(ntrials=5, timepars=baselist, basevar=0.05, y0=NULL, tvec=tvec_base, options=list(), syear=0){
@@ -239,4 +264,5 @@ ci_df = function(ntrials=5, timepars=baselist, basevar=0.05, y0=NULL, tvec=tvec_
   }
   trials_df = summarise_trials(trials_df)
   return(trials_df)
+
 }

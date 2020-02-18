@@ -1,5 +1,6 @@
 l2 = function(x, y){
-  v = (x - y) / pmax(1e-6, pmin(x, y))
+  v = (x - y) / pmin(x, y)
+  v = fixnan(v)
   v = v^2
   return(sum(v, na.rm=T))
 }

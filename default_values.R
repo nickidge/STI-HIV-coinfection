@@ -42,4 +42,6 @@ for(j in 1:ncol(popsize)){
   popsize[,j] = population_values[1,j+1] * (growth[1,j]) ^ (1 / (population_values[2,1] - population_values[1,1]) * (popsize_t - population_year))
 }
 
+# popsize[,"pop_int"] = 0
+
 dt = static_pars$dt$v

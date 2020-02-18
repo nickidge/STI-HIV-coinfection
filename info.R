@@ -12,6 +12,7 @@ HIV_labs = c("S_lo", "S_hi", "S_pr",
              "D1_pr", "D2_pr", "D3_pr")
              # "D1", "D2", "D3")
 STI_labs = c("S", "E", "I_s", "I_a", "T")
+# STI_labs = "S"
 med_labs = c("aus", "int")
 
 # secondary labels
@@ -63,6 +64,7 @@ sHIV[['PLHIV']] = union(sHIV[['I']], sHIV[['D']])
 sHIV[['lo']] = HIV_labs_get("lo")
 sHIV[['hi']] = HIV_labs_get("hi")
 sHIV[['pr']] = HIV_labs_get("pr")
+sHIV[['hi_pr']] = union(sHIV$hi, sHIV$pr)
 sHIV[['und']] = setdiff(HIV_labs, sHIV$D)
 sHIV[['S_lo']] = 'S_lo'
 sHIV[['S_hi']] = 'S_hi'
@@ -105,9 +107,13 @@ HIV_transitions = rbind(c("S_lo_inf_aus", "S_lo", "I_lo_new", 1),
                         c("viral_supp_lo", "D2_lo", "D3_lo", 0),
                         c("viral_supp_hi", "D2_hi", "D3_hi", 0),
                         c("viral_supp_pr", "D2_pr", "D3_pr", 0),
-                        c("become_high_risk", "S_lo", "S_hi", 1),
-                        c("start_prep_aus", "S_hi", "S_pr", 1),
-                        c("start_prep_int", "S_hi", "S_pr", 2)
+                        # c("become_high_risk", "S_lo", "S_hi", 1),
+                        # c("start_prep_aus", "S_hi", "S_pr", 1),
+                        # c("start_prep_int", "S_hi", "S_pr", 2)
+                        
+                        c("D1_off_pr", "D1_pr", "D1_hi", 0),
+                        c("D2_off_pr", "D2_pr", "D2_hi", 0),
+                        c("D3_off_pr", "D3_pr", "D3_hi", 0)
                         
 )
 colnames(HIV_transitions) = c("trans", "from", "to", "med")

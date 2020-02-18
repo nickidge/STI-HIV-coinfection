@@ -7,7 +7,7 @@ getdict = function(list, key, default){
 }
 
 fixnan = function(x){
-  x[is.nan(x)] = 0
+  x[!is.finite(x)] = 0
   return(x)
 }
 
@@ -78,6 +78,15 @@ extr = function(output, keys, tvec=tvec_base){
       pop = sum_dim(pop, i)
     }
   }
+  if(any(grepl('PLHIV', keys))){
+    PLHIV_risk = SID[,sHIV[['PLHIV']],,]
+    dimnames(PLHIV_risk)[[2]] = HIV_risk_index[dimnames(PLHIV_risk)[[2]]]
+    PLHIV_risk = acast(melt(PLHIV_risk), Var1 ~ Var2 ~ Var3 ~ Var4, fun.aggregate = sum)
+    for(i in 2:length(dim(PLHIV_risk))){
+      PLHIV_risk = sum_dim(PLHIV_risk, i)
+    }
+  }
+  
   
   df = data.frame()
   for(key in unique(keys)){
@@ -105,11 +114,12 @@ extr = function(output, keys, tvec=tvec_base){
                           sti_pop = 'all', HIV_pop = 'all', risk_pop = 'all')
     } else if(key == 'popsize') {
       thisdf = melt(SID, varnames = c('t', 'HIV_pop', 'sti_pop', 'med_pop'))
-      thisdf$type = 'popsize'
+      thisdf = data.frame(this, type = 'pop', dt = 1, pid='pop', plot='pop')
     } else if(key == 'popsize_by_risk') {
       thispop = pop
       dimnames(thispop)[[2]] = HIV_risk_index[dimnames(thispop)[[2]]]
       this = melt(thispop, varnames = c('t', 'risk_pop', 'sti_pop', 'med_pop'))
+      this = aggregate(value~., data = this, FUN=sum)
       this = subset(this, sti_pop == 'tot' & med_pop == 'tot')
       
       thisdf = data.frame(this, type = 'pop', dt = 1, pid='pop_by_risk', plot='popsize_by_risk',
@@ -211,7 +221,7 @@ extr = function(output, keys, tvec=tvec_base){
       thisdf = thisdf[is.finite(thisdf$value),]
 
     }  else if(key == 'HIV_prev_by_risk'){
-
+      
       this = apply(SID[tvec,,,], c(1,2,4), sum)
       thisPLHIV = this[,sHIV$PLHIV,]
       dimnames(thisPLHIV)[[2]] = HIV_risk_index[dimnames(thisPLHIV)[[2]]]
@@ -234,18 +244,32 @@ extr = function(output, keys, tvec=tvec_base){
         # last(dimnames(thistotpop)[[thisdim]]) = 'tot'
       }
       thisprev = thisPLHIV / thistotpop
-
+      
       thisprevall = melt(thisprev)
       colnames(thisprevall) = c('t', 'risk_pop', 'med_pop', 'value')
       
       thisprevall = subset(thisprevall, med_pop == 'tot')
-
+      
       thisdf = data.frame(thisprevall, type = 'pop', dt = 1, pid = 'HIV_prev_by_risk_prop',
                           sti_pop = 'all', HIV_pop = 'HIV_prev', plot='HIV_prev_by_risk')
       # thisdf = thisdf[is.finite(thisdf$value),]
       
+    }  else if(key == 'HIV_prev_by_risk_all'){
       
+      pop_risk = pop
+      dimnames(pop_risk)[[2]] = HIV_risk_index[dimnames(pop_risk)[[2]]]
+      pop_risk = acast(melt(pop_risk), Var1 ~ Var2 ~ Var3 ~ Var4, fun.aggregate = sum)
+      thisprev = PLHIV_risk / pop_risk
       
+      thisprevall = melt(thisprev)
+      colnames(thisprevall) = c('t', 'risk_pop', 'sti_pop', 'med_pop', 'value')
+      
+      thisprevall = subset(thisprevall, sti_pop == 'tot')
+      
+      thisdf = data.frame(thisprevall, type = 'pop', dt = 1, pid = 'HIV_prev_by_risk_all',
+                          HIV_pop = 'HIV_prev', plot='HIV_prev_by_risk_all')
+      # thisdf = thisdf[is.finite(thisdf$value),]
+
     } else if(key == 'prop_prep'){
       
       this = SID[tvec,,,]
