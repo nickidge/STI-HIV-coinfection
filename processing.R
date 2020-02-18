@@ -132,7 +132,7 @@ extr = function(output, keys, tvec=tvec_base){
       this$tot = rowSums(this) 
       this = melt(as.matrix(this))
       colnames(this) = c('t', 'med_pop', 'value')
-      thisdf = data.frame(this, type = 'trans', dt = 1/12, pid='HIV_diag_tot',
+      thisdf = data.frame(this, type = 'trans', dt = 1/12, pid='HIV_diag_tot', plot='HIV_diag',
                           sti_pop = 'all', risk_pop = 'all', HIV_pop = 'HIV_diag')
       # thisdf = data.frame(t = names(this), value = this, type = 'trans', dt = 1/12, pid='HIV_diag_tot',
       #                     sti_pop = 'all', risk_pop = 'all', HIV_pop = 'HIV_diag')
