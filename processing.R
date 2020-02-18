@@ -22,6 +22,12 @@ DIM <- function( ... ){
     dim(x) } )
 }
 
+sum_dim = function(thisarr, thisdim){
+  thisarr = abind(thisarr, apply(thisarr, setdiff(1:length(dim(thisarr)), thisdim), sum), along=thisdim)
+  last(dimnames(thisarr)[[thisdim]]) = 'tot'
+  return(thisarr)
+}
+
 widen_sources = function(...){
   df = rbind.fill(...)
   df$source = factor(df$source, levels=c('model', 'data'))
@@ -66,6 +72,12 @@ extr = function(output, keys, tvec=tvec_base){
   SID = output$SID
   HIV_trans_log = output$HIV_trans_log
   tvec = intersect(as.character(tvec), dimnames(SID)[[1]])
+  if(any(grepl('pop', keys))){
+    pop = SID
+    for(i in 2:length(dim(pop))){
+      pop = sum_dim(pop, i)
+    }
+  }
   
   df = data.frame()
   for(key in unique(keys)){
@@ -94,6 +106,14 @@ extr = function(output, keys, tvec=tvec_base){
     } else if(key == 'popsize') {
       thisdf = melt(SID, varnames = c('t', 'HIV_pop', 'sti_pop', 'med_pop'))
       thisdf$type = 'popsize'
+    } else if(key == 'popsize_by_risk') {
+      thispop = pop
+      dimnames(thispop)[[2]] = HIV_risk_index[dimnames(thispop)[[2]]]
+      this = melt(thispop, varnames = c('t', 'risk_pop', 'sti_pop', 'med_pop'))
+      this = subset(this, sti_pop == 'tot' & med_pop == 'tot')
+      
+      thisdf = data.frame(this, type = 'pop', dt = 1, pid='pop_by_risk', plot='popsize_by_risk',
+                          HIV_pop = 'all')
     } else if(key == 'HIV_diag'){
       this = HIV_trans_log
       this = this[tvec,tHIV$test,,]
@@ -205,11 +225,13 @@ extr = function(output, keys, tvec=tvec_base){
       
       # sum along aus/int dimension
       for(thisdim in 2:3){
-        thisPLHIV = abind(thisPLHIV, apply(thisPLHIV, setdiff(c(1,2,3), thisdim), sum), along=thisdim)
-        last(dimnames(thisPLHIV)[[thisdim]]) = 'tot'
+        thisPLHIV = sum_dim(thisPLHIV, thisdim)
+        # thisPLHIV = abind(thisPLHIV, apply(thisPLHIV, setdiff(c(1,2,3), thisdim), sum), along=thisdim)
+        # last(dimnames(thisPLHIV)[[thisdim]]) = 'tot'
         
-        thistotpop = abind(thistotpop, apply(thistotpop, setdiff(c(1,2,3), thisdim), sum), along=thisdim)
-        last(dimnames(thistotpop)[[thisdim]]) = 'tot'
+        thistotpop = sum_dim(thistotpop, thisdim)
+        # thistotpop = abind(thistotpop, apply(thistotpop, setdiff(c(1,2,3), thisdim), sum), along=thisdim)
+        # last(dimnames(thistotpop)[[thisdim]]) = 'tot'
       }
       thisprev = thisPLHIV / thistotpop
 

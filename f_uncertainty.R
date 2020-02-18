@@ -57,6 +57,7 @@ plot_uncertainty = function(thisdf, colour_strat='cascade', toplot=NULL){
     thisdf = subset(thisdf, plot %in% toplot)
     max_df = subset(max_df, plot %in% toplot)
   }
+  thisdf$plot = factor(thisdf$plot, levels = toplot)
   
   # initialise plot
   p = ggplot(subset(thisdf, plot != 'num_cascade'), aes(x=t, group=col_pop, colour=col_pop, fill=col_pop))
@@ -121,9 +122,9 @@ plot_uncertainty = function(thisdf, colour_strat='cascade', toplot=NULL){
   
   # add percentages
   if(colour_strat == 'cascade'){
-    perc_axes = c('1-1', '1-2')
+    perc_axes = c('2-1', '1-2')
   } else if(colour_strat == 'med'){
-    perc_axes = c('2-1', '3-2')
+    perc_axes = c('2-1', '2-2')
   } else {perc_axes = NULL}
   if(!is.null(perc_axes)){
     p = convert_axis(p, paste0('axis-l-', perc_axes))

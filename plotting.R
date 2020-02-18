@@ -1,6 +1,7 @@
 
 plot_index = rbind(
   c('pop_tot', 'pop'),
+  c('pop_by_risk', 'popsize_by_risk'),
   c('PLHIV_tot', 'PLHIV'),
   c('num_prep_prop', 'prop_prep'),
   c('HIV_diag_tot', 'HIV_diag'),
@@ -22,6 +23,7 @@ plot_index = data.frame(plot_index)
 
 plot_key_index = rbind(
   c('pop', 'Population'),
+  c('popsize_by_risk', 'Population by risk status'),
   c('PLHIV','Total PLHIV'),
   c('prop_prep', 'Proportion HIV- on PrEP'),
   c('HIV_diag', 'Annual HIV diagnoses'),

@@ -27,6 +27,7 @@ SID_mat = makearray(list(HIV_labs, STI_labs, med_labs))
 HIV_labs_get = function(x) grep(x, HIV_labs, value=TRUE)
 HIV_risk_index = setNames(ifelse(grepl('lo', HIV_labs), 'lo', ifelse(grepl('hi', HIV_labs), 'hi', ifelse(grepl('pr', HIV_labs), 'pr', 'na'))),
                           HIV_labs)
+HIV_risk_index = c(HIV_risk_index, 'tot' = 'tot')
 
 # HIV compartment label index
 sHIV = list()
