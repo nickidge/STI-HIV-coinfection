@@ -270,6 +270,20 @@ add_data_col = function(thislist, t_dat, data_col, deflist = baselist, syear = N
   return(thislist)
 }
 
+constant_prep = function(num_prep){
+  final_prep = tail(unique(num_prep), 1)
+  final_year = rownames(final_prep)
+  which_years = rownames(num_prep)[as.numeric(rownames(num_prep)) > as.numeric(final_year)]
+  num_prep[which_years,] = sweep(popsize[which_years,], 2, final_prep / popsize[final_year,], FUN="*")
+  return(num_prep)
+}
+
+smooth_risk = function(high_risk){
+  which_unique = which(high_risk[,1] != lag(high_risk[,1], default=-1))
+  unique_ends = c(head(high_risk[which_unique,1], 1), tail(high_risk[which_unique,1], 1))
+  high_risk[which_unique,1] = approx(names(unique_ends), unique_ends, xout=names(which_unique))$y
+  return(high_risk)
+}
 
 load_time_par_sheet = function(sheetname, deflist = baselist, syear=NA){
   
@@ -289,14 +303,9 @@ load_time_par_sheet = function(sheetname, deflist = baselist, syear=NA){
   
   thislist = fill_list(thislist, deflist = deflist)
   
-  constant_prep = function(num_prep){
-    final_prep = tail(unique(num_prep), 1)
-    final_year = rownames(final_prep)
-    which_years = rownames(num_prep)[as.numeric(rownames(num_prep)) > as.numeric(final_year)]
-    num_prep[which_years,] = sweep(popsize[which_years,], 2, final_prep / popsize[final_year,], FUN="*")
-    return(num_prep)
-  }
   thislist$num_prep = constant_prep(thislist$num_prep)
+  thislist$prop_high_risk = smooth_risk(thislist$prop_high_risk)
+
   
   return(thislist)
   
