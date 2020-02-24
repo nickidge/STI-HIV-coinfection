@@ -79,7 +79,7 @@ extr = function(output, keys, tvec=tvec_base){
     }
   }
   if(any(grepl('PLHIV', keys))){
-    PLHIV_risk = SID[,sHIV[['PLHIV']],,]
+    PLHIV_risk = SID[,sHIV[['PLHIV']],,,drop=FALSE]
     dimnames(PLHIV_risk)[[2]] = HIV_risk_index[dimnames(PLHIV_risk)[[2]]]
     PLHIV_risk = acast(melt(PLHIV_risk), Var1 ~ Var2 ~ Var3 ~ Var4, fun.aggregate = sum)
     for(i in 2:length(dim(PLHIV_risk))){
@@ -92,7 +92,7 @@ extr = function(output, keys, tvec=tvec_base){
   for(key in unique(keys)){
     
     if(key == 'PLHIV'){
-      this = SID[tvec,sHIV$PLHIV,,]
+      this = SID[tvec,sHIV$PLHIV,,,drop=FALSE]
       this = apply(this, c(1,4), sum)
       this = as.data.frame(this)
       this$tot = rowSums(this)
@@ -104,7 +104,7 @@ extr = function(output, keys, tvec=tvec_base){
       #                     sti_pop = 'all', risk_pop = 'all', HIV_pop = 'PLHIV')
       
     } else if(key == 'pop'){
-      this = SID[tvec,,,]
+      this = SID[tvec,,,,drop=FALSE]
       this = apply(this, c(1,4), sum)
       this = as.data.frame(this)
       this$tot = rowSums(this)
@@ -126,7 +126,7 @@ extr = function(output, keys, tvec=tvec_base){
                           HIV_pop = 'all')
     } else if(key == 'HIV_diag'){
       this = HIV_trans_log
-      this = this[tvec,tHIV$test,,]
+      this = this[tvec,tHIV$test,,,drop=FALSE]
       this = apply(this, c(1,4), sum)
       this = as.data.frame(this)
       this$tot = rowSums(this) 
@@ -140,7 +140,7 @@ extr = function(output, keys, tvec=tvec_base){
       
     } else if(key == 'HIV_diag_by_pop'){
       this = HIV_trans_log
-      this = this[tvec,tHIV$test,,]
+      this = this[tvec,tHIV$test,,,drop=FALSE]
       # this = apply(this, 1, sum)
       this = apply(this, c(1,2), sum)
       this = melt(this, varnames = c("t", "I_group"), variable.name="value")
@@ -152,7 +152,7 @@ extr = function(output, keys, tvec=tvec_base){
 
     } else if(key == 'HIV_diag_new'){
       this = HIV_trans_log
-      this = this[tvec,tHIV$test,,]
+      this = this[tvec,tHIV$test,,,drop=FALSE]
       # this = apply(this, 1, sum)
       this = apply(this, c(1,2,4), sum)
       
@@ -168,7 +168,7 @@ extr = function(output, keys, tvec=tvec_base){
       
     } else if(key == 'HIV_inf'){
       this = HIV_trans_log
-      this = this[tvec,tHIV$inf,,]
+      this = this[tvec,tHIV$inf,,,drop=FALSE]
       this = apply(this, c(1,4), sum)
       this = as.data.frame(this)
       this$tot = rowSums(this) 
@@ -200,12 +200,12 @@ extr = function(output, keys, tvec=tvec_base){
       
     } else if(key == 'HIV_prev'){
       
-      this = SID[tvec,,,]
-      thisPLHIV = apply(this[,sHIV$PLHIV,,], 1, sum)
+      this = SID[tvec,,,,drop=FALSE]
+      thisPLHIV = apply(this[,sHIV$PLHIV,,,drop=FALSE], 1, sum)
       thistotpop = apply(this, 1, sum)
       thisprev = thisPLHIV / thistotpop
 
-      thisPLHIVall = apply(this[,sHIV$PLHIV,,], c(1,4), sum)
+      thisPLHIVall = apply(this[,sHIV$PLHIV,,,drop=FALSE], c(1,4), sum)
       thistotpopall = apply(this, c(1,4), sum)
       thisprevall = thisPLHIVall / thistotpopall
       thisprevall = melt(as.matrix(thisprevall))
@@ -222,8 +222,8 @@ extr = function(output, keys, tvec=tvec_base){
 
     }  else if(key == 'HIV_prev_by_risk'){
       
-      this = apply(SID[tvec,,,], c(1,2,4), sum)
-      thisPLHIV = this[,sHIV$PLHIV,]
+      this = apply(SID[tvec,,,,drop=FALSE], c(1,2,4), sum)
+      thisPLHIV = this[,sHIV$PLHIV,,drop=FALSE]
       dimnames(thisPLHIV)[[2]] = HIV_risk_index[dimnames(thisPLHIV)[[2]]]
       # thisPLHIV = apply(this[,sHIV$PLHIV,,], 1, sum)
       thistotpop = this
@@ -272,13 +272,13 @@ extr = function(output, keys, tvec=tvec_base){
 
     } else if(key == 'prop_prep'){
       
-      this = SID[tvec,,,]
-      thisprep = apply(this[,sHIV$S_pr,,], 1, sum)
-      thistotpop = apply(this[,sHIV$S,,], 1, sum)
+      this = SID[tvec,,,,drop=FALSE]
+      thisprep = apply(this[,sHIV$S_pr,,,drop=FALSE], 1, sum)
+      thistotpop = apply(this[,sHIV$S,,,drop=FALSE], 1, sum)
       thisprev = thisprep / thistotpop
       
-      thisprepall = apply(this[,sHIV$S_pr,,], c(1,3), sum)
-      thistotpopall = apply(this[,sHIV$S,,], c(1,4), sum)
+      thisprepall = apply(this[,sHIV$S_pr,,,drop=FALSE], c(1,4), sum)
+      thistotpopall = apply(this[,sHIV$S,,,drop=FALSE], c(1,4), sum)
       thisprevall = thisprepall / thistotpopall
       thisprevall = melt(as.matrix(thisprevall))
       colnames(thisprevall) = c('t', 'med_pop', 'value')
@@ -294,7 +294,7 @@ extr = function(output, keys, tvec=tvec_base){
       
     } else if(key == 'num_cascade'){
       
-      get_num_ppl = function(HIV_ppl) apply(SID[tvec,HIV_ppl,,], 1, sum)
+      get_num_ppl = function(HIV_ppl) apply(SID[tvec,HIV_ppl,,,drop=FALSE], 1, sum)
       
       thisund = get_num_ppl(sHIV$I)
       thisD1 = get_num_ppl(sHIV$D1)

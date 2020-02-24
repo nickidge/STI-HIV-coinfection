@@ -39,15 +39,15 @@ run_model = function(y0=NULL, tvec=tvec_base, modelpars=list(), options=list(), 
     
     # HIV
     # ninf_HIV = y0[sHIV$S,,] * init_prev_HIV
-    ninf_HIV = sweep(y0[sHIV$S,,], 3, c(init_prev_HIV_aus, init_prev_HIV_int), FUN="*")
-    y0[sHIV$S,,] = y0[sHIV$S,,] - ninf_HIV
-    y0[sHIV$I_new,,] = y0[sHIV$I_new,,] + ninf_HIV
+    ninf_HIV = sweep(y0[sHIV$S,,,drop = FALSE], 3, c(init_prev_HIV_aus, init_prev_HIV_int), FUN="*")
+    y0[sHIV$S,,] = y0[sHIV$S,,,drop = FALSE] - ninf_HIV
+    y0[sHIV$I_new,,] = y0[sHIV$I_new,,, drop = FALSE] + ninf_HIV
     
-    ndiag_HIV = y0[sHIV$I,,] * init_diag_prop
-    y0[sHIV$I,,] = y0[sHIV$I,,] - ndiag_HIV
+    ndiag_HIV = y0[sHIV$I,,, drop = FALSE] * init_diag_prop
+    y0[sHIV$I,,] = y0[sHIV$I,,, drop = FALSE] - ndiag_HIV
     dimnames(ndiag_HIV)[[1]] = paste0('D1_', substr(dimnames(ndiag_HIV)[[1]], 3, 4))
     ndiag_HIV = acast(melt(ndiag_HIV), Var1 ~ Var2 ~ Var3, fun.aggregate = sum)
-    y0[sHIV$D1,,] = y0[sHIV$D1,,] + ndiag_HIV
+    y0[sHIV$D1,,] = y0[sHIV$D1,,, drop = FALSE] + ndiag_HIV
     
     # # STI
     # ninf_STI = y0[,'S',] * init_prev_STI
@@ -80,7 +80,7 @@ run_model = function(y0=NULL, tvec=tvec_base, modelpars=list(), options=list(), 
       prevdt = y0
       prevdt[1, 1,] = thispopsize - apply(y0, 3, sum) + prevdt[1, 1, ]
     } else {
-      prevdt = SID[t-1,,,]
+      prevdt = adrop(SID[t-1,,,, drop = FALSE], 1)
     }
     
     
@@ -118,7 +118,8 @@ run_model = function(y0=NULL, tvec=tvec_base, modelpars=list(), options=list(), 
     
     # calculate force of infections
     totalppl = sum(prevdt)
-    rel_inf_STI = sum(prevdt[,sSTI$I,])
+    # rel_inf_STI = sum(prevdt[,sSTI$I,])
+    rel_inf_STI = 0
     
     mix_pops = makearray(list(c('inf', 'pop'), medi_states))
     for(i_mix in 1:nrow(mixing)){
@@ -153,7 +154,7 @@ run_model = function(y0=NULL, tvec=tvec_base, modelpars=list(), options=list(), 
     HIV_p = setNames(numeric(nrow(HIV_transitions)), HIV_transitions[,'trans'])
     
     # infections
-    HIV_p[tHIV$inf] = as.vector(apply(prevdt[sHIV$S,,], MARGIN=c(1,3), FUN=sum)) * foi_HIV
+    HIV_p[tHIV$inf] = as.vector(apply(prevdt[sHIV$S,,,drop=FALSE], MARGIN=c(1,3), FUN=sum)) * foi_HIV
     
     # waiting undiagnosed
     HIV_p[tHIV$wait_1] = 1/test_wait[1]
@@ -194,7 +195,7 @@ run_model = function(y0=NULL, tvec=tvec_base, modelpars=list(), options=list(), 
     
     # functions to calculate number of people moving for each transition
     getppl_HIV = function(from, med, prop){
-      this = prevdt[from,,] * as.numeric(prop)
+      this = adrop(prevdt[from,,,drop=FALSE], 1) * as.numeric(prop)
       if(as.numeric(med) != 0){
         this[,-as.numeric(med)] = 0
       }
@@ -240,7 +241,7 @@ run_model = function(y0=NULL, tvec=tvec_base, modelpars=list(), options=list(), 
         risk_lab = HIV_risk_labs[j_risk]
         
         # care cascade info
-        d1 = sum(prevdt[sHIV[[paste0('D1_', risk_lab)]],,i_med]) + sum(apply(HIV_trans[tHIV[[paste0('test_', risk_lab)]],,], c(2,3), sum)[,i_med])
+        d1 = sum(prevdt[sHIV[[paste0('D1_', risk_lab)]],,i_med]) + sum(apply(HIV_trans[tHIV[[paste0('test_', risk_lab)]],,,drop=FALSE], c(2,3), sum)[,i_med])
         d2 = sum(prevdt[sHIV[[paste0('D2_', risk_lab)]],,i_med])
         d3 = sum(prevdt[sHIV[[paste0('D3_', risk_lab)]],,i_med])
         d1plus = d1 + d2 + d3
@@ -265,7 +266,7 @@ run_model = function(y0=NULL, tvec=tvec_base, modelpars=list(), options=list(), 
           HIV_p[paste0('treat_', risk_lab)] = prop1_to_2
           HIV_p[paste0('viral_supp_', risk_lab)] = prop2_to_3
           
-          num1_to_2 = prop1_to_2 * (apply(prevdt[sHIV[[paste0('D1_', risk_lab)]],,, drop = FALSE], c(2,3), sum)[,i_med] + apply(HIV_trans[tHIV[[paste0('test_', risk_lab)]],,], c(2,3), sum)[,i_med])
+          num1_to_2 = prop1_to_2 * (apply(prevdt[sHIV[[paste0('D1_', risk_lab)]],,, drop = FALSE], c(2,3), sum)[,i_med] + apply(HIV_trans[tHIV[[paste0('test_', risk_lab)]],,,drop=FALSE], c(2,3), sum)[,i_med])
           num2_to_3 = prop2_to_3 * apply(prevdt[sHIV[[paste0('D2_', risk_lab)]],,, drop = FALSE], c(2,3), sum)[,i_med] + care_cascade[2] * num1_to_2
           
           # i1 = grep("^treat$", names(HIV_p))      
@@ -283,7 +284,7 @@ run_model = function(y0=NULL, tvec=tvec_base, modelpars=list(), options=list(), 
     #   print('')
     # }
     for(i_diag in 1:3){
-      already_in = prevdt[paste0('D', i_diag, '_pr'),,]
+      already_in = prevdt[paste0('D', i_diag, '_pr'),,,drop=FALSE]
       moving_in = get_movement(paste0('D', i_diag, '_pr'), HIV_trans)
       # if(abs(already_in[1,1]) > 0){
       #   print(already_in[1,1])
@@ -302,7 +303,8 @@ run_model = function(y0=NULL, tvec=tvec_base, modelpars=list(), options=list(), 
       hfrom = HIV_transitions[i,"from"]
       hto = HIV_transitions[i,"to"]
       hpop = HIV_transitions[i,"med"]
-      hp = HIV_trans[i,,]
+      hp = HIV_trans[i,,, drop=FALSE]
+      hp = adrop(hp, drop=1)
       
       hpop = list("0" = med_labs, "1" = 1, "2" = 2)[[hpop]]
       

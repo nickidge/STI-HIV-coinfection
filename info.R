@@ -11,9 +11,11 @@ HIV_labs = c("S_lo", "S_hi", "S_pr",
              "D1_hi", "D2_hi", "D3_hi",
              "D1_pr", "D2_pr", "D3_pr")
              # "D1", "D2", "D3")
-STI_labs = c("S", "E", "I_s", "I_a", "T")
-# STI_labs = "S"
+# STI_labs = c("S", "E", "I_s", "I_a", "T")
+STI_labs = "S"
 med_labs = c("aus", "int")
+
+SID_dims = c('t' = 1, 'HIV' = 2, 'STI' = 3, 'med' = 4)
 
 # secondary labels
 HIV_risk_labs = c("lo", "hi", "pr")
