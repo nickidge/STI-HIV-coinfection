@@ -115,7 +115,8 @@ plot_uncertainty = function(thisdf, colour_strat='cascade', toplot=NULL){
                               aesthetics = c('colour', 'fill'),
                               name = legend_name)
   
-  p = p + coord_cartesian(xlim = c(min(thisdf$t), max(thisdf$t)))
+  # p = p + coord_cartesian(xlim = c(min(thisdf$t), max(thisdf$t)))
+  p = p + coord_cartesian(xlim = plot_years)
   
   # themes
   p = p + theme_all
