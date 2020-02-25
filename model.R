@@ -199,6 +199,7 @@ run_model = function(y0=NULL, tvec=tvec_base, modelpars=list(), options=list(), 
     
     foi_HIV = condom_thru * f_infect_HIV * foi_mix
     foi_HIV[grepl('pr_', colnames(foi_HIV))] = foi_HIV[grepl('pr_', colnames(foi_HIV))] * (1 - eff_prep)
+    foi_HIV[2:3] = foi_HIV[2:3] * high_risk_factor
     foi_HIV[4:6] = foi_HIV[4:6] * int_factor
     foi_HIV = fixnan(foi_HIV)
     

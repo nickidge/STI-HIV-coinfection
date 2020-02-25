@@ -21,9 +21,10 @@ for(thisname in names(defaultlist)){
 
 defaultlist[['f_infect_HIV']] = 6.5e-6 # initial guess for HIV force of infection
 defaultlist[['int_factor']] = 2.5
+defaultlist[['high_risk_factor']] = 1
 defaultlist[['init_diag_prop']] = 0.7 # initial guess for proportion of PLHIV who are diagnosed
 # defaultlist[['init_prev_HIV']] = 0.1 # initial guess for proportion of people who are living with HIV
-defaultlist[['init_prev_HIV_aus']] = 0.1 # initial guess for proportion of people who are living with HIV
+defaultlist[['init_prev_HIV_aus']] = 0.11608 # initial guess for proportion of people who are living with HIV
 defaultlist[['init_prev_HIV_int']] = 0.12 # initial guess for proportion of people who are living with HIV
 defaultlist[['init_late_prop']] = 0.1
 
