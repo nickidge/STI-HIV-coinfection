@@ -15,6 +15,7 @@ PLHIV0 = PLHIV0[!is.na(PLHIV0[,2]),]
 prop_diag0 =  data_raw[,c(1,which(data_cols=="prop_HIV_diagnosed"))]
 prop_diag0_index = !is.na(prop_diag0[,2]) # [1:max(which(!is.na(prop_diag0[,2])==TRUE))]
 prop_diag0 = prop_diag0[!is.na(prop_diag0[,2]),]
+prop_diag0 = prop_diag0[-1,]
 totalpop0 =  data_raw[,c(1,which(data_cols=="pop_tot"))] 
 totalpop0 = totalpop0[!is.na(totalpop0[,2]),]
 
