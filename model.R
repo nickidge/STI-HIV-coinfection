@@ -213,16 +213,17 @@ run_model = function(y0=NULL, tvec=tvec_base, modelpars=list(), options=list(), 
     HIV_p[tHIV$inf] = as.vector(apply(prevdt[sHIV$S,,,drop=FALSE], MARGIN=c(1,3), FUN=sum)) * foi_HIV
     
     # waiting undiagnosed
-    HIV_p[tHIV$wait_1] = 1/test_wait[1]
+    # HIV_p[tHIV$wait_1] = 1/test_wait[1]
+    HIV_p[tHIV$wait_1] = duration2rate(test_wait[1])
     
     for(i_med in 1:length(med_labs)){
       this_testing = t_testing[((6 * i_med) - 5) : ((6 * i_med))] / 2
-      HIV_p[paste0(sHIV$I, '_d_', med_labs[i_med])] = 1/this_testing
-
+      # HIV_p[paste0(sHIV$I, '_d_', med_labs[i_med])] = 1/this_testing
+      HIV_p[paste0(sHIV$I, '_d_', med_labs[i_med])] = duration2rate(this_testing)
     }
     
-    # multiply by dt
-    HIV_p = HIV_p * dt
+    # # multiply by dt
+    # HIV_p = HIV_p * dt
     
     # ensure all transitions are as expected
     if(any(is.nan(HIV_p))) print('nan values in transitions?!')
@@ -379,7 +380,8 @@ run_model = function(y0=NULL, tvec=tvec_base, modelpars=list(), options=list(), 
     prevdt = prevdt - deaths
     
     # ineligibile become eligible or leave
-    num_no_longer_ineligible = prevdt[,,2] * dt / stay_time
+    # num_no_longer_ineligible = prevdt[,,2] * dt / stay_time
+    num_no_longer_ineligible = prevdt[,,2] * duration2rate(stay_time)
     num_stay = num_no_longer_ineligible * stay_prop
     num_leave = num_no_longer_ineligible * (1 - stay_prop)
     
