@@ -328,7 +328,7 @@ extr = function(output, keys, tvec=tvec_base){
 }
 
 get_movement = function(HIV_compartments, HIV_trans, med=0){
-  l = lapply(1:nrow(HIV_transitions), function(x) HIV_trans[x,,] * ((HIV_transitions[x, "to"] %in% HIV_compartments) - (HIV_transitions[x, "from"] %in% HIV_compartments)))
+  l = lapply(1:nrow(HIV_transitions), function(x) adrop(HIV_trans[x,,,drop=FALSE] * ((HIV_transitions[x, "to"] %in% HIV_compartments) - (HIV_transitions[x, "from"] %in% HIV_compartments)), 1))
   d = Reduce('+', l)
   if(med != 0){
     d = d[,med]

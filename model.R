@@ -115,6 +115,66 @@ run_model = function(y0=NULL, tvec=tvec_base, modelpars=list(), options=list(), 
     
     #########################
     
+    # risk and prep
+    
+    # calculate risk transitions
+    # pop_lo = prevdt[sHIV[['lo']],,1]
+    # pop_lo = prevdt[sHIV[['eff_I_lo']],,1]
+    pop_lo = prevdt[sHIV[['lo']],,1]
+    # pop_hi = prevdt[sHIV[['hi']],,1]
+    # pop_hi = prevdt[sHIV[['hi_pr']],,1]
+    # pop_hi = prevdt[union(sHIV[['eff_I_hi']], sHIV[['eff_I_pr']]),,1]
+    pop_hi = prevdt[sHIV[['hi']],,1] + prevdt[sHIV[['pr']],,1]
+    
+    if(sum(pop_lo) > 0){
+      become_high_risk = ((sum(pop_lo) + sum(pop_hi)) * prop_high_risk - sum(pop_hi)) / sum(pop_lo) * pop_lo
+    } else if(sum(pop_hi) > 0){
+      become_high_risk = (1 - prop_high_risk) * pop_hi
+    } else {
+      become_high_risk = 0
+    }
+    if(any(become_high_risk < -100)){
+      print('negative become_high_risk')
+    }
+    
+    prevdt[sHIV[['lo']],,1] = prevdt[sHIV[['lo']],,1] - become_high_risk
+    prevdt[sHIV[['hi']],,1] = prevdt[sHIV[['hi']],,1] + become_high_risk
+    
+    # prevdt[sHIV[['eff_I_lo']],,1] = prevdt[sHIV[['eff_I_lo']],,1] - become_high_risk
+    # prevdt[sHIV[['eff_I_hi']],,1] = prevdt[sHIV[['eff_I_hi']],,1] + become_high_risk
+    
+    
+    if(any(num_prep > 0)){
+      for(i_med in 1:length(med_labs)){
+        
+        # calculate prep transitions
+        pop_hi = prevdt[sHIV[['und_hi']],,i_med]
+        pop_pr = prevdt[sHIV[['und_pr']],,i_med]
+        
+        if(sum(pop_pr) == num_prep[i_med]){
+          num_to_prep = 0
+        } else if(sum(pop_pr) > num_prep[i_med]){
+          num_to_prep = (num_prep[i_med] - sum(pop_pr)) / sum(pop_pr) * pop_pr
+        } else if((sum(pop_hi) + sum(pop_pr)) <= num_prep[i_med]){
+          # num_to_prep = sum(pop_hi)
+          num_to_prep = pop_hi
+        } else {
+          num_to_prep = (num_prep[i_med] - sum(pop_pr)) / sum(pop_hi) * pop_hi
+        }
+        
+        prevdt[sHIV[['und_hi']],,i_med] = prevdt[sHIV[['und_hi']],,i_med] - num_to_prep
+        
+        # prevdt[sHIV[['und_pr']][1],,i_med] = prevdt[sHIV[['und_pr']][1],,i_med] + num_to_prep[1]
+        
+        
+        prevdt[sHIV[['und_pr']],,i_med] = prevdt[sHIV[['und_pr']],,i_med] + num_to_prep
+        
+      }
+    }
+    
+    
+    #################
+    
     
     # calculate force of infections
     totalppl = sum(prevdt)
@@ -147,6 +207,7 @@ run_model = function(y0=NULL, tvec=tvec_base, modelpars=list(), options=list(), 
     foi_HIV = fixnan(foi_HIV)
     
     foi_STI = f_infect_STI * rel_inf_STI / totalppl
+    
     
     ###### TRANSITIONS ######
     
@@ -284,9 +345,9 @@ run_model = function(y0=NULL, tvec=tvec_base, modelpars=list(), options=list(), 
     #   print('')
     # }
     for(i_diag in 1:3){
-      already_in = prevdt[paste0('D', i_diag, '_pr'),,,drop=FALSE]
+      already_in = adrop(prevdt[paste0('D', i_diag, '_pr'),,,drop=FALSE], 1)
       moving_in = get_movement(paste0('D', i_diag, '_pr'), HIV_trans)
-      # if(abs(already_in[1,1]) > 0){
+      # if(abs(already_in[1,1]) + abs(moving_in[1,1]) > 0){
       #   print(already_in[1,1])
       #   print(moving_in[1,1])
       # }
@@ -331,56 +392,64 @@ run_model = function(y0=NULL, tvec=tvec_base, modelpars=list(), options=list(), 
     
     ###########
     
-    # risk and prep
+    # # risk and prep
+    # 
+    # # calculate risk transitions
+    # # pop_lo = prevdt[sHIV[['lo']],,1]
+    # pop_lo = prevdt[sHIV[['eff_I_lo']],,1]
+    # # pop_hi = prevdt[sHIV[['hi']],,1]
+    # # pop_hi = prevdt[sHIV[['hi_pr']],,1]
+    # pop_hi = prevdt[union(sHIV[['eff_I_hi']], sHIV[['eff_I_pr']]),,1]
+    # 
+    # if(sum(pop_lo) > 0){
+    #   become_high_risk = ((sum(pop_lo) + sum(pop_hi)) * prop_high_risk - sum(pop_hi)) / sum(pop_lo) * pop_lo
+    # } else if(sum(pop_hi) > 0){
+    #   become_high_risk = (1 - prop_high_risk) * pop_hi
+    # } else {
+    #   become_high_risk = 0
+    # }
+    # if(any(become_high_risk < -100)){
+    #   print('negative become_high_risk')
+    # }
+    # 
+    # # prevdt[sHIV[['lo']],,1] = prevdt[sHIV[['lo']],,1] - become_high_risk
+    # # prevdt[sHIV[['hi']],,1] = prevdt[sHIV[['hi']],,1] + become_high_risk
+    #     
+    # prevdt[sHIV[['eff_I_lo']],,1] = prevdt[sHIV[['eff_I_lo']],,1] - become_high_risk
+    # prevdt[sHIV[['eff_I_hi']],,1] = prevdt[sHIV[['eff_I_hi']],,1] + become_high_risk
+    # 
+    # 
+    # if(any(num_prep > 0)){
+    #   for(i_med in 1:length(med_labs)){
+    #     
+    #     # calculate prep transitions
+    #     pop_hi = prevdt[sHIV[['und_hi']],,i_med]
+    #     pop_pr = prevdt[sHIV[['und_pr']],,i_med]
+    #     
+    #     if(sum(pop_pr) == num_prep[i_med]){
+    #       num_to_prep = 0
+    #     } else if(sum(pop_pr) > num_prep[i_med]){
+    #       num_to_prep = (num_prep[i_med] - sum(pop_pr)) / sum(pop_pr) * pop_pr
+    #     } else if((sum(pop_hi) + sum(pop_pr)) <= num_prep[i_med]){
+    #       # num_to_prep = sum(pop_hi)
+    #       num_to_prep = pop_hi
+    #     } else {
+    #       num_to_prep = (num_prep[i_med] - sum(pop_pr)) / sum(pop_hi) * pop_hi
+    #     }
+    #     
+    #     prevdt[sHIV[['und_hi']],,i_med] = prevdt[sHIV[['und_hi']],,i_med] - num_to_prep
+    #     
+    #     # prevdt[sHIV[['und_pr']][1],,i_med] = prevdt[sHIV[['und_pr']][1],,i_med] + num_to_prep[1]
+    #     
+    #     
+    #     prevdt[sHIV[['und_pr']],,i_med] = prevdt[sHIV[['und_pr']],,i_med] + num_to_prep
+    #     
+    #   }
+    # }
     
-    # calculate risk transitions
-    # pop_lo = prevdt[sHIV[['lo']],,1]
-    pop_lo = prevdt[sHIV[['eff_I_lo']],,1]
-    # pop_hi = prevdt[sHIV[['hi']],,1]
-    # pop_hi = prevdt[sHIV[['hi_pr']],,1]
-    pop_hi = prevdt[union(sHIV[['eff_I_hi']], sHIV[['eff_I_pr']]),,1]
-    
-    if(sum(pop_lo) > 0){
-      become_high_risk = ((sum(pop_lo) + sum(pop_hi)) * prop_high_risk - sum(pop_hi)) / sum(pop_lo) * pop_lo
-    } else if(sum(pop_hi) > 0){
-      become_high_risk = (1 - prop_high_risk) * pop_hi
-    } else {
-      become_high_risk = 0
-    }
-    if(any(become_high_risk < -100)){
-      print('negative become_high_risk')
-    }
-    
-    # prevdt[sHIV[['lo']],,1] = prevdt[sHIV[['lo']],,1] - become_high_risk
-    # prevdt[sHIV[['hi']],,1] = prevdt[sHIV[['hi']],,1] + become_high_risk
-        
-    prevdt[sHIV[['eff_I_lo']],,1] = prevdt[sHIV[['eff_I_lo']],,1] - become_high_risk
-    prevdt[sHIV[['eff_I_hi']],,1] = prevdt[sHIV[['eff_I_hi']],,1] + become_high_risk
-    
-    
-    if(any(num_prep > 0)){
-      for(i_med in 1:length(med_labs)){
-        
-        # calculate prep transitions
-        pop_hi = prevdt[sHIV[['hi']],,i_med]
-        pop_pr = prevdt[sHIV[['pr']],,i_med]
-        
-        if(sum(pop_pr) == num_prep[i_med]){
-          num_to_prep = 0
-        } else if(sum(pop_pr) > num_prep[i_med]){
-          num_to_prep = (num_prep[i_med] - sum(pop_pr)) / sum(pop_pr) * pop_pr
-        } else if((sum(pop_hi) + sum(pop_pr)) <= num_prep[i_med]){
-          # num_to_prep = sum(pop_hi)
-          num_to_prep = pop_hi
-        } else {
-          num_to_prep = (num_prep[i_med] - sum(pop_pr)) / sum(pop_hi) * pop_hi
-        }
-        
-        prevdt[sHIV[['hi']],,i_med] = prevdt[sHIV[['hi']],,i_med] - num_to_prep
-        prevdt[sHIV[['pr']],,i_med] = prevdt[sHIV[['pr']],,i_med] + num_to_prep
-        
-      }
-    }
+    # if(any(num_prep > 0)){
+    #   print('')
+    # }
 
     # deaths
     deaths = mu * prevdt

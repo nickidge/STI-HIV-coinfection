@@ -71,6 +71,9 @@ sHIV[['und']] = setdiff(HIV_labs, sHIV$D)
 sHIV[['S_lo']] = 'S_lo'
 sHIV[['S_hi']] = 'S_hi'
 sHIV[['S_pr']] = 'S_pr'
+sHIV[['und_lo']] = intersect(sHIV$und, sHIV$lo)
+sHIV[['und_hi']] = intersect(sHIV$und, sHIV$hi)
+sHIV[['und_pr']] = intersect(sHIV$und, sHIV$pr)
 
 # HIV transitions -- e.g. infection, diagnosis, starting treatment, etc.
 HIV_transitions = rbind(c("S_lo_inf_aus", "S_lo", "I_lo_new", 1),
