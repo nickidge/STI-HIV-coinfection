@@ -63,7 +63,7 @@ plot_scens = function(df, base_uncertainty=F){
   max_df = max_df_base[max_df_base$plot %in% df$plot,]
   max_df$plot = factor(max_df$plot)
   
-  thisdf = subset(thisdf, t >= plot_years[1] & t <= plot_years[2])
+  df = subset(df, t >= plot_years[1] & t <= plot_years[2])
   
   # initialise plot
   p = ggplot(df, aes(x=t, group=scen, colour=scen, fill=scen))
