@@ -91,34 +91,6 @@ run_model = function(y0=NULL, tvec=tvec_base, modelpars=list(), options=list(), 
       prevdt = adrop(SID[t-1,,,, drop = FALSE], 1)
     }
     
-    
-    # prop_condom_strat = rbind(
-    #   (1-condom_by_HIV_de)*(1-gel_mat_de[1,]),
-    #   (1-condom_by_HIV_de)*gel_mat_de[1,] + condom_by_HIV_de*gel_mat_de[2,],
-    #   condom_by_HIV_de*(1-gel_mat_de[2,])
-    # )
-    # 
-    # dimnames(prop_condom_strat) = list(c("Nil", "Gel", "Condom"),
-    #                                               c("HIV- no prep", "HIV- prep", "HIV+"))
-    # 
-    # if(any(abs(colSums(prop_condom_strat)-1) > 10^-10) | any(prop_condom_strat<0)){
-    #   print("Condom proportions are not contained!")
-    # }
-    # # through_condom_by_type = c(1,(1-eff_gel_de[1]),(1-eff_condom))
-    # through_condom_by_type = cbind(1, 1-eff_gel_de, 1-eff_condom)
-    # dimnames(through_condom_by_type) = list(c("HIV", "Gonorrhoea"),
-    #                                         c("Nil", "Gel", "Condom"))
-    # # dot_condom = prop_condom_strat * through_condom_by_type
-    # dot_condom = NULL
-    # for(i in 1:nrow(through_condom_by_type)){
-    #   dot_condom = abind(dot_condom, prop_condom_strat * through_condom_by_type[i,], along=3)
-    # }
-    # dimnames(dot_condom)[[3]] = c("HIV", "Gonorrhoea")
-    # mult_condom = colSums(dot_condom)
-    # mult_condom_means = colSums(prevdt[c(1,2,9),"pop_sti",3] * mult_condom) / prevdt[13,"pop_sti",3]
-    # cond_HIV = mult_condom_means[1]
-    # cond_sti = mult_condom[,2]
-    
     condom_thru = 1 - condom_usage * eff_condom
     
     #########################
