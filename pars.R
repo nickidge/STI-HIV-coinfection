@@ -279,11 +279,11 @@ constant_prep = function(num_prep){
   return(num_prep)
 }
 
-smooth_risk = function(high_risk){
-  which_unique = which(high_risk[,1] != lag(high_risk[,1], default=-1))
-  unique_ends = c(head(high_risk[which_unique,1], 1), tail(high_risk[which_unique,1], 1))
-  high_risk[which_unique,1] = approx(names(unique_ends), unique_ends, xout=names(which_unique))$y
-  return(high_risk)
+smooth_par = function(thispar, thiscol=1){
+  which_unique = which(thispar[,thiscol] != lag(thispar[,thiscol], default=-1))
+  unique_ends = c(head(thispar[which_unique,thiscol], 1), tail(thispar[which_unique,thiscol], 1))
+  thispar[which_unique,thiscol] = approx(names(unique_ends), unique_ends, xout=names(which_unique))$y
+  return(thispar)
 }
 
 load_time_par_sheet = function(sheetname, deflist = baselist, syear=NA){
@@ -305,7 +305,10 @@ load_time_par_sheet = function(sheetname, deflist = baselist, syear=NA){
   thislist = fill_list(thislist, deflist = deflist)
   
   thislist$num_prep = constant_prep(thislist$num_prep)
-  thislist$prop_high_risk = smooth_risk(thislist$prop_high_risk)
+  to_smooth = c('prop_high_risk')
+  for(thissmooth in to_smooth){
+    thislist[[thissmooth]] = smooth_par(thislist[[thissmooth]])
+  }
 
   
   return(thislist)
