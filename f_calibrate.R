@@ -40,10 +40,12 @@ compare_model_to_data = function(output){
   
   thisdat = all_dat
   thisdat = subset(thisdat, !(med_pop == 'tot' & HIV_pop == 'PLHIV'))
+  thisdat = subset(thisdat, !(med_pop == 'tot' & substr(HIV_pop, 1, 8) == 'HIV_diag'))
   
   res = extr(output, unique(thisdat$plot))
   
   df_wide = widen_sources(thisdat %>% select(-contains('scen')), res %>% select(-contains('scen')))
+  df_wide = df_wide[!is.na(df_wide$model) & !is.na(df_wide$data),]
   
   return(df_wide)
 }
