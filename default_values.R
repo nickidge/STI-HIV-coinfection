@@ -25,6 +25,7 @@ defaultlist[['init_diag_prop']] = 0.7 # initial guess for proportion of PLHIV wh
 # defaultlist[['init_prev_HIV']] = 0.1 # initial guess for proportion of people who are living with HIV
 defaultlist[['init_prev_HIV_aus']] = 0.1 # initial guess for proportion of people who are living with HIV
 defaultlist[['init_prev_HIV_int']] = 0.12 # initial guess for proportion of people who are living with HIV
+defaultlist[['init_late_prop']] = 0.1
 
 defaultlist[['f_infect_STI']] = 0 # foi for STI
 defaultlist[['init_prev_STI']] = 0 # initial prevalence of STI

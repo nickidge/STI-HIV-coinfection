@@ -50,9 +50,12 @@ compare_model_to_data = function(output){
 
 gen_calibration = function(cal_vars = c('f_infect_HIV', 'init_diag_prop'), control=list()){
   
-  lbs = c('f_infect_HIV' = 0, 'int_factor' = 1, 'init_diag_prop' = 0, 'init_prev_HIV_aus' = 0, 'init_prev_HIV_int' = 0)
-  bes = c('f_infect_HIV' = 6e-6, 'int_factor' = 1.2, 'init_diag_prop' = 0.6, 'init_prev_HIV_aus' = 0.07, 'init_prev_HIV_int' = 0.07)
-  ubs = c('f_infect_HIV' = 1e-4, 'int_factor' = 10, 'init_diag_prop' = 0.7, 'init_prev_HIV_aus' = 0.18, 'init_prev_HIV_int' = 0.3)
+  lbs = c('f_infect_HIV' = 0, 'int_factor' = 1, 'init_diag_prop' = 0,
+          'init_prev_HIV_aus' = 0, 'init_prev_HIV_int' = 0, 'init_late_prop' = 0)
+  bes = c('f_infect_HIV' = 3e-5, 'int_factor' = 1.2, 'init_diag_prop' = 0.6,
+          'init_prev_HIV_aus' = 0.11, 'init_prev_HIV_int' = 0.07, 'init_late_prop' = 1e-6)
+  ubs = c('f_infect_HIV' = 1e-4, 'int_factor' = 10, 'init_diag_prop' = 0.9,
+          'init_prev_HIV_aus' = 0.15, 'init_prev_HIV_int' = 0.3, 'init_late_prop' = 1)
   
   optim_result <<- nmkb(par=bes[cal_vars],
                         fn=distance_given_cal_vec,

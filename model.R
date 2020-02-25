@@ -43,6 +43,10 @@ run_model = function(y0=NULL, tvec=tvec_base, modelpars=list(), options=list(), 
     y0[sHIV$S,,] = y0[sHIV$S,,,drop = FALSE] - ninf_HIV
     y0[sHIV$I_new,,] = y0[sHIV$I_new,,, drop = FALSE] + ninf_HIV
     
+    nlate_HIV = y0[sHIV$I_new,,,drop = FALSE] * init_late_prop
+    y0[sHIV$I_new,,] = y0[sHIV$I_new,,,drop = FALSE] - nlate_HIV
+    y0[sHIV$I_old,,] = y0[sHIV$I_old,,,drop = FALSE] + nlate_HIV
+    
     ndiag_HIV = y0[sHIV$I,,, drop = FALSE] * init_diag_prop
     y0[sHIV$I,,] = y0[sHIV$I,,, drop = FALSE] - ndiag_HIV
     dimnames(ndiag_HIV)[[1]] = paste0('D1_', substr(dimnames(ndiag_HIV)[[1]], 3, 4))
