@@ -63,6 +63,8 @@ plot_scens = function(df, base_uncertainty=F){
   max_df = max_df_base[max_df_base$plot %in% df$plot,]
   max_df$plot = factor(max_df$plot)
   
+  thisdf = subset(thisdf, t >= plot_years[1] & t <= plot_years[2])
+  
   # initialise plot
   p = ggplot(df, aes(x=t, group=scen, colour=scen, fill=scen))
   p = p + facet_wrap(.~plot, scales="free", ncol=2, labeller = labeller(plot = setNames(plot_long, plot_keys)))
@@ -73,12 +75,13 @@ plot_scens = function(df, base_uncertainty=F){
   p = p + geom_ribbon(aes(ymin = lower_ci, ymax = upper_ci, x=t), alpha=0.2, colour=NA)
   
   # define axes scales
-  p = p + geom_blank(data=max_df, aes(y=upperlim), inherit.aes = F)
+  # p = p + geom_blank(data=max_df, aes(y=upperlim), inherit.aes = F)
   p = p + scale_x_continuous(breaks = label_years,
                              name = 'Year',
                              limits = c(min(df$t), max(df$t)),
                              expand = c(0, 0))
-  p = p + scale_y_continuous(expand = c(0,0))
+  # p = p + scale_y_continuous(expand = c(0,0))
+  p = p + scale_y_continuous(expand = expand_scale(mult = c(0, 0.1)))
   p = p + expand_limits(y = 0)
   p = p + coord_cartesian(xlim = plot_years)
   

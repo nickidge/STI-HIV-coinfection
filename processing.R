@@ -121,6 +121,7 @@ extr = function(output, keys, tvec=tvec_base){
       this = melt(thispop, varnames = c('t', 'risk_pop', 'sti_pop', 'med_pop'))
       this = aggregate(value~., data = this, FUN=sum)
       this = subset(this, sti_pop == 'tot' & med_pop == 'tot')
+      this$med_pop = 'all'
       
       thisdf = data.frame(this, type = 'pop', dt = 1, pid='pop_by_risk', plot='popsize_by_risk',
                           HIV_pop = 'all')
@@ -249,6 +250,7 @@ extr = function(output, keys, tvec=tvec_base){
       colnames(thisprevall) = c('t', 'risk_pop', 'med_pop', 'value')
       
       thisprevall = subset(thisprevall, med_pop == 'tot')
+      thisprevall$med_pop = 'all'
       
       thisdf = data.frame(thisprevall, type = 'pop', dt = 1, pid = 'HIV_prev_by_risk_prop',
                           sti_pop = 'all', HIV_pop = 'HIV_prev', plot='HIV_prev_by_risk')

@@ -5,7 +5,11 @@ gen_uncertainty = function(ntrials=10){
   cal_wide = widen_sources(trials_df)
   cal_wide$scen = 'base'
   cal_wide$scen_long = 'Base'
-  cal_wide = rbind.fill(cal_wide, data_wide)
+  
+  this_data_wide = data_wide
+  this_data_wide = subset(this_data_wide, med_pop %in% unique(cal_wide$med_pop))
+  
+  cal_wide = rbind.fill(cal_wide, this_data_wide)
   
   return(cal_wide)
 }
@@ -47,6 +51,8 @@ plot_uncertainty = function(thisdf, colour_strat='cascade', toplot=NULL){
                           col = c('black', 'red', 'blue'))
     thisdf$col_pop = thisdf$med_pop
     final_cs$col_pop = final_cs$med_pop
+    
+    final_cs = subset(final_cs, col_pop %in% unique(thisdf$col_pop))
   } else if(colour_strat == 'prev'){
     legend_name = 'Population group'
     # thisdf$col_pop = paste(thisdf$HIV_pop, thisdf$risk_pop, thisdf$med_pop, sep='_')
@@ -57,6 +63,7 @@ plot_uncertainty = function(thisdf, colour_strat='cascade', toplot=NULL){
     final_cs$col = rep(rainbow(4), 3)
   }
   
+  thisdf = subset(thisdf, t >= plot_years[1] & t <= plot_years[2])
 
   # initialise plot
   p = ggplot(subset(thisdf, plot != 'num_cascade'), aes(x=t, group=col_pop, colour=col_pop, fill=col_pop))
@@ -80,14 +87,15 @@ plot_uncertainty = function(thisdf, colour_strat='cascade', toplot=NULL){
   }
   
   # define axes scales
-  if(nrow(max_df) > 0){
-    p = p + geom_blank(data=max_df, aes(y=upperlim), inherit.aes = F)
-  }
+  # if(nrow(max_df) > 0){
+  #   p = p + geom_blank(data=max_df, aes(y=upperlim), inherit.aes = F)
+  # }
   p = p + scale_x_continuous(breaks = label_years,
                              name = 'Year',
                              limits = c(min(thisdf$t), max(thisdf$t)),
                              expand = c(0, 0))
-  p = p + scale_y_continuous(expand = c(0,0))
+  # p = p + scale_y_continuous(expand = c(0,0))
+  p = p + scale_y_continuous(expand = expand_scale(mult = c(0, 0.1)))
   p = p + expand_limits(y = 0)
   
   # guides / legend
@@ -216,21 +224,20 @@ upper_ci <- function(mean, se, n, conf_level = 0.95){
 }
 
 summarise_trials = function(df, value='value', lbfunc=lower_ci, ubfunc=upper_ci, conf_level=0.95){
-  # med_count = 0
-  # for(i_med in 1:length(med_labs)){
-  #   med_values = subset(df, med_pop == med_labs[i_med])$value
-  #   if(sum(is.finite(med_values) & med_values != 0) > 0){
-  #     med_count = med_count + 1
-  #   } else {
-  #     # df = subset(df, med_pop != med_labs[i_med])
-  #     # df[df$med_pop == med_labs[i_med],"value"] = NaN
-  #     df = df[df$med_pop != med_labs[i_med],]
-  #   }
-  # }
+  med_count = 0
+  med_exclude = c()
+  for(i_med in 1:length(med_labs)){
+    med_values = subset(df, med_pop == med_labs[i_med])$value
+    if(sum(is.finite(med_values) & med_values != 0) > 0){
+      med_count = med_count + 1
+    } else {
+      med_exclude = c(med_exclude, med_labs[i_med])
+    }
+  }
   
-  # if(med_count == 1){
-  #   df = subset(df, med_pop %in% med_labs)
-  # }
+  if(med_count == 1){
+    df = subset(df, med_pop %nin% c(med_exclude, 'tot'))
+  }
   
   df = df %>%
     group_by_at(vars(-!!sym(value), -trial)) %>%

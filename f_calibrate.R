@@ -38,9 +38,12 @@ distance_given_cal_vec = function(x, keys, norm=l2){
 
 compare_model_to_data = function(output){
   
-  res = extr(output, unique(all_dat$plot))
+  thisdat = all_dat
+  thisdat = subset(thisdat, !(med_pop == 'tot' & HIV_pop == 'PLHIV'))
   
-  df_wide = widen_sources(all_dat %>% select(-contains('scen')), res %>% select(-contains('scen')))
+  res = extr(output, unique(thisdat$plot))
+  
+  df_wide = widen_sources(thisdat %>% select(-contains('scen')), res %>% select(-contains('scen')))
   
   return(df_wide)
 }
