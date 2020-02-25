@@ -388,7 +388,7 @@ run_model = function(y0=NULL, tvec=tvec_base, modelpars=list(), options=list(), 
     # num_no_longer_ineligible = prevdt[,,2] * dt / stay_time
     num_no_longer_ineligible = prevdt[,,2] * duration2rate(stay_time)
     num_stay = num_no_longer_ineligible * stay_prop
-    num_leave = num_no_longer_ineligible * (1 - stay_prop)
+    # num_leave = num_no_longer_ineligible * (1 - stay_prop)
     
     prevdt[,,1] = prevdt[,,1] + num_stay
     prevdt[,,2] = prevdt[,,2] - num_no_longer_ineligible
