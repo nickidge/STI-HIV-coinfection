@@ -85,7 +85,8 @@ run_model = function(y0=NULL, tvec=tvec_base, modelpars=list(), options=list(), 
     # initialise temp
     if(t==1){
       prevdt = y0
-      prevdt[1, 1,] = thispopsize - apply(y0, 3, sum) + prevdt[1, 1, ]
+      # prevdt[1, 1,] = thispopsize - apply(y0, 3, sum) + prevdt[1, 1, ]
+      prevdt[1, 1,] = thispopsize - rowSums(aperm(y0, c(3, 1, 2))) + prevdt[1, 1, ]
     } else {
       prevdt = adrop(SID[t-1,,,, drop = FALSE], 1)
     }
@@ -318,8 +319,11 @@ run_model = function(y0=NULL, tvec=tvec_base, modelpars=list(), options=list(), 
           HIV_p[paste0('treat_', risk_lab)] = prop1_to_2
           HIV_p[paste0('viral_supp_', risk_lab)] = prop2_to_3
           
-          num1_to_2 = prop1_to_2 * (apply(prevdt[sHIV[[paste0('D1_', risk_lab)]],,i_med, drop = FALSE], 2, sum) + apply(HIV_trans[tHIV[[paste0('test_', risk_lab)]],,i_med,drop=FALSE], 2, sum))
-          num2_to_3 = prop2_to_3 * apply(prevdt[sHIV[[paste0('D2_', risk_lab)]],,i_med, drop = FALSE], 2, sum) + care_cascade[2] * num1_to_2
+          # num1_to_2 = prop1_to_2 * (apply(prevdt[sHIV[[paste0('D1_', risk_lab)]],,i_med, drop = FALSE], 2, sum) + apply(HIV_trans[tHIV[[paste0('test_', risk_lab)]],,i_med,drop=FALSE], 2, sum))
+          # num2_to_3 = prop2_to_3 * apply(prevdt[sHIV[[paste0('D2_', risk_lab)]],,i_med, drop = FALSE], 2, sum) + care_cascade[2] * num1_to_2
+
+          num1_to_2 = prop1_to_2 * (rowSums(aperm(prevdt[sHIV[[paste0('D1_', risk_lab)]],,i_med, drop = FALSE], c(2,1,3))) + apply(HIV_trans[tHIV[[paste0('test_', risk_lab)]],,i_med,drop=FALSE], 2, sum))
+          num2_to_3 = prop2_to_3 * rowSums(aperm(prevdt[sHIV[[paste0('D2_', risk_lab)]],,i_med, drop = FALSE], c(2,1,3))) + care_cascade[2] * num1_to_2
 
           HIV_trans[paste0('treat_', risk_lab),,i_med] = num1_to_2
           HIV_trans[paste0('viral_supp_', risk_lab),,i_med] = num2_to_3
@@ -390,6 +394,7 @@ run_model = function(y0=NULL, tvec=tvec_base, modelpars=list(), options=list(), 
     
     # pop growth
     popgrowth = thispopsize - apply(prevdt, 3, sum)
+    popgrowth = thispopsize - rowSums(aperm(prevdt, c(3, 1, 2)))
     
     thisgrowth = makearray(list(c("S_lo", "S_hi"), med_labs))
     thisgrowth[,1] = popgrowth[1] * c((1-prop_high_risk), prop_high_risk)
