@@ -207,7 +207,8 @@ run_model = function(y0=NULL, tvec=tvec_base, modelpars=list(), options=list(), 
     if(any(HIV_p[tHIV$inf] > 1) & t > 2){
       print('everyone infected?!')
     }
-    HIV_p = vapply(HIV_p, function(x) median(c(0, x, 1)), 1)
+    HIV_p[HIV_p > 1] = 1
+    HIV_p[HIV_p < 0] = 0
     
     # functions to calculate number of people moving for each transition
     # getppl_HIV = function(from, med, prop){
@@ -220,15 +221,20 @@ run_model = function(y0=NULL, tvec=tvec_base, modelpars=list(), options=list(), 
     # trans_i_HIV = function(i) getppl_HIV(HIV_transitions[i,'from'], HIV_transitions[i, 'med'], HIV_p[i])
     
     # calculate transitions in absolute numbers
-    HIV_trans[] = 0
-    for(i in 1:length(HIV_p)){
-      med = HIV_transitions[i, 'med']
-      this = adrop(prevdt[HIV_transitions[i,'from'],,,drop=FALSE], 1) * as.numeric(HIV_p[i])
-      if(as.numeric(med) != 0){
-        this[,-as.numeric(med)] = 0
-      }
-      # HIV_trans[i,,] = trans_i_HIV(i)
-      HIV_trans[i,,] = this
+    # HIV_trans[] = 0
+    # for(i in 1:length(HIV_p)){
+    #   med = HIV_transitions[i, 'med']
+    #   this = adrop(prevdt[HIV_transitions[i,'from'],,,drop=FALSE], 1) * as.numeric(HIV_p[i])
+    #   if(as.numeric(med) != 0){
+    #     this[,-as.numeric(med)] = 0
+    #   }
+    #   # HIV_trans[i,,] = trans_i_HIV(i)
+    #   HIV_trans[i,,] = this
+    # }
+    
+    HIV_trans[] = prevdt[HIV_transitions[,'from'],,,drop=FALSE] * as.numeric(HIV_p)
+    for(i in 1:length(med_labs)){
+      HIV_trans[as.numeric(HIV_transitions[,"med"]) == i,,-i] = 0
     }
     # HIV_trans = lapply(1:length(HIV_p), FUN=trans_i_HIV)
     # HIV_trans = abind(HIV_trans, along=0, new.names=names(HIV_p))
