@@ -32,7 +32,8 @@ distance_given_cal_vec = function(x, keys, norm=l2){
     p = plot_uncertainty(df)
     saveopen(p, paste0('calplots/', round(distance * 1e7)), open=FALSE)
   }
-  
+
+  print(distance)
   return(distance)
 }
 
