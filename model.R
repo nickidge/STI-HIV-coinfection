@@ -70,6 +70,8 @@ run_model = function(y0=NULL, tvec=tvec_base, modelpars=list(), options=list(), 
   deaths_log = makearray(list(tvec, HIV_labs, STI_labs, med_labs))
   popgrowth_log = makearray(list(tvec, colnames(popsize)))
   
+  t_total = 0
+  t_start = Sys.time()
   
   for (t in 1:(length(tvec))){
     
@@ -267,6 +269,8 @@ run_model = function(y0=NULL, tvec=tvec_base, modelpars=list(), options=list(), 
     #     HIV_trans[thisname,,i_med] = (num_prep[i_med] - sum(s_pr)) / sum(s_hi) * s_hi
     #   }
     # }
+    
+    
     trip = 0
     for(i_med in 1:length(med_labs)){
       for(j_risk in 1:length(HIV_risk_labs)){
@@ -310,6 +314,8 @@ run_model = function(y0=NULL, tvec=tvec_base, modelpars=list(), options=list(), 
       }
     }
     
+    
+    
     # if(trip == 1){
     #   print('')
     # }
@@ -328,6 +334,33 @@ run_model = function(y0=NULL, tvec=tvec_base, modelpars=list(), options=list(), 
       HIV_trans[as.numeric(HIV_transitions[,"med"]) == i,,-i] = 0
     }
     
+    t0 = Sys.time()
+    
+    
+    # HIV_to = HIV_trans
+    # rownames(HIV_to) = HIV_transitions[,"to"]
+    # # HIV_to = melt(HIV_to)
+    # HIV_to$Var1 = factor(HIV_to$Var1, levels = rownames(SID_mat))
+    # HIV_to = acast(HIV_to, Var1 ~ Var2 ~ Var3, fun.aggregate = sum, drop=FALSE)
+    #
+    # HIV_from = HIV_trans
+    # rownames(HIV_from) = HIV_transitions[,"from"]
+    # HIV_from = melt(HIV_from)
+    # HIV_from$Var1 = factor(HIV_from$Var1, levels = rownames(SID_mat))
+    # HIV_from = acast(HIV_from, Var1 ~ Var2 ~ Var3, fun.aggregate = sum, drop=FALSE)
+    # 
+    # HIV_delta = HIV_to - HIV_from
+    # 
+    # prevdt = prevdt + HIV_delta
+    # 
+    # if(any(prevdt < 0)){
+    #   if(all(prevdt > -1e-6)){
+    #     prevdt[prevdt > -1e-6 & prevdt < 0] = 0
+    #   } else {
+    #     print(paste0('negative pop for ', HIV_transitions[i,1], ' transition'))
+    #   }
+    # }
+
     # apply transitions
     for(i in 1:length(HIV_p)){
       # get info
@@ -347,6 +380,9 @@ run_model = function(y0=NULL, tvec=tvec_base, modelpars=list(), options=list(), 
         }
       }
     }
+    
+    t_total = t_total + Sys.time() - t0
+    
     
     # ensure no low risk medicare ineligible
     prevdt["S_hi",,2] = prevdt["S_hi",,2] + prevdt["S_lo",,2]
@@ -404,6 +440,8 @@ run_model = function(y0=NULL, tvec=tvec_base, modelpars=list(), options=list(), 
     ################
     
   }
+  
+  # print(paste0('time prop = ', round(as.numeric(t_total) / as.numeric(as.numeric(Sys.time()) - as.numeric(t_start)), 3)))
   
   if('only_cal_outs' %in% names(options)){
     if(options$only_cal_outs){

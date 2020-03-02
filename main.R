@@ -6,14 +6,11 @@ if(!exists('cal')){
   baselist = load_time_par_sheet('timepars', deflist = defaultlist)
   cal_keys = c('PLHIV', 'HIV_diag', 'care_cascade', 'HIV_prev')
   cal_pars = c('f_infect_HIV', 'init_prev_HIV_aus', 'init_diag_prop', 'init_late_prop', 'high_risk_factor')
-  gen_calibration(cal_pars, control = list(tol = 1e-4))
+  gen_calibration(cal_pars, control = list(tol = 1e-6))
 }
 
 # run base scenario (with uncertainty)
-base_df = gen_uncertainty(0)
-# saveopen(plot_uncertainty(base_df, toplot=c('pop', 'PLHIV', 'HIV_diag', 'HIV_inf', 'HIV_prev', 'prop_prep', 'HIV_diag_new', 'HIV_diag_old'), colour_strat = 'med'), 'cal1')
-# saveopen(plot_uncertainty(base_df, toplot=c('num_cascade', 'care_cascade', 'HIV_diag_by_pop', 'HIV_prev_by_risk', 'popsize_by_risk')), 'cal2')
-# saveopen(plot_uncertainty(base_df, toplot=c('HIV_prev_by_risk_all'), colour_strat = 'prev'), 'cal3')
+base_df = gen_uncertainty(100)
 saveopen(plot_cals(base_df), 'calibration', 'plots', width=2*1.1*page_width)
 
 # run all scenarios (with uncertainty)
@@ -23,10 +20,10 @@ input_scenarios = list(list(sheet = 'scen_1',
                        list(sheet = 'scen_2',
                             short = 'care_cascade_stops',
                             long = 'Care cascade stays constant after 2014'))
-scen_df = gen_scenarios(scen_df=base_df, scenarios=input_scenarios, ntrials=2)
+scen_df = gen_scenarios(scen_df=base_df, scenarios=input_scenarios, ntrials=100)
 saveopen(plot_scens(scen_df, base_uncertainty = T), 'scenarios', 'plots', width=1.5*1.1*page_width)
-# 
-# # create table of scenario results
+
+# # create table of scenario results (old)
 # t_results = make_tab(scen_df, tab_row_funcs, allscens)
 
 # output results tables

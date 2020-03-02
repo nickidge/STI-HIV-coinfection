@@ -17,10 +17,10 @@ gen_scenarios = function(scen_df=NULL, scenarios = scenarios, ntrials=0, varianc
     }
       
     scen_df = widen_sources(scen_df)
+    scen_df$scen = 'base'
+    scen_df$scen_long = 'Base'
   }
-  scen_df$scen = 'base'
   scen_df$scen_short = 'base'
-  scen_df$scen_long = 'Base'
  
   
   dat = subset(dat, med_pop %in% unique(scen_df$med_pop))
