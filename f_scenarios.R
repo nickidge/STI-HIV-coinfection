@@ -28,7 +28,8 @@ gen_scenarios = function(scen_df=NULL, scenarios = list(), ntrials=3, variance=0
   for(s in scenarios){
     thisscen = load_time_par_sheet(s$sheet, deflist = baselist, syear=split_year)
     
-    this_scen_trials = ci_df(ntrials=ntrials, timepars=thisscen, basevar=variance, options=list('keep_static'=TRUE), syear=split_year)
+    # this_scen_trials = ci_df(ntrials=ntrials, timepars=thisscen, basevar=variance, options=list('keep_static'=TRUE), syear=split_year)
+    this_scen_trials = ci_df(ntrials=ntrials, timepars=thisscen, basevar=variance, y0=y0_split, tvec=tvec_split, options=list('keep_static'=TRUE), syear=split_year)
     # this_scen_trials = ci_df(ntrials=5, timepars=thisscen, basevar=0.1, tvec=tvec_split, y0=y0_split, options=list('split'=TRUE, 'keep_static'=TRUE), syear=split_year+1)
     
     thisdf = this_scen_trials
