@@ -19,10 +19,13 @@ base_df = gen_uncertainty(0)
 # saveopen(plot_uncertainty(base_df, toplot=c('HIV_prev_by_risk_all'), colour_strat = 'prev'), 'cal3')
 saveopen(plot_cals(base_df), 'calibration', 'plots', width=2*1.1*page_width)
 
-# # run all scenarios (with uncertainty)
-# scen_df = gen_scenarios(scen_df=base_df, scenarios=scenarios, ntrials=2, variance=0.1)
-# saveopen(plot_scens(scen_df), 'scenarios', 'plots')
-
+# run all scenarios (with uncertainty)
+scen_df = gen_scenarios(scen_df=base_df, scenarios=scenarios, ntrials=5)
+saveopen(plot_scens(scen_df, base_uncertainty = T), 'scenarios', 'plots', width=1.5*1.1*page_width)
+# 
 # # create table of scenario results
 # t_results = make_tab(scen_df, tab_row_funcs, allscens)
+
+# output results tables
+save_results_xlsx(create_results_df(scen_df))
 

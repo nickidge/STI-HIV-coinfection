@@ -29,6 +29,7 @@ library(minpack.lm)
 library(grid)
 library(stringi)
 library(stringr)
+library(openxlsx)
 
 # base model information
 tvec_base = seq(2007, 2030, by=1/12)
@@ -41,7 +42,7 @@ scenarios = list(list(sheet = 'scen_1',
                       short = 'no_prep',
                       long = 'Everyone stops using PrEP'),
                  list(sheet = 'scen_2',
-                      short = 'care_cascade_halt',
+                      short = 'care_cascade_stops',
                       long = 'Care cascade stays constant after 2015'))
 
 label_years = unique(c(plot_years, seq(2000, 2050, by=5)))
@@ -63,3 +64,4 @@ source("f_calibrate.R", echo = F)
 source("f_uncertainty.R", echo = F)
 source("f_scenarios.R", echo = F)
 source("f_table.R", echo = F)
+source("f_results.R", echo = F)

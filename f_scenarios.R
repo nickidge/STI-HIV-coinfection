@@ -1,8 +1,9 @@
 
-gen_scenarios = function(scen_df=NULL, scenarios = list(), ntrials=3, variance=0.1){
+gen_scenarios = function(scen_df=NULL, scenarios = list(), ntrials=3, variance=base_variance){
   
   dat = all_dat
   dat$scen = 'data'
+  dat$scen_short = 'data'
   dat$scen_long = 'Data'
   dat = widen_sources(dat)
   
@@ -17,9 +18,11 @@ gen_scenarios = function(scen_df=NULL, scenarios = list(), ntrials=3, variance=0
     }
       
     scen_df = widen_sources(scen_df)
-    scen_df$scen = 'base'
-    scen_df$scen_long = 'Base'
   }
+  scen_df$scen = 'base'
+  scen_df$scen_short = 'base'
+  scen_df$scen_long = 'Base'
+ 
   
   dat = subset(dat, med_pop %in% unique(scen_df$med_pop))
   
@@ -35,6 +38,7 @@ gen_scenarios = function(scen_df=NULL, scenarios = list(), ntrials=3, variance=0
     thisdf = this_scen_trials
     thisdf = widen_sources(thisdf)
     thisdf$scen = s$short
+    thisdf$scen_short = s$short
     thisdf$scen_long = s$long
     
     scen_df = rbind.fill(scen_df, thisdf)
@@ -49,19 +53,26 @@ gen_scenarios = function(scen_df=NULL, scenarios = list(), ntrials=3, variance=0
   
 }
 
-plot_scens = function(this_df, base_uncertainty=F){
-  
-  scen_colours = c('black', 'red', 'green')
+scen_update = function(this_df){
   # scen_keys = c('PLHIV', 'HIV_prev', 'HIV_diag', 'HIV_inf', 'num_diag', 'care_cascade')
   scen_keys = c('pop', 'PLHIV', 'HIV_prev', 'prop_prep', 'HIV_diag', 'HIV_inf', 'HIV_diag_new', 'HIV_diag_old')
   scen_keys = c(scen_keys, 'care_cascade')
-  # 
+  scen_keys <<- scen_keys 
+  
   this_df = subset(this_df, plot %in% scen_keys)
   # this_df = subset(this_df, HIV_pop %in% scen_keys)
   this_df$plot = factor(this_df$plot, levels=scen_keys)
   # this_df = subset(this_df, med_pop %nin% med_labs)
   this_df = subset(this_df, plot != 'care_cascade' | HIV_pop == 'num_diag')
+  return(this_df)
+}
+
+plot_scens = function(this_df, base_uncertainty=F){
   
+  scen_colours = c('black', 'red', 'green')
+  
+  this_df = scen_update(this_df)
+
   if(!base_uncertainty){
     baserows = this_df$scen == 'Base'
     this_df[baserows, c('lower_ci', 'upper_ci')] = this_df$model[baserows]
