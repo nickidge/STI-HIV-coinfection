@@ -20,7 +20,13 @@ base_df = gen_uncertainty(0)
 saveopen(plot_cals(base_df), 'calibration', 'plots', width=2*1.1*page_width)
 
 # run all scenarios (with uncertainty)
-scen_df = gen_scenarios(scen_df=base_df, scenarios=scenarios, ntrials=5)
+input_scenarios = list(list(sheet = 'scen_1',
+                            short = 'no_prep',
+                            long = 'Everyone stops using PrEP'),
+                       list(sheet = 'scen_2',
+                            short = 'care_cascade_stops',
+                            long = 'Care cascade stays constant after 2014'))
+scen_df = gen_scenarios(scen_df=base_df, scenarios=input_scenarios, ntrials=2)
 saveopen(plot_scens(scen_df, base_uncertainty = T), 'scenarios', 'plots', width=1.5*1.1*page_width)
 # 
 # # create table of scenario results

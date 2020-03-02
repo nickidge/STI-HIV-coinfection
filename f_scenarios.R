@@ -1,5 +1,5 @@
 
-gen_scenarios = function(scen_df=NULL, scenarios = list(), ntrials=3, variance=base_variance){
+gen_scenarios = function(scen_df=NULL, scenarios = scenarios, ntrials=0, variance=base_variance){
   
   dat = all_dat
   dat$scen = 'data'

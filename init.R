@@ -43,7 +43,7 @@ scenarios = list(list(sheet = 'scen_1',
                       long = 'Everyone stops using PrEP'),
                  list(sheet = 'scen_2',
                       short = 'care_cascade_stops',
-                      long = 'Care cascade stays constant after 2015'))
+                      long = 'Care cascade stays constant after 2014'))
 
 label_years = unique(c(plot_years, seq(2000, 2050, by=5)))
 
