@@ -221,28 +221,26 @@ run_trial = function(timepars=baselist, basevar=0.05, y0=NULL, tvec=tvec_base, o
   }
   basekeyindex = setNames(rep(list(NA), length(basekeys)), basekeys)
 
-  if(syear != 0){
-    for(i in 1:length(basekeys)){
-      ind = basekeys[i]
-      if(!is.matrix(timepars[[ind]])){
-        timepars[[ind]] = matrix(timepars[[ind]], ncol=1, nrow=length(tvec_base))
-        rownames(timepars[[ind]]) = tvec_base
-      }
-      if(is.na(basekeyindex[[ind]])){
-        basekeyindex[[ind]] = 1:ncol(timepars[[basekeys[[i]]]])
-      }
+  for(i in 1:length(basekeys)){
+    ind = basekeys[i]
+    if(!is.matrix(timepars[[ind]])){
+      timepars[[ind]] = matrix(timepars[[ind]], ncol=1, nrow=length(tvec_base))
+      rownames(timepars[[ind]]) = tvec_base
+    }
+    if(is.na(basekeyindex[[ind]])){
+      basekeyindex[[ind]] = 1:ncol(timepars[[basekeys[[i]]]])
     }
   }
 
   this_stat_pars = randomise_keys(timepars=timepars, basekeyindex = basekeyindex, basevar=basevar, syear=syear)
   
-  for(ind in names(this_stat_pars)){
-    if(nrow(unique(this_stat_pars[[ind]])) == 1){
-      this_stat_pars[[ind]] = this_stat_pars[[ind]][1,]
+  mpars = this_stat_pars[[1]]
+  for(ind in basekeys){
+    if(nrow(unique(mpars[[ind]])) == 1){
+      mpars[[ind]] = mpars[[ind]][1,]
     }
   }
   
-  mpars = this_stat_pars[[1]]
   if(getdict(options, 'keep_static', FALSE)){
     spars = static_pars
   } else {
