@@ -9,9 +9,6 @@ if(!exists('cal')){
   gen_calibration(cal_pars, control = list(tol = 1e-4))
 }
 
-# model_df = run_model(y0=NULL, tvec=tvec_base, modelpars=baselist, options=options)
-# model_df = extr(model_df, 'popsize')
-
 # run base scenario (with uncertainty)
 base_df = gen_uncertainty(0)
 # saveopen(plot_uncertainty(base_df, toplot=c('pop', 'PLHIV', 'HIV_diag', 'HIV_inf', 'HIV_prev', 'prop_prep', 'HIV_diag_new', 'HIV_diag_old'), colour_strat = 'med'), 'cal1')

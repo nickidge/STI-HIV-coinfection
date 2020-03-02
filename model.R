@@ -399,8 +399,6 @@ run_model = function(y0=NULL, tvec=tvec_base, modelpars=list(), options=list(), 
     
     SID[t,,,] = prevdt
     HIV_trans_log[t,,,] = HIV_trans
-    # deaths_log[t,,,] = deaths
-    # popgrowth_log[t,] = popgrowth
     
     
     ################

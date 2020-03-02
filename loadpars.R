@@ -22,7 +22,6 @@ totalpop0 = totalpop0[!is.na(totalpop0[,2]),]
 risk_data_to_frame = function(this_str){
   diag_cols = which(grepl(paste0(this_str), data_cols))
   df = data_raw[,c(1,diag_cols)]
-  # colnames(df) = c('t', substring(colnames(df)[-1], nchar(this_str)+2))
   dot_positions = unlist(str_locate_all(this_str, '\\.\\.\\.'))
   colnames(df) = c('t', substring(colnames(df)[-1], dot_positions[1], dot_positions[2]))
   df = reshape(data.frame(df),
@@ -95,10 +94,6 @@ mixing = as.matrix(mixing_raw)
 rownames(mixing) = medi_states
 mixing[!is.finite(suppressWarnings(as.numeric(mixing)))] = 0
 class(mixing) = 'numeric'
-# mixing = makearray(list(medi_states, medi_states))
-# mixing[,] = 1
-
-
 
 # import parameters, including upper and lower bounds (if they exist)
 pars_raw = read_excel("data_sti.xlsx", sheet="pars", col_names=TRUE)

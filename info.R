@@ -1,9 +1,6 @@
 
 # labels
 HIV_labs = c("S_lo", "S_hi", "S_pr",
-             # "I_lo_new", "I_lo_mid", "I_lo_old",
-             # "I_hi_new", "I_hi_mid", "I_hi_old",
-             # "I_pr_new", "I_pr_mid", "I_pr_old",
              "I_lo_new", "I_lo_old",
              "I_hi_new", "I_hi_old",
              "I_pr_new", "I_pr_old",
@@ -85,12 +82,7 @@ HIV_transitions = rbind(c("S_lo_inf_aus", "S_lo", "I_lo_new", 1),
                         c("S_lo_inf_int", "S_lo", "I_lo_new", 2),
                         c("S_hi_inf_int", "S_hi", "I_hi_new", 2),
                         c("S_pr_inf_int","S_pr", "I_pr_new", 2),
-                        # c("I_lo_wait_1", "I_lo_new", "I_lo_mid", 0),
-                        # c("I_lo_wait_2","I_lo_mid", "I_lo_old", 0),
-                        # c("I_hi_wait_1", "I_hi_new", "I_hi_mid", 0),
-                        # c("I_hi_wait_2", "I_hi_mid", "I_hi_old", 0),
-                        # c("I_pr_wait_1", "I_pr_new", "I_pr_mid", 0),
-                        # c("I_pr_wait_2", "I_pr_mid", "I_pr_old", 0),
+
                         c("I_lo_wait_1", "I_lo_new", "I_lo_old", 0),
                         c("I_hi_wait_1", "I_hi_new", "I_hi_old", 0),
                         c("I_pr_wait_1", "I_pr_new", "I_pr_old", 0),
@@ -133,7 +125,6 @@ tHIV[['wait_1']] = grep("wait_1", HIV_transitions, value=TRUE)
 tHIV[['wait_2']] = grep("wait_2", HIV_transitions, value=TRUE)
 tHIV[['wait']] = grep("wait", HIV_transitions, value=TRUE)
 tHIV[['test_new']] = grep("I_.._new_d", HIV_transitions, value=TRUE)
-# tHIV[['test_mid']] = grep("I_.._mid_d", HIV_transitions, value=TRUE)
 tHIV[['test_old']] = grep("I_.._old_d", HIV_transitions, value=TRUE)
 tHIV[['test']] = grep("I_.._..._d", HIV_transitions, value=TRUE)
 tHIV[['test_lo']] = grep("I_lo_..._d", HIV_transitions, value=TRUE)

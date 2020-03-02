@@ -42,10 +42,6 @@ widen_sources = function(...){
   df_wide = spread(df, source, value)
   for(key in c('model', 'data')){if(!(key %in% colnames(df_wide))){df_wide[key]=NA}}
   df_wide$t = as.numeric(as.character(df_wide$t))
-  # df_wide$plot = factor(plot_keys[match(df_wide$HIV_pop, plot_keys)], levels=(plot_keys))
-  
-  # df_wide$plot = NULL
-  # df_wide = merge(df_wide, plot_index, all.x=T, all.y=F, sort=F)
   df_wide = suppressMessages(join(df_wide, plot_index))
   df_wide$plot = factor(df_wide$plot, levels=plot_keys)
   

@@ -14,7 +14,6 @@ gen_scenarios = function(scen_df=NULL, scenarios = scenarios, ntrials=0, varianc
     } else {
       scen_df = run_model(y0=y0, tvec=tvec, modelpars=timepars, options=options)
       scen_df = extr(scen_df, plot_keys)
-      # scen_df$trial=0
     }
       
     scen_df = widen_sources(scen_df)
@@ -31,9 +30,7 @@ gen_scenarios = function(scen_df=NULL, scenarios = scenarios, ntrials=0, varianc
   for(s in scenarios){
     thisscen = load_time_par_sheet(s$sheet, deflist = baselist, syear=split_year)
     
-    # this_scen_trials = ci_df(ntrials=ntrials, timepars=thisscen, basevar=variance, options=list('keep_static'=TRUE), syear=split_year)
     this_scen_trials = ci_df(ntrials=ntrials, timepars=thisscen, basevar=variance, y0=y0_split, tvec=tvec_split, options=list('keep_static'=TRUE), syear=split_year)
-    # this_scen_trials = ci_df(ntrials=5, timepars=thisscen, basevar=0.1, tvec=tvec_split, y0=y0_split, options=list('split'=TRUE, 'keep_static'=TRUE), syear=split_year+1)
     
     thisdf = this_scen_trials
     thisdf = widen_sources(thisdf)
@@ -54,15 +51,9 @@ gen_scenarios = function(scen_df=NULL, scenarios = scenarios, ntrials=0, varianc
 }
 
 scen_update = function(this_df){
-  # scen_keys = c('PLHIV', 'HIV_prev', 'HIV_diag', 'HIV_inf', 'num_diag', 'care_cascade')
-  scen_keys = c('pop', 'PLHIV', 'HIV_prev', 'prop_prep', 'HIV_diag', 'HIV_inf', 'HIV_diag_new', 'HIV_diag_old')
-  scen_keys = c(scen_keys, 'care_cascade')
-  scen_keys <<- scen_keys 
-  
+
   this_df = subset(this_df, plot %in% scen_keys)
-  # this_df = subset(this_df, HIV_pop %in% scen_keys)
   this_df$plot = factor(this_df$plot, levels=scen_keys)
-  # this_df = subset(this_df, med_pop %nin% med_labs)
   this_df = subset(this_df, plot != 'care_cascade' | HIV_pop == 'num_diag')
   return(this_df)
 }
@@ -120,8 +111,6 @@ plot_scens = function(this_df, base_uncertainty=F){
   
   # themes
   p = p + theme_all
-  # p = p + theme(legend.justification = c(0.5, 0.5),
-  #               legend.position = c(5/6, 1/6 - 0.02))
   p = p + theme(legend.position = 'right')
   
   # add percentages

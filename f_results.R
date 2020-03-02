@@ -14,10 +14,6 @@ create_results_df = function(scen_df){
       max(value) <= 1 ~ round(value, 3),
       TRUE ~ round(value)
     )) %>% 
-    # mutate(class(value) = case_when(
-    #   max(value) <= 1 ~ c(class(value), 'percentage'),
-    #   TRUE ~ class(value)
-    # )) %>% 
     spread(t, value, fill=NA, drop=F)
   return(dft)
 }

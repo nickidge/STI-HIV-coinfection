@@ -46,7 +46,6 @@ plot_long = plot_key_index[,2]
 max_df_base = data.frame(
   plot = c('pop', 'PLHIV', 'HIV_diag', 'HIV_inf', 'HIV_prev', 'care_cascade', 'num_diag', 'num_cascade'),
   lowerlim = 0,
-  # upperlim = c(20000, 1500, 1500, 0.2, 1, 1, 20000)
   upperlim = c(100000, 25000, 2500, 3000, 0.25, 1, 1, 25000)
 )
 

@@ -174,23 +174,12 @@ randomise_within_bounds = function(v, lb, ub){
 
 randomise_keys = function(statkeys=static_pars, timepars=baselist, basekeyindex=c(), basevar=0.05, syear=0){
   
-  # for(key in names(statkeys)){
-  #   # statkeys[[key]]$v = runif(1, min=statkeys[[key]]$lb, max=statkeys[[key]]$ub)
-  #   statkeys[[key]]$v = randomise_within_bounds(statkeys[[key]]$v, statkeys[[key]]$lb, statkeys[[key]]$ub)
-  # }
-  
   for(ind in names(basekeyindex)){
     columns = basekeyindex[[ind]]
     tv = rownames(timepars[[ind]])
     multyears = (as.numeric(tv) >= syear)
     
-    # if(length(timepars[[ind]] == 1)){
-    #   n_var = 1
-    # } else if(is.na(columns)){
-    #   n_var = ncol(timepars[[ind]])
-    # } else {
-      n_var = length(columns)
-    # }
+    n_var = length(columns)
     
     if(ind %in% prop_pars_index){
       ub = 1
@@ -199,15 +188,8 @@ randomise_keys = function(statkeys=static_pars, timepars=baselist, basekeyindex=
     }
     
     v = gen_var(var=basevar, n=n_var)
-    
-    # if(length(timepars[[ind]]) == 1){
-    #   timepars[[ind]] = timepars[[ind]] * v
-    #   timepars[[ind]][timepars[[ind]] > ub] = ub
-    # } else {
-      timepars[[ind]][multyears,columns] = timepars[[ind]][multyears,columns] * v
-      timepars[[ind]][timepars[[ind]] > ub] = ub
-      
-    # }
+    timepars[[ind]][multyears,columns] = timepars[[ind]][multyears,columns] * v
+    timepars[[ind]][timepars[[ind]] > ub] = ub
   }
   
   return(list(timepars, statkeys))
@@ -283,9 +265,6 @@ summarise_trials = function(df, value='value', lbfunc=lower_ci, ubfunc=upper_ci,
               lower_ci = quantile(!!sym(value), probs=(1-conf_level)/2, na.rm=TRUE),
               upper_ci = quantile(!!sym(value), probs=1 - (1-conf_level)/2, na.rm=TRUE),
               value = first(!!sym(value))) %>%
-    # mutate(se = ssd / sqrt(count),
-    #        lower_ci = lbfunc(smean, se, count),
-    #        upper_ci = ubfunc(smean, se, count)) %>%
     ungroup() %>% 
     mutate(t = as.numeric(t)) %>% 
     as.data.frame()

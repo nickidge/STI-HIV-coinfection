@@ -172,7 +172,6 @@ fill_list = function(parlist, deflist=baselist){
       
     outlist[[parname]] = thismat
   }
-  # for(parname in optvarkeys){
   for(parname in names(deflist)){
     if(!(parname %in% names(outlist))){
       if(parname %in% names(deflist)){
