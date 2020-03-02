@@ -5,9 +5,8 @@ source("init.R", echo = T)
 if(!exists('cal')){
   baselist = load_time_par_sheet('timepars', deflist = defaultlist)
   cal_keys = c('PLHIV', 'HIV_diag', 'care_cascade')
-  # gen_calibration(c('f_infect_HIV', 'int_factor', 'init_prev_HIV_aus', 'init_prev_HIV_int', 'init_diag_prop'))
-  gen_calibration(c('f_infect_HIV', 'init_prev_HIV_aus', 'init_diag_prop', 'init_late_prop'),
-                  control = list(tol = 1e-3))
+  cal_pars = c('f_infect_HIV', 'init_prev_HIV_aus', 'init_diag_prop', 'init_late_prop', 'high_risk_factor')
+  gen_calibration(cal_pars, control = list(tol = 1e-4))
 }
 
 # model_df = run_model(y0=NULL, tvec=tvec_base, modelpars=baselist, options=options)

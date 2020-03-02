@@ -15,6 +15,8 @@ makearray = function(dimnames){
   return(array(0, dim=lengths(dimnames), dimnames=dimnames))
 }
 
+gen_var = function(basevar) (1 - basevar) ^ runif(n=1, min=-1, max=1)
+
 DIM <- function( ... ){
   args <- list(...)
   lapply( args , function(x) { if( is.null( dim(x) ) )

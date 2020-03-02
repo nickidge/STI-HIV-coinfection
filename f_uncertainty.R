@@ -1,6 +1,6 @@
 
-gen_uncertainty = function(ntrials=10){
-  trials_df = ci_df(ntrials=ntrials, basevar=0.2, options=list('keep_static'=TRUE))
+gen_uncertainty = function(ntrials=0, variance=0.2){
+  trials_df = ci_df(ntrials=ntrials, basevar=variance, options=list('keep_static'=TRUE))
   
   cal_wide = widen_sources(trials_df)
   cal_wide$scen = 'base'
@@ -174,24 +174,25 @@ randomise_within_bounds = function(v, lb, ub){
 
 randomise_keys = function(statkeys=static_pars, timepars=baselist, basekeyindex=c(), basevar=0.05, syear=0){
   
-  for(key in names(statkeys)){
-    # statkeys[[key]]$v = runif(1, min=statkeys[[key]]$lb, max=statkeys[[key]]$ub)
-    statkeys[[key]]$v = randomise_within_bounds(statkeys[[key]]$v, statkeys[[key]]$lb, statkeys[[key]]$ub)
-  }
+  # for(key in names(statkeys)){
+  #   # statkeys[[key]]$v = runif(1, min=statkeys[[key]]$lb, max=statkeys[[key]]$ub)
+  #   statkeys[[key]]$v = randomise_within_bounds(statkeys[[key]]$v, statkeys[[key]]$lb, statkeys[[key]]$ub)
+  # }
   
   for(ind in names(basekeyindex)){
-    var = runif(1, (1-basevar), 1/(1-basevar))
     columns = basekeyindex[[ind]]
     tv = rownames(timepars[[ind]])
     multyears = (as.numeric(tv) >= syear)
     if(length(timepars[[ind]]) == 1){
-      
+      timepars[[ind]] = timepars[[ind]] * gen_var(basevar)
     } else if(is.na(columns)){
-      timepars[[ind]][multyears,] = timepars[[ind]][multyears,] * var
-      # timepars[[ind]] = timepars[[ind]] * var
+      for(i_col in 1:ncol(timepars[[ind]])){
+        timepars[[ind]][multyears,i_col] = timepars[[ind]][multyears,i_col] * gen_var(basevar)
+      }
     } else {
-      timepars[[ind]][multyears,columns] = timepars[[ind]][multyears,columns] * var
-      # timepars[[ind]][,columns] = timepars[[ind]][,columns] * var
+      for(i_col in columns){
+        timepars[[ind]][multyears,columns] = timepars[[ind]][multyears,columns] * gen_var(basevar)
+      }
     }
   }
   
@@ -199,8 +200,10 @@ randomise_keys = function(statkeys=static_pars, timepars=baselist, basekeyindex=
 }
 
 run_trial = function(timepars=baselist, basevar=0.05, y0=NULL, tvec=tvec_base, options=options, syear=0){
-  basekeyindex = c(t_testing = NA, condom_usage = NA, num_prep = NA, eff_condom = NA,
-                   f_infect_HIV = NA, risk_mat = NA)
+  # basekeyindex = c(t_testing = NA, condom_usage = NA, num_prep = NA, eff_condom = NA,
+  #                  f_infect_HIV = NA, risk_mat = NA)
+  basekeys = c(cal_pars, 't_testing')
+  basekeyindex = setNames(rep(NA, length(basekeys)), basekeys)
   
   this_stat_pars = randomise_keys(timepars=timepars, basekeyindex = basekeyindex, basevar=basevar, syear=syear)
   
