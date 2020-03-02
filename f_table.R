@@ -21,7 +21,7 @@ tab_get_value = function(df, fmat=function(x) x){
   return(values[1])
 }
 
-make_tab = function(tab_row_funcs, allscens){
+make_tab = function(scen_df, tab_row_funcs, allscens){
   tab_out = makearray(list(names(tab_row_funcs), allscens))
   tab_out[,] = do.call(rbind, lapply(1:length(tab_row_funcs), function(i)  sapply(allscens, function(x) tab_get_value(tab_row_funcs[[i]][[1]](subset(scen_df, scen==x)), tab_row_funcs[[i]][[2]]))))
   

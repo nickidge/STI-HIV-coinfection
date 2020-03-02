@@ -24,5 +24,5 @@ saveopen(plot_cals(base_df), 'calibration', 'plots', width=2*1.1*page_width)
 # saveopen(plot_scens(scen_df), 'scenarios', 'plots')
 
 # # create table of scenario results
-# t_results = make_tab(tab_row_funcs, allscens)
+# t_results = make_tab(scen_df, tab_row_funcs, allscens)
 
