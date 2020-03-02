@@ -33,7 +33,7 @@ library(stringr)
 # base model information
 tvec_base = seq(2007, 2030, by=1/12)
 plot_years = c(2010, 2030)
-split_year = 2014
+split_year = 2013
 
 # scenario details (names, tab in data_sti.xlsx)
 scenarios = list(list(sheet = 'scen_1',

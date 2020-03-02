@@ -21,12 +21,14 @@ gen_scenarios = function(scen_df=NULL, scenarios = list(), ntrials=3, variance=0
     scen_df$scen_long = 'Base'
   }
   
+  dat = subset(dat, med_pop %in% unique(scen_df$med_pop))
+  
   scen_df = rbind.fill(dat, scen_df)
   
   for(s in scenarios){
-    thisscen = load_time_par_sheet(s$sheet, deflist = baselist, syear=split_year+1)
+    thisscen = load_time_par_sheet(s$sheet, deflist = baselist, syear=split_year)
     
-    this_scen_trials = ci_df(ntrials=ntrials, timepars=thisscen, basevar=basevar, options=list('keep_static'=TRUE), syear=split_year+1)
+    this_scen_trials = ci_df(ntrials=ntrials, timepars=thisscen, basevar=variance, options=list('keep_static'=TRUE), syear=split_year)
     # this_scen_trials = ci_df(ntrials=5, timepars=thisscen, basevar=0.1, tvec=tvec_split, y0=y0_split, options=list('split'=TRUE, 'keep_static'=TRUE), syear=split_year+1)
     
     thisdf = this_scen_trials
@@ -37,6 +39,7 @@ gen_scenarios = function(scen_df=NULL, scenarios = list(), ntrials=3, variance=0
     scen_df = rbind.fill(scen_df, thisdf)
   }
   
+  
   # diffscens = thisscen[laply(names(thisscen), function(x) !identical(thisscen[[x]], baselist[[x]]))]
   
   scen_df$scen = factor(scen_df$scen, levels = rev(unique(scen_df$scen)), labels = rev(unique(scen_df$scen_long)))
@@ -45,29 +48,32 @@ gen_scenarios = function(scen_df=NULL, scenarios = list(), ntrials=3, variance=0
   
 }
 
-plot_scens = function(df, base_uncertainty=F){
+plot_scens = function(this_df, base_uncertainty=F){
   
   scen_colours = c('black', 'red', 'green')
-  scen_keys = c('PLHIV', 'HIV_prev', 'HIV_diag', 'HIV_inf', 'num_diag', 'care_cascade')
-  
-  df = subset(df, plot %in% scen_keys)
-  df = subset(df, HIV_pop %in% scen_keys)
-  df$plot = factor(df$plot, levels=scen_keys)
-  df = subset(df, med_pop %nin% med_labs)
+  # scen_keys = c('PLHIV', 'HIV_prev', 'HIV_diag', 'HIV_inf', 'num_diag', 'care_cascade')
+  scen_keys = c('pop', 'PLHIV', 'HIV_prev', 'prop_prep', 'HIV_diag', 'HIV_inf', 'HIV_diag_new', 'HIV_diag_old')
+  scen_keys = c(scen_keys, 'care_cascade')
+  # 
+  this_df = subset(this_df, plot %in% scen_keys)
+  # this_df = subset(this_df, HIV_pop %in% scen_keys)
+  this_df$plot = factor(this_df$plot, levels=scen_keys)
+  # this_df = subset(this_df, med_pop %nin% med_labs)
+  this_df = subset(this_df, plot != 'care_cascade' | HIV_pop == 'num_diag')
   
   if(!base_uncertainty){
-    baserows = df$scen == 'Base'
-    df[baserows, c('lower_ci', 'upper_ci')] = df$model[baserows]
+    baserows = this_df$scen == 'Base'
+    this_df[baserows, c('lower_ci', 'upper_ci')] = this_df$model[baserows]
   }
   
-  max_df = max_df_base[max_df_base$plot %in% df$plot,]
+  max_df = max_df_base[max_df_base$plot %in% this_df$plot,]
   max_df$plot = factor(max_df$plot)
   
-  df = subset(df, t >= plot_years[1] & t <= plot_years[2])
+  this_df = subset(this_df, t >= plot_years[1] & t <= plot_years[2])
   
   # initialise plot
-  p = ggplot(df, aes(x=t, group=scen, colour=scen, fill=scen))
-  p = p + facet_wrap(.~plot, scales="free", ncol=2, labeller = labeller(plot = setNames(plot_long, plot_keys)))
+  p = ggplot(this_df, aes(x=t, group=scen, colour=scen, fill=scen))
+  p = p + facet_wrap(.~plot, scales="free", ncol=3, labeller = labeller(plot = setNames(plot_long, plot_keys)))
   
   # plot information
   p = p + geom_point(aes(y = data), na.rm=T, size=1.3)
@@ -78,14 +84,14 @@ plot_scens = function(df, base_uncertainty=F){
   # p = p + geom_blank(data=max_df, aes(y=upperlim), inherit.aes = F)
   p = p + scale_x_continuous(breaks = label_years,
                              name = 'Year',
-                             limits = c(min(df$t), max(df$t)),
+                             limits = c(min(this_df$t), max(this_df$t)),
                              expand = c(0, 0))
   # p = p + scale_y_continuous(expand = c(0,0))
   p = p + scale_y_continuous(expand = expand_scale(mult = c(0, 0.1)))
   p = p + expand_limits(y = 0)
   p = p + coord_cartesian(xlim = plot_years)
   
-  scen_longs = unique(df$scen_long)
+  scen_longs = unique(this_df$scen_long)
   
   # guides / legend
   p = p + guides(colour = guide_legend(override.aes = list(
@@ -102,11 +108,12 @@ plot_scens = function(df, base_uncertainty=F){
   
   # themes
   p = p + theme_all
-  p = p + theme(legend.justification = c(0.5, 0.5),
-                legend.position = c(3/4, 1/6))
+  # p = p + theme(legend.justification = c(0.5, 0.5),
+  #               legend.position = c(5/6, 1/6 - 0.02))
+  p = p + theme(legend.position = 'right')
   
   # add percentages
-  p = convert_axis(p, c('axis-l-3-1', 'axis-l-1-2'))
+  p = convert_axis(p, paste0('axis-l-', c('1-3', '2-1')))
   
   return(p)
 }
