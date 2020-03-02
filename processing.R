@@ -329,14 +329,12 @@ extr = function(output, keys, tvec=tvec_base){
   return(df)
 }
 
-get_movement = function(HIV_compartments, HIV_trans, med=0){
-  l = lapply(1:nrow(HIV_transitions), function(x) adrop(HIV_trans[x,,,drop=FALSE] * ((HIV_transitions[x, "to"] %in% HIV_compartments) - (HIV_transitions[x, "from"] %in% HIV_compartments)), 1))
-  d = Reduce('+', l)
+get_movement = function(compartment, HIV_trans, med=0){
+  going_in = colSums(HIV_trans[HIV_transitions[,'to'] == compartment,,,drop=FALSE])
+  going_out = colSums(HIV_trans[HIV_transitions[,'from'] == compartment,,,drop=FALSE])
+  d = going_in - going_out
   if(med != 0){
     d = d[,med]
   }
-  # if(any(is.na(d))){
-  #   print('')
-  # }
   return(d)
 }
