@@ -77,8 +77,12 @@ diagnoses_sti0 = diagnoses_sti0[diagnoses_sti0_index[,1],]
 prop_diag_dat = data.frame(t = prop_diag0$Year, value = prop_diag0$prop_HIV_diagnosed, type='pop', dt=1, pid='num_diag_prop',
                           sti_pop='all', risk_pop='all', HIV_pop='num_diag', source='data', scen='', plot='care_cascade')
 
+prev_dat = data.frame(t = 2014, value = 0.07, type='pop', dt=1, pid='HIV_prev_prop', plot='HIV_prev', sti_pop='all', HIV_pop='HIV_prev',
+                      med_pop = 'aus', risk_pop = 'all', source='data', scen='')
+
 all_dat = rbind.fill(PLHIV_dat, HIV_diag_dat, prop_diag_dat)
 all_dat = rbind.fill(all_dat, HIV_diag_new, HIV_diag_old)
+all_dat = rbind.fill(all_dat, prev_dat)
 all_dat$plot[is.na(all_dat$plot)] = all_dat$HIV_pop[is.na(all_dat$plot)]
 all_dat$scen = 'data'
 all_dat$scen_long = 'Data'
