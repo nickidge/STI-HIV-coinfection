@@ -34,6 +34,7 @@ library(stringr)
 tvec_base = seq(2007, 2030, by=1/12)
 plot_years = c(2010, 2030)
 split_year = 2013
+base_variance = 0.1
 
 # scenario details (names, tab in data_sti.xlsx)
 scenarios = list(list(sheet = 'scen_1',

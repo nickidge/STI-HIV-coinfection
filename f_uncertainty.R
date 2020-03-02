@@ -1,5 +1,5 @@
 
-gen_uncertainty = function(ntrials=0, variance=0.1){
+gen_uncertainty = function(ntrials=0, variance=base_variance){
   trials_df = ci_df(ntrials=ntrials, basevar=variance, options=list('keep_static'=TRUE))
   
   cal_wide = widen_sources(trials_df)

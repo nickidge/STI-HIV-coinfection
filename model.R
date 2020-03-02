@@ -146,7 +146,7 @@ run_model = function(y0=NULL, tvec=tvec_base, modelpars=list(), options=list(), 
       }
     }
     
-    
+
     #################
     
     
@@ -323,22 +323,22 @@ run_model = function(y0=NULL, tvec=tvec_base, modelpars=list(), options=list(), 
       HIV_trans[paste0('D', i_diag, '_off_pr'),,] = already_in + moving_in
     }
     
-
+    
+    for(i in 1:length(med_labs)){
+      HIV_trans[as.numeric(HIV_transitions[,"med"]) == i,,-i] = 0
+    }
+    
     # apply transitions
     for(i in 1:length(HIV_p)){
       # get info
       hfrom = HIV_transitions[i,"from"]
       hto = HIV_transitions[i,"to"]
-      hpop = HIV_transitions[i,"med"]
-      hp = HIV_trans[i,,, drop=FALSE]
-      hp = adrop(hp, drop=1)
-      
-      hpop = list("0" = med_labs, "1" = 1, "2" = 2)[[hpop]]
-      
+      hp = adrop(HIV_trans[i,,, drop=FALSE], 1)
+
       # make transitions
-      prevdt[hfrom,,hpop] = prevdt[hfrom,,hpop] - hp[,hpop]
-      prevdt[hto,,hpop] = prevdt[hto,,hpop] + hp[,hpop]
-      
+      prevdt[hfrom,,] = prevdt[hfrom,,] - hp
+      prevdt[hto,,] = prevdt[hto,,] + hp
+
       if(any(prevdt < 0)){
         if(all(prevdt > -1e-6)){
           prevdt[prevdt > -1e-6 & prevdt < 0] = 0
