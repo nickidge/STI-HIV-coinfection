@@ -246,6 +246,15 @@ extr = function(output, keys, tvec=tvec_base){
         # thistotpop = abind(thistotpop, apply(thistotpop, setdiff(c(1,2,3), thisdim), sum), along=thisdim)
         # last(dimnames(thistotpop)[[thisdim]]) = 'tot'
       }
+      
+      thisPLHIV_hi_all = thisPLHIV[,'hi',] + thisPLHIV[,'pr',]
+      thisPLHIV = abind(thisPLHIV, thisPLHIV_hi_all, along=2, new.names = )
+      dimnames(thisPLHIV)[[2]][length(dimnames(thisPLHIV)[[2]])] = 'hi_all'
+      
+      thistotpop_hi_all = thistotpop[,'hi',] + thistotpop[,'pr',]
+      thistotpop = abind(thistotpop, thistotpop_hi_all, along=2, new.names = )
+      dimnames(thistotpop)[[2]][length(dimnames(thistotpop)[[2]])] = 'hi_all'
+      
       thisprev = thisPLHIV / thistotpop
       
       thisprevall = melt(thisprev)

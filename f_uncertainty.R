@@ -36,9 +36,9 @@ plot_uncertainty = function(thisdf, colour_strat='cascade', toplot=NULL){
                                     risk_pop = 'all',
                                     long = 'na')
     risk_colour_scale = data.frame(HIV_pop = 'all',
-                                   long = c('Low risk', 'High risk not on PrEP', 'High risk on PrEP'),
-                                   risk_pop = c('lo', 'hi', 'pr'),
-                                   col = c('darkgreen', 'darkred', 'darkorange'))
+                                   long = c('Low risk', 'High risk not on PrEP', 'High risk on PrEP', 'High risk (all)'),
+                                   risk_pop = c('lo', 'hi', 'pr', 'hi_all'),
+                                   col = c('darkgreen', 'darkred', 'darkorange', 'purple'))
     final_cs = rbind(colour_scale, black_colour_scale, risk_colour_scale)
     final_cs$col_pop = paste0(final_cs$HIV_pop, '_', final_cs$risk_pop)
     thisdf$col_pop = factor(paste0(ifelse(thisdf$HIV_pop %in% c('HIV_diag_by_pop', 'HIV_prev'), 'all', thisdf$HIV_pop), '_', thisdf$risk_pop),
