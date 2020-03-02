@@ -20,6 +20,8 @@ SID_dims = c('t' = 1, 'HIV' = 2, 'STI' = 3, 'med' = 4)
 # secondary labels
 HIV_risk_labs = c("lo", "hi", "pr")
 timeindex = c("new", "old")
+prop_pars_index = c('prop_high_risk', 'eff_prep', 'eff_condom', 'care_cascade', 'treatment_eff', 'stay_prop', 'condom_usage',
+                    'init_diag_prop', 'init_prev_HIV_aus', 'init_prev_HIV_int', 'init_late_prop', 'init_prev_STI')
 
 # compartment array
 # dim 1: HIV status -- only this one is in use at the moment

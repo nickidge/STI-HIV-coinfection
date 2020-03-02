@@ -15,7 +15,11 @@ makearray = function(dimnames){
   return(array(0, dim=lengths(dimnames), dimnames=dimnames))
 }
 
-gen_var = function(basevar) (1 - basevar) ^ runif(n=1, min=-1, max=1)
+gen_var = function(var, n=1, ub=Inf){
+  y = (1 - var) ^ runif(n=n, min=-1, max=1)
+  y[y > ub] = ub
+  return(y)
+}
 
 DIM <- function( ... ){
   args <- list(...)

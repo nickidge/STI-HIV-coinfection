@@ -183,29 +183,64 @@ randomise_keys = function(statkeys=static_pars, timepars=baselist, basekeyindex=
     columns = basekeyindex[[ind]]
     tv = rownames(timepars[[ind]])
     multyears = (as.numeric(tv) >= syear)
-    if(length(timepars[[ind]]) == 1){
-      timepars[[ind]] = timepars[[ind]] * gen_var(basevar)
-    } else if(is.na(columns)){
-      for(i_col in 1:ncol(timepars[[ind]])){
-        timepars[[ind]][multyears,i_col] = timepars[[ind]][multyears,i_col] * gen_var(basevar)
-      }
+    
+    # if(length(timepars[[ind]] == 1)){
+    #   n_var = 1
+    # } else if(is.na(columns)){
+    #   n_var = ncol(timepars[[ind]])
+    # } else {
+      n_var = length(columns)
+    # }
+    
+    if(ind %in% prop_pars_index){
+      ub = 1
     } else {
-      for(i_col in columns){
-        timepars[[ind]][multyears,columns] = timepars[[ind]][multyears,columns] * gen_var(basevar)
-      }
+      ub = Inf
     }
+    
+    v = gen_var(var=basevar, n=n_var)
+    
+    # if(length(timepars[[ind]]) == 1){
+    #   timepars[[ind]] = timepars[[ind]] * v
+    #   timepars[[ind]][timepars[[ind]] > ub] = ub
+    # } else {
+      timepars[[ind]][multyears,columns] = timepars[[ind]][multyears,columns] * v
+      timepars[[ind]][timepars[[ind]] > ub] = ub
+      
+    # }
   }
   
   return(list(timepars, statkeys))
 }
 
 run_trial = function(timepars=baselist, basevar=0.05, y0=NULL, tvec=tvec_base, options=options, syear=0){
-  # basekeyindex = c(t_testing = NA, condom_usage = NA, num_prep = NA, eff_condom = NA,
-  #                  f_infect_HIV = NA, risk_mat = NA)
-  basekeys = c(cal_pars, 't_testing')
-  basekeyindex = setNames(rep(NA, length(basekeys)), basekeys)
   
+  basekeys = c(cal_pars, 't_testing')
+  if(syear != 0){
+    basekeys = basekeys[!grepl('init', basekeys)]
+  }
+  basekeyindex = setNames(rep(list(NA), length(basekeys)), basekeys)
+
+  if(syear != 0){
+    for(i in 1:length(basekeys)){
+      ind = basekeys[i]
+      if(!is.matrix(timepars[[ind]])){
+        timepars[[ind]] = matrix(timepars[[ind]], ncol=1, nrow=length(tvec_base))
+        rownames(timepars[[ind]]) = tvec_base
+      }
+      if(is.na(basekeyindex[[ind]])){
+        basekeyindex[[ind]] = 1:ncol(timepars[[basekeys[[i]]]])
+      }
+    }
+  }
+
   this_stat_pars = randomise_keys(timepars=timepars, basekeyindex = basekeyindex, basevar=basevar, syear=syear)
+  
+  for(ind in names(this_stat_pars)){
+    if(nrow(unique(this_stat_pars[[ind]])) == 1){
+      this_stat_pars[[ind]] = this_stat_pars[[ind]][1,]
+    }
+  }
   
   mpars = this_stat_pars[[1]]
   if(getdict(options, 'keep_static', FALSE)){
