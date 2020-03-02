@@ -273,9 +273,9 @@ run_model = function(y0=NULL, tvec=tvec_base, modelpars=list(), options=list(), 
         risk_lab = HIV_risk_labs[j_risk]
         
         # care cascade info
-        d1 = sum(prevdt[sHIV[[paste0('D1_', risk_lab)]],,i_med]) + sum(apply(HIV_trans[tHIV[[paste0('test_', risk_lab)]],,,drop=FALSE], c(2,3), sum)[,i_med])
-        d2 = sum(prevdt[sHIV[[paste0('D2_', risk_lab)]],,i_med])
-        d3 = sum(prevdt[sHIV[[paste0('D3_', risk_lab)]],,i_med])
+        d1 = sum(prevdt[sHIV[[paste0('D1_', risk_lab)]],,i_med]) + sum(get_movement(paste0('D1_', risk_lab), HIV_trans, med=i_med))
+        d2 = sum(prevdt[sHIV[[paste0('D2_', risk_lab)]],,i_med]) + sum(get_movement(paste0('D2_', risk_lab), HIV_trans, med=i_med))
+        d3 = sum(prevdt[sHIV[[paste0('D3_', risk_lab)]],,i_med]) + sum(get_movement(paste0('D3_', risk_lab), HIV_trans, med=i_med))
         d1plus = d1 + d2 + d3
         d2plus = d2 + d3
         
