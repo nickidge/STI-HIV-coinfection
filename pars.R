@@ -271,11 +271,13 @@ add_data_col = function(thislist, t_dat, data_col, deflist = baselist, syear = N
 }
 
 constant_prep = function(num_prep){
-  final_prep = tail(unique(num_prep), 1)
-  final_year = rownames(final_prep)
-  which_years = rownames(num_prep)[as.numeric(rownames(num_prep)) > as.numeric(final_year)]
-  num_prep[which_years,] = sweep(popsize[which_years,], 2, final_prep / popsize[final_year,], FUN="*")
-  num_prep = fixnan(num_prep)
+  if(nrow(num_prep) > 1){
+    final_prep = tail(unique(num_prep), 1)
+    final_year = rownames(final_prep)
+    which_years = rownames(num_prep)[as.numeric(rownames(num_prep)) > as.numeric(final_year)]
+    num_prep[which_years,] = sweep(popsize[which_years,], 2, final_prep / popsize[final_year,], FUN="*")
+    num_prep = fixnan(num_prep)
+  }
   return(num_prep)
 }
 
