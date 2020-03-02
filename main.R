@@ -20,7 +20,7 @@ base_df = gen_uncertainty(0)
 saveopen(plot_cals(base_df), 'calibration', 'plots', width=2*1.1*page_width)
 
 # # run all scenarios (with uncertainty)
-# scen_df = gen_scenarios(scen_df=base_df, scenarios=scenarios, ntrials=1)
+# scen_df = gen_scenarios(scen_df=base_df, scenarios=scenarios, ntrials=2, variance=0.1)
 # saveopen(plot_scens(scen_df), 'scenarios', 'plots')
 
 # # create table of scenario results

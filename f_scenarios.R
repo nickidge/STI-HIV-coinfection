@@ -1,5 +1,5 @@
 
-gen_scenarios = function(scen_df=NULL, scenarios = list(), ntrials=3, basevar=0.2){
+gen_scenarios = function(scen_df=NULL, scenarios = list(), ntrials=3, variance=0.1){
   
   dat = all_dat
   dat$scen = 'data'
@@ -9,7 +9,7 @@ gen_scenarios = function(scen_df=NULL, scenarios = list(), ntrials=3, basevar=0.
   
   if(is.null(scen_df)){
     if(base_uncertainty){
-      scen_df = ci_df(ntrials, basevar=basevar, options=list('keep_static'=TRUE))
+      scen_df = ci_df(ntrials, basevar=variance, options=list('keep_static'=TRUE))
     } else {
       scen_df = run_model(y0=y0, tvec=tvec, modelpars=timepars, options=options)
       scen_df = extr(scen_df, plot_keys)
