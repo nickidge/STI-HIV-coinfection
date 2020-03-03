@@ -10,8 +10,10 @@ if(!exists('cal')){
 }
 
 # run base scenario (with uncertainty)
-base_df = gen_uncertainty(100)
-saveopen(plot_cals(base_df), 'calibration', 'plots', width=2*1.1*page_width)
+if(!exists('base_df')){
+  base_df = gen_uncertainty(100)
+  saveopen(plot_cals(base_df), 'calibration', 'plots', width=2*1.1*page_width)
+}
 
 # run all scenarios (with uncertainty)
 input_scenarios = list(list(sheet = 'scen_1',
