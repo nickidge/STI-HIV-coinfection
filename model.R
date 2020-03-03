@@ -336,52 +336,52 @@ run_model = function(y0=NULL, tvec=tvec_base, modelpars=list(), options=list(), 
     
     t0 = Sys.time()
     
+    # calculate transitions
+    HIV_to = HIV_trans
+    rownames(HIV_to) = HIV_transitions[,"to"]
+    HIV_to = sapply(med_labs, function(x) rowsum(adrop(HIV_to[,,x,drop=FALSE], 3), HIV_transitions[,"to"]), simplify='array')
     
-    # HIV_to = HIV_trans
-    # rownames(HIV_to) = HIV_transitions[,"to"]
-    # # HIV_to = melt(HIV_to)
-    # HIV_to$Var1 = factor(HIV_to$Var1, levels = rownames(SID_mat))
-    # HIV_to = acast(HIV_to, Var1 ~ Var2 ~ Var3, fun.aggregate = sum, drop=FALSE)
-    #
-    # HIV_from = HIV_trans
-    # rownames(HIV_from) = HIV_transitions[,"from"]
-    # HIV_from = melt(HIV_from)
-    # HIV_from$Var1 = factor(HIV_from$Var1, levels = rownames(SID_mat))
-    # HIV_from = acast(HIV_from, Var1 ~ Var2 ~ Var3, fun.aggregate = sum, drop=FALSE)
-    # 
-    # HIV_delta = HIV_to - HIV_from
-    # 
-    # prevdt = prevdt + HIV_delta
-    # 
-    # if(any(prevdt < 0)){
-    #   if(all(prevdt > -1e-6)){
-    #     prevdt[prevdt > -1e-6 & prevdt < 0] = 0
-    #   } else {
-    #     print(paste0('negative pop for ', HIV_transitions[i,1], ' transition'))
-    #   }
-    # }
+    HIV_from = HIV_trans
+    rownames(HIV_from) = HIV_transitions[,"from"]
+    HIV_from = sapply(med_labs, function(x) rowsum(adrop(HIV_from[,,x,drop=FALSE], 3), HIV_transitions[,"from"]), simplify='array')
+    
+    HIV_delta = SID_mat
+    HIV_delta[rownames(HIV_to),,] = HIV_delta[rownames(HIV_to),,,drop=FALSE] + HIV_to
+    HIV_delta[rownames(HIV_from),,] = HIV_delta[rownames(HIV_from),,,drop=FALSE] - HIV_from
 
     # apply transitions
-    for(i in 1:length(HIV_p)){
-      # get info
-      hfrom = HIV_transitions[i,"from"]
-      hto = HIV_transitions[i,"to"]
-      hp = adrop(HIV_trans[i,,, drop=FALSE], 1)
+    prevdt = prevdt + HIV_delta
 
-      # make transitions
-      prevdt[hfrom,,] = prevdt[hfrom,,] - hp
-      prevdt[hto,,] = prevdt[hto,,] + hp
+    t_total = t_total + Sys.time() - t0
 
-      if(any(prevdt < 0)){
-        if(all(prevdt > -1e-6)){
-          prevdt[prevdt > -1e-6 & prevdt < 0] = 0
-        } else {
-          print(paste0('negative pop for ', HIV_transitions[i,1], ' transition'))
-        }
+    if(any(prevdt < 0)){
+      if(all(prevdt > -1e-6)){
+        prevdt[prevdt > -1e-6 & prevdt < 0] = 0
+      } else {
+        print(paste0('negative pop for ', HIV_transitions[i,1], ' transition'))
       }
     }
+
+    # # apply transitions
+    # for(i in 1:length(HIV_p)){
+    #   # get info
+    #   hfrom = HIV_transitions[i,"from"]
+    #   hto = HIV_transitions[i,"to"]
+    #   hp = adrop(HIV_trans[i,,, drop=FALSE], 1)
+    # 
+    #   # make transitions
+    #   prevdt[hfrom,,] = prevdt[hfrom,,] - hp
+    #   prevdt[hto,,] = prevdt[hto,,] + hp
+    # 
+    #   if(any(prevdt < 0)){
+    #     if(all(prevdt > -1e-6)){
+    #       prevdt[prevdt > -1e-6 & prevdt < 0] = 0
+    #     } else {
+    #       print(paste0('negative pop for ', HIV_transitions[i,1], ' transition'))
+    #     }
+    #   }
+    # }
     
-    t_total = t_total + Sys.time() - t0
     
     
     # ensure no low risk medicare ineligible
