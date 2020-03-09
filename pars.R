@@ -269,7 +269,7 @@ add_data_col = function(thislist, t_dat, data_col, deflist = baselist, syear = N
   return(thislist)
 }
 
-constant_prep = function(num_prep){
+constant_prep = function(num_prep, popsize){
   if(nrow(num_prep) > 1){
     final_prep = tail(unique(num_prep), 1)
     final_year = rownames(final_prep)
