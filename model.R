@@ -25,9 +25,12 @@ run_model = function(y0=NULL, tvec=tvec_base, modelpars=list(), options=list(), 
   # if(!getdict(options, 'split', FALSE)){
   if(is.null(y0)){
     
+    init_popsize = c(init_pop_aus, init_pop_int)
+    
     # S
     y0 = SID_mat
-    y0[1,1,] = popsize[as.character(tvec[1]),]
+    # y0[1,1,] = popsize[as.character(tvec[1]),]
+    y0[1,1,] = init_popsize
     
     # risk
     prop_high_risk = modelpars$prop_high_risk[1,1]
@@ -56,6 +59,14 @@ run_model = function(y0=NULL, tvec=tvec_base, modelpars=list(), options=list(), 
     # # STI
     # ninf_STI = y0[,'S',] * init_prev_STI
     
+  } else {
+    init_popsize = colSums(y0, dims=2)
+  }
+  
+  popsize = makearray(list(tvec, med_labs))
+  popsize[1,] = init_popsize
+  for(j in 1:ncol(popsize)){
+    popsize[,j] = popsize[1,j] * pop_growth[j] ^ (as.numeric(tvec) - as.numeric(tvec)[1])
   }
   
   # initialise model array

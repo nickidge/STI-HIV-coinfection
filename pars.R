@@ -305,7 +305,7 @@ load_time_par_sheet = function(sheetname, deflist = baselist, syear=NA){
   
   thislist = fill_list(thislist, deflist = deflist)
   
-  thislist$num_prep = constant_prep(thislist$num_prep)
+  # thislist$num_prep = constant_prep(thislist$num_prep)
   to_smooth = list('prop_high_risk' = 1)
   for(i_smooth in names(to_smooth)){
     for(j_smooth in 1:length(to_smooth[i_smooth])){

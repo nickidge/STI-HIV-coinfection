@@ -26,22 +26,26 @@ defaultlist[['init_prev_HIV_aus']] = 0.11608 # initial guess for proportion of p
 defaultlist[['init_prev_HIV_int']] = 0.12 # initial guess for proportion of people who are living with HIV
 defaultlist[['init_late_prop']] = 0.1
 
+defaultlist[['init_pop_aus']] = 25000
+defaultlist[['init_pop_int']] = 0
+defaultlist[['pop_growth']] = c(1.05, 1.1)
+
 defaultlist[['f_infect_STI']] = 0 # foi for STI
 defaultlist[['init_prev_STI']] = 0 # initial prevalence of STI
 
-# calculate population size at each time step
-population_values = data.frame(data_raw[,c('Year','pop_aus', 'pop_int')])
-population_values_notna = population_values[!is.na(population_values[,2]) & !is.na(population_values[,3]),]
-population_values = rbind(head(population_values_notna, 1), tail(population_values_notna, 1))
-growth = population_values[2,2:3] / population_values[1,2:3]
-population_year = as.numeric(data_years[1,1])
-
-popsize_t = seq(1990, 2050, by=1/12)
-popsize = makearray(list(popsize_t, colnames(population_values[,2:3])))
-for(j in 1:ncol(popsize)){
-  popsize[,j] = population_values[1,j+1] * (growth[1,j]) ^ (1 / (population_values[2,1] - population_values[1,1]) * (popsize_t - population_year))
-}
-
-popsize[,"pop_int"] = 0
+# # calculate population size at each time step
+# population_values = data.frame(data_raw[,c('Year','pop_aus', 'pop_int')])
+# population_values_notna = population_values[!is.na(population_values[,2]) & !is.na(population_values[,3]),]
+# population_values = rbind(head(population_values_notna, 1), tail(population_values_notna, 1))
+# growth = population_values[2,2:3] / population_values[1,2:3]
+# population_year = as.numeric(data_years[1,1])
+# 
+# popsize_t = seq(1990, 2050, by=1/12)
+# popsize = makearray(list(popsize_t, colnames(population_values[,2:3])))
+# for(j in 1:ncol(popsize)){
+#   popsize[,j] = population_values[1,j+1] * (growth[1,j]) ^ (1 / (population_values[2,1] - population_values[1,1]) * (popsize_t - population_year))
+# }
+# 
+# popsize[,"pop_int"] = 0
 
 dt = static_pars$dt$v
