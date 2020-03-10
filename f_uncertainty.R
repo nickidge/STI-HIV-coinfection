@@ -81,7 +81,9 @@ plot_uncertainty = function(thisdf, colour_strat='cascade', toplot=NULL){
   
   # p = p + geom_line(aes(y = model), na.rm=T, lwd=1.3) # best estimate line
   if('lower_ci' %in% names(thisdf)){
-    p = p + geom_ribbon(data=subset(thisdf, med_pop %in% med_labs & is.finite(lower_ci)), aes(ymin = lower_ci, ymax = upper_ci, x=t), alpha=0.2, colour=NA, na.rm=T) # 95% confidence interval
+    # p = p + geom_ribbon(data=subset(thisdf, med_pop %in% med_labs & is.finite(lower_ci)), aes(ymin = lower_ci, ymax = upper_ci, x=t), alpha=0.2, colour=NA, na.rm=T) # 95% confidence interval
+    p = p + geom_ribbon(data=subset(thisdf, is.finite(lower_ci) & plot != 'num_cascade'),
+                        aes(ymin = lower_ci, ymax = upper_ci, x=t), alpha=0.2, colour=NA, na.rm=T) # 95% confidence interval
   }
   if(colour_strat == 'cascade'){
     p = p + geom_area(data=subset(thisdf, plot=='num_cascade'), aes(y = model), alpha=0.8, na.rm=T) # stacked care cascade
