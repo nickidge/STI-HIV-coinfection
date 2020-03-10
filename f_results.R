@@ -11,7 +11,7 @@ create_results_df = function(scen_df){
     # unique() %>% 
     group_by(plot) %>% 
     mutate(value = case_when(
-      max(value) <= 1 ~ round(value, 3),
+      max(value) <= 1 ~ round(value, 4),
       TRUE ~ round(value)
     )) %>% 
     spread(t, value, fill=NA, drop=F)
