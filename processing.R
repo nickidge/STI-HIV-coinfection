@@ -166,6 +166,8 @@ extr = function(output, keys, tvec=tvec_base){
       this = aggregate(value~., data=melt(this), sum)
       colnames(this) = c('t', 'diag_time', 'med_pop', 'value')
       
+      this = rbind.fill(this, data.frame(aggregate(value~t+diag_time, FUN=sum, data=this), med_pop='tot'))
+      
       thisdf = data.frame(this, type = 'trans', dt = 1/12,
                           sti_pop = 'all')
       thisdf[,c("pid", "HIV_pop", "plot")] = paste0('HIV_diag_', thisdf$diag_time)
