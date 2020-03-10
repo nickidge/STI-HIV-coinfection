@@ -40,9 +40,9 @@ distance_given_cal_vec = function(x, keys, norm=l2){
 compare_model_to_data = function(output){
   
   thisdat = all_dat
-  thisdat = subset(thisdat, !(med_pop == 'tot' & HIV_pop == 'PLHIV'))
-  thisdat = subset(thisdat, !(med_pop == 'tot' & substr(HIV_pop, 1, 8) == 'HIV_diag'))
-  thisdat = subset(thisdat, HIV_pop != 'PLHIV')
+  # thisdat = subset(thisdat, !(med_pop == 'tot' & HIV_pop == 'PLHIV'))
+  # thisdat = subset(thisdat, !(med_pop == 'tot' & substr(HIV_pop, 1, 8) == 'HIV_diag'))
+  # thisdat = subset(thisdat, HIV_pop != 'PLHIV')
   
   res = extr(output, unique(thisdat$plot))
   
@@ -59,7 +59,7 @@ gen_calibration = function(cal_vars = c('f_infect_HIV', 'init_diag_prop'), contr
   bes = c('f_infect_HIV' = 2.5755e-6, 'int_factor' = 1.2, 'high_risk_factor' = 2, 'init_diag_prop' = 0.6,
           'init_prev_HIV_aus' = 0.12515, 'init_prev_HIV_int' = 0.07, 'init_late_prop' = 0.5, 'init_pop_aus' = 25000)
   ubs = c('f_infect_HIV' = 1e-5, 'int_factor' = 10, 'high_risk_factor' = 5, 'init_diag_prop' = 0.9,
-          'init_prev_HIV_aus' = 0.15, 'init_prev_HIV_int' = 0.3, 'init_late_prop' = 1, 'init_pop_aus' = 50000)
+          'init_prev_HIV_aus' = 0.15, 'init_prev_HIV_int' = 0.3, 'init_late_prop' = 1, 'init_pop_aus' = 100000)
   
   optim_result <<- nmkb(par=bes[cal_vars],
                         fn=distance_given_cal_vec,

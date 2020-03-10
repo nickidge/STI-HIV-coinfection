@@ -63,7 +63,8 @@ plot_scens = function(this_df, base_uncertainty=F){
   scen_colours = c('black', 'red', 'green')
   
   this_df = scen_update(this_df)
-
+  if(!medicare_ineligible){this_df = subset(this_df, med_pop %nin% med_labs)}
+  
   if(!base_uncertainty){
     baserows = this_df$scen == 'Base'
     this_df[baserows, c('lower_ci', 'upper_ci')] = this_df$model[baserows]

@@ -7,7 +7,8 @@ gen_uncertainty = function(ntrials=0, variance=base_variance){
   cal_wide$scen_long = 'Base'
   
   this_data_wide = data_wide
-  this_data_wide = subset(this_data_wide, med_pop %in% unique(cal_wide$med_pop))
+  # this_data_wide = subset(this_data_wide, med_pop %in% unique(cal_wide$med_pop))
+  if(!medicare_ineligible){this_data_wide = subset(this_data_wide, med_pop %nin% med_labs)}
   
   cal_wide = rbind.fill(cal_wide, this_data_wide)
   
@@ -242,19 +243,23 @@ upper_ci <- function(mean, se, n, conf_level = 0.95){
 }
 
 summarise_trials = function(df, value='value', lbfunc=lower_ci, ubfunc=upper_ci, conf_level=0.95){
-  med_count = 0
-  med_exclude = c()
-  for(i_med in 1:length(med_labs)){
-    med_values = subset(df, med_pop == med_labs[i_med])$value
-    if(sum(is.finite(med_values) & med_values != 0) > 0){
-      med_count = med_count + 1
-    } else {
-      med_exclude = c(med_exclude, med_labs[i_med])
-    }
-  }
+  # med_count = 0
+  # med_exclude = c()
+  # for(i_med in 1:length(med_labs)){
+  #   med_values = subset(df, med_pop == med_labs[i_med])$value
+  #   if(sum(is.finite(med_values) & med_values != 0) > 0){
+  #     med_count = med_count + 1
+  #   } else {
+  #     med_exclude = c(med_exclude, med_labs[i_med])
+  #   }
+  # }
+  # 
+  # if(med_count == 1){
+  #   df = subset(df, med_pop %nin% c(med_exclude, 'tot'))
+  # }
   
-  if(med_count == 1){
-    df = subset(df, med_pop %nin% c(med_exclude, 'tot'))
+  if(!medicare_ineligible){
+    df = subset(df, med_pop %nin% med_labs)
   }
   
   df = df %>%

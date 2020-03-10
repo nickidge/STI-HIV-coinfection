@@ -67,7 +67,7 @@ run_model = function(y0=NULL, tvec=tvec_base, modelpars=list(), options=list(), 
   popsize = makearray(list(popsize_t, med_labs))
   popsize[1,] = init_popsize
   for(j in 1:ncol(popsize)){
-    popsize[,j] = popsize[1,j] * pop_growth[j] ^ (popsize_t - popsize_t[1])
+    popsize[,j] = popsize[1,j] * (1 + growth) ^ (12 * (popsize_t - popsize_t[1]))
   }
   
   num_prep = constant_prep(modelpars$num_prep, popsize)

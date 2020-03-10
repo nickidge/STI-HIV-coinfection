@@ -27,8 +27,8 @@ defaultlist[['init_prev_HIV_int']] = 0.12 # initial guess for proportion of peop
 defaultlist[['init_late_prop']] = 0.1
 
 defaultlist[['init_pop_aus']] = 25000
-defaultlist[['init_pop_int']] = 0
-defaultlist[['pop_growth']] = c(1.05, 1.1)
+defaultlist[['init_pop_int']] = 10000
+if(!medicare_ineligible){defaultlist[['init_pop_int']] = 0}
 
 defaultlist[['f_infect_STI']] = 0 # foi for STI
 defaultlist[['init_prev_STI']] = 0 # initial prevalence of STI
