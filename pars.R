@@ -254,8 +254,10 @@ add_data_col = function(thislist, t_dat, data_col, deflist = baselist, syear = N
       vl = baseentry[tvec_base <= syear]
       vh = thispar$v[tvec_base >= (syear + 1)]
       
+      # approx_method = 'constant'
+      approx_method = 'linear'
       vm = approx(x = c(syear, syear + 1), y=c(vl[as.character(syear)], vh[as.character(syear + 1)]), xout=tvec_m,
-                  method = 'constant',
+                  method = approx_method,
                   f=1)
       vm = setNames(vm$y, vm$x)
       
