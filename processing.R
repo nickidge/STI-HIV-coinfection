@@ -347,11 +347,9 @@ get_movement = function(compartment, HIV_trans, med=1:length(med_labs), sum=FALS
   if(sum){
     going_in = sum(this[HIV_transitions[,'to'] == compartment,,])
     going_out = sum(this[HIV_transitions[,'from'] == compartment,,])
-    return(going_in - going_out)
   } else {
     going_in = colSums(this[HIV_transitions[,'to'] == compartment,,,drop=FALSE])
     going_out = colSums(this[HIV_transitions[,'from'] == compartment,,,drop=FALSE])
-    d = going_in - going_out
-    return(d)
   }
+  return(going_in - going_out)
 }
