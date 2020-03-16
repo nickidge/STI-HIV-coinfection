@@ -345,6 +345,14 @@ extr = function(output, keys, tvec=tvec_base){
 
       thisdf = rbind.fill(thisund_df, thisd1_df, thisd2_df, thisd3_df)
       
+    } else if(key == 'prev_lo'){
+      thisdf = data.frame()
+      for(i_risk in HIV_risk_labs){
+        thisvalues = PLHIV_risk[,i_risk,"tot","tot"] / rowSums(pop[,sHIV[[i_risk]],"tot","tot"])
+        thisdf_risk = data.frame(t = names(thisvalues), value = thisvalues, pid=paste0('prev_', i_risk), plot=paste0('prev_', i_risk),
+                                 dt = 1/12, sti_pop='all', risk_pop='all', HIV_pop=paste0('prev_', i_risk))
+        thisdf = rbind.fill(thisdf, thisdf_risk)
+      }
     } else {
       thisdf = data.frame()
     }

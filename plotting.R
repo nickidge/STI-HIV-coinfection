@@ -19,7 +19,10 @@ plot_index = rbind(
   c('HIV_diag_new', 'HIV_diag_new'),
   c('HIV_diag_old', 'HIV_diag_old'),
   c('diagnosed_treated', 'diagnosed_treated'),
-  c('treated_virally_suppressed', 'treated_virally_suppressed')
+  c('treated_virally_suppressed', 'treated_virally_suppressed'),
+  c('prev_lo', 'prev_lo'),
+  c('prev_hi', 'prev_hi'),
+  c('prev_pr', 'prev_pr')
 )
 colnames(plot_index) = c('pid', 'plot')
 plot_index = data.frame(plot_index)
@@ -41,7 +44,10 @@ plot_key_index = rbind(
   c('HIV_diag_new', 'Annual early HIV diagnoses'),
   c('HIV_diag_old', 'Annual late HIV diagnoses'),
   c('diagnosed_treated', 'Proportion of diagnosed PLHIV on treatment'),
-  c('treated_virally_suppressed', 'Proportion of treated PLHIV on viral suppression')
+  c('treated_virally_suppressed', 'Proportion of treated PLHIV on viral suppression'),
+  c('prev_lo', 'Prevalence in low risk population'),
+  c('prev_hi', 'Prevalence in high risk population not on PrEP'),
+  c('prev_pr', 'Prevalence in high risk population on PrEP')
 )
 
 plot_keys = plot_key_index[,1]

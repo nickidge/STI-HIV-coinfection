@@ -45,7 +45,7 @@ scenarios = list(list(sheet = 'scen_1',
                       short = 'care_cascade_stops',
                       long = 'Care cascade stays constant after 2014'))
 scen_keys = c('pop', 'PLHIV', 'HIV_prev', 'prop_prep', 'HIV_diag', 'HIV_inf', 'HIV_diag_new', 'HIV_diag_old', 'care_cascade',
-              'diagnosed_treated', 'treated_virally_suppressed')
+              'diagnosed_treated', 'treated_virally_suppressed', 'prev_lo', 'prev_hi', 'prev_pr')
 
 label_years = unique(c(plot_years, seq(2000, 2050, by=5)))
 

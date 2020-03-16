@@ -83,7 +83,7 @@ plot_scens = function(this_df, base_uncertainty=F){
   
   # initialise plot
   p = ggplot(this_df, aes(x=t, group=scen, colour=scen, fill=scen))
-  p = p + facet_wrap(.~plot, scales="free", ncol=3, labeller = labeller(plot = setNames(plot_long, plot_keys)))
+  p = p + facet_wrap(.~plot, scales="free", ncol=4, labeller = labeller(plot = setNames(plot_long, plot_keys)))
   
   # plot information
   p = p + geom_point(aes(y = data), na.rm=T, size=1.3)
@@ -121,7 +121,7 @@ plot_scens = function(this_df, base_uncertainty=F){
   p = p + theme(legend.position = 'right')
   
   # add percentages
-  p = convert_axis(p, paste0('axis-l-', c('1-3', '2-1')))
+  p = convert_axis(p, paste0('axis-l-', c('1-3', '1-4')))
   
   return(p)
 }

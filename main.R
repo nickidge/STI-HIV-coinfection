@@ -25,7 +25,7 @@ input_scenarios = list(list(sheet = 'scen_1',
                             short = 'care_cascade_stops',
                             long = 'Care cascade stays constant after 2014'))
 scen_df = gen_scenarios(base_df=base_df, scenarios=input_scenarios, ntrials=10)
-saveopen(plot_scens(scen_df, base_uncertainty = T), 'scenarios', 'plots', width=1.5*1.1*page_width)
+saveopen(plot_scens(scen_df, base_uncertainty = T), 'scenarios', 'plots', width=2*1.1*page_width)
 
 # # create table of scenario results (old)
 # t_results = make_tab(scen_df, tab_row_funcs, allscens)
