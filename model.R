@@ -22,7 +22,6 @@ run_model = function(y0=NULL, tvec=tvec_base, modelpars=list(), options=list(), 
     assign(spar$name, spar$v)
   }
   
-  # if(!getdict(options, 'split', FALSE)){
   if(is.null(y0)){
     
     init_popsize = c(init_pop_aus, init_pop_int)
@@ -106,7 +105,6 @@ run_model = function(y0=NULL, tvec=tvec_base, modelpars=list(), options=list(), 
     # initialise temp
     if(t==1){
       prevdt = y0
-      # prevdt[1, 1,] = thispopsize - apply(y0, 3, sum) + prevdt[1, 1, ]
       prevdt[1, 1,] = thispopsize - rowSums(aperm(y0, c(3, 1, 2))) + prevdt[1, 1, ]
     } else {
       prevdt = adrop(SID[t-1,,,, drop = FALSE], 1)
@@ -138,10 +136,6 @@ run_model = function(y0=NULL, tvec=tvec_base, modelpars=list(), options=list(), 
     
     prevdt[sHIV[['lo']],,1] = prevdt[sHIV[['lo']],,1] - become_high_risk
     prevdt[sHIV[['hi']],,1] = prevdt[sHIV[['hi']],,1] + become_high_risk
-    
-    # prevdt[sHIV[['eff_I_lo']],,1] = prevdt[sHIV[['eff_I_lo']],,1] - become_high_risk
-    # prevdt[sHIV[['eff_I_hi']],,1] = prevdt[sHIV[['eff_I_hi']],,1] + become_high_risk
-    
     
     if(any(num_prep > 0)){
       for(i_med in 1:length(med_labs)){
@@ -210,17 +204,12 @@ run_model = function(y0=NULL, tvec=tvec_base, modelpars=list(), options=list(), 
     HIV_p[tHIV$inf] = as.vector(apply(prevdt[sHIV$S,,,drop=FALSE], MARGIN=c(1,3), FUN=sum)) * foi_HIV
     
     # waiting undiagnosed
-    # HIV_p[tHIV$wait_1] = 1/test_wait[1]
     HIV_p[tHIV$wait_1] = duration2rate(test_wait[1])
     
     for(i_med in 1:length(med_labs)){
       this_testing = t_testing[((6 * i_med) - 5) : ((6 * i_med))] / 2
-      # HIV_p[paste0(sHIV$I, '_d_', med_labs[i_med])] = 1/this_testing
       HIV_p[paste0(sHIV$I, '_d_', med_labs[i_med])] = duration2rate(this_testing)
     }
-    
-    # # multiply by dt
-    # HIV_p = HIV_p * dt
     
     # ensure all transitions are as expected
     if(any(is.nan(HIV_p))) print('nan values in transitions?!')
@@ -233,65 +222,11 @@ run_model = function(y0=NULL, tvec=tvec_base, modelpars=list(), options=list(), 
     HIV_p[HIV_p > 1] = 1
     HIV_p[HIV_p < 0] = 0
     
-    # functions to calculate number of people moving for each transition
-    # getppl_HIV = function(from, med, prop){
-    #   this = adrop(prevdt[from,,,drop=FALSE], 1) * as.numeric(prop)
-    #   if(as.numeric(med) != 0){
-    #     this[,-as.numeric(med)] = 0
-    #   }
-    #   return(this)
-    # }
-    # trans_i_HIV = function(i) getppl_HIV(HIV_transitions[i,'from'], HIV_transitions[i, 'med'], HIV_p[i])
-    
-    # calculate transitions in absolute numbers
-    # HIV_trans[] = 0
-    # for(i in 1:length(HIV_p)){
-    #   med = HIV_transitions[i, 'med']
-    #   this = adrop(prevdt[HIV_transitions[i,'from'],,,drop=FALSE], 1) * as.numeric(HIV_p[i])
-    #   if(as.numeric(med) != 0){
-    #     this[,-as.numeric(med)] = 0
-    #   }
-    #   # HIV_trans[i,,] = trans_i_HIV(i)
-    #   HIV_trans[i,,] = this
-    # }
-    
     HIV_trans[] = prevdt[HIV_transitions[,'from'],,,drop=FALSE] * as.numeric(HIV_p)
     for(i in 1:length(med_labs)){
       HIV_trans[as.numeric(HIV_transitions[,"med"]) == i,,-i] = 0
     }
-    # HIV_trans = lapply(1:length(HIV_p), FUN=trans_i_HIV)
-    # HIV_trans = abind(HIV_trans, along=0, new.names=names(HIV_p))
-    
-    # # calculate risk transitions
-    # s_lo = prevdt['S_lo',,1] + get_movement('S_lo', HIV_trans)
-    # s_hi = apply(prevdt[c('S_hi', 'S_pr'),,1], c(2), sum) + get_movement(c('S_hi', 'S_pr'), HIV_trans)
-    # 
-    # if(sum(s_lo) > 0){
-    #   HIV_trans['become_high_risk',,] = (sum(s_lo + s_hi) * prop_high_risk - sum(s_hi)) / sum(s_lo) * s_lo
-    # } else if(sum(s_hi) > 0){
-    #   HIV_trans['become_high_risk',,] = (1 - prop_high_risk) * s_hi
-    # }
-    # 
-    # # 
-    # for(i_med in 1:length(med_labs)){
-    #   # calculate prep transitions
-    #   s_hi = prevdt['S_hi',,i_med] + get_movement('S_hi', HIV_trans, med=i_med)
-    #   s_pr = prevdt['S_pr',,i_med] + get_movement('S_pr', HIV_trans, med=i_med)
-    #   
-    #   thisname = paste0('start_prep_', med_labs[i_med])
-    #   
-    #   if(sum(s_pr) == num_prep[i_med]){
-    #     HIV_trans[thisname,,] = 0
-    #   } else if(sum(s_pr) > num_prep[i_med]){
-    #     HIV_trans[thisname,,] = (num_prep[i_med] - sum(s_pr)) / sum(s_pr) * s_pr
-    #   } else if(sum(s_hi + s_pr) <= num_prep[i_med]){
-    #     HIV_trans[thisname,,i_med] = sum(s_hi)
-    #   } else {
-    #     HIV_trans[thisname,,i_med] = (num_prep[i_med] - sum(s_pr)) / sum(s_hi) * s_hi
-    #   }
-    # }
-    
-    
+
     trip = 0
     for(i_med in 1:length(med_labs)){
       for(j_risk in 1:length(HIV_risk_labs)){
@@ -323,9 +258,6 @@ run_model = function(y0=NULL, tvec=tvec_base, modelpars=list(), options=list(), 
           HIV_p[paste0('treat_', risk_lab)] = prop1_to_2
           HIV_p[paste0('viral_supp_', risk_lab)] = prop2_to_3
           
-          # num1_to_2 = prop1_to_2 * (apply(prevdt[sHIV[[paste0('D1_', risk_lab)]],,i_med, drop = FALSE], 2, sum) + apply(HIV_trans[tHIV[[paste0('test_', risk_lab)]],,i_med,drop=FALSE], 2, sum))
-          # num2_to_3 = prop2_to_3 * apply(prevdt[sHIV[[paste0('D2_', risk_lab)]],,i_med, drop = FALSE], 2, sum) + care_cascade[2] * num1_to_2
-
           num1_to_2 = prop1_to_2 * (rowSums(aperm(prevdt[sHIV[[paste0('D1_', risk_lab)]],,i_med, drop = FALSE], c(2,1,3))) + rowSums(aperm(HIV_trans[tHIV[[paste0('test_', risk_lab)]],,i_med,drop=FALSE], c(2,1,3))))
           num2_to_3 = prop2_to_3 * rowSums(aperm(prevdt[sHIV[[paste0('D2_', risk_lab)]],,i_med, drop = FALSE], c(2,1,3))) + care_cascade[2] * num1_to_2
 
@@ -382,28 +314,6 @@ run_model = function(y0=NULL, tvec=tvec_base, modelpars=list(), options=list(), 
         print(paste0('negative pop for ', HIV_transitions[i,1], ' transition'))
       }
     }
-
-    # # apply transitions
-    # for(i in 1:length(HIV_p)){
-    #   # get info
-    #   hfrom = HIV_transitions[i,"from"]
-    #   hto = HIV_transitions[i,"to"]
-    #   hp = adrop(HIV_trans[i,,, drop=FALSE], 1)
-    # 
-    #   # make transitions
-    #   prevdt[hfrom,,] = prevdt[hfrom,,] - hp
-    #   prevdt[hto,,] = prevdt[hto,,] + hp
-    # 
-    #   if(any(prevdt < 0)){
-    #     if(all(prevdt > -1e-6)){
-    #       prevdt[prevdt > -1e-6 & prevdt < 0] = 0
-    #     } else {
-    #       print(paste0('negative pop for ', HIV_transitions[i,1], ' transition'))
-    #     }
-    #   }
-    # }
-    
-    
     
     # ensure no low risk medicare ineligible
     prevdt["S_hi",,2] = prevdt["S_hi",,2] + prevdt["S_lo",,2]
@@ -419,12 +329,9 @@ run_model = function(y0=NULL, tvec=tvec_base, modelpars=list(), options=list(), 
     deaths = mu * prevdt
     prevdt = prevdt - deaths
     
-    # ineligibile become eligible or leave
-    # num_no_longer_ineligible = prevdt[,,2] * dt / stay_time
     num_no_longer_ineligible = prevdt[,,2] * duration2rate(stay_time)
     num_stay = num_no_longer_ineligible * stay_prop
-    # num_leave = num_no_longer_ineligible * (1 - stay_prop)
-    
+
     prevdt[,,1] = prevdt[,,1] + num_stay
     prevdt[,,2] = prevdt[,,2] - num_no_longer_ineligible
     
