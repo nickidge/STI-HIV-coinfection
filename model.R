@@ -463,6 +463,7 @@ run_model = function(y0=NULL, tvec=tvec_base, modelpars=list(), options=list(), 
   }
   
   # print(paste0('time prop = ', round(as.numeric(t_total) / as.numeric(as.numeric(Sys.time()) - as.numeric(t_start)), 3)))
+  # print(paste0('total time = ', round(1000 * as.numeric(as.numeric(Sys.time()) - as.numeric(t_start)), 0), ' ms'))
   
   if('only_cal_outs' %in% names(options)){
     if(options$only_cal_outs){
