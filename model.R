@@ -326,7 +326,7 @@ run_model = function(y0=NULL, tvec=tvec_base, modelpars=list(), options=list(), 
           # num1_to_2 = prop1_to_2 * (apply(prevdt[sHIV[[paste0('D1_', risk_lab)]],,i_med, drop = FALSE], 2, sum) + apply(HIV_trans[tHIV[[paste0('test_', risk_lab)]],,i_med,drop=FALSE], 2, sum))
           # num2_to_3 = prop2_to_3 * apply(prevdt[sHIV[[paste0('D2_', risk_lab)]],,i_med, drop = FALSE], 2, sum) + care_cascade[2] * num1_to_2
 
-          num1_to_2 = prop1_to_2 * (rowSums(aperm(prevdt[sHIV[[paste0('D1_', risk_lab)]],,i_med, drop = FALSE], c(2,1,3))) + apply(HIV_trans[tHIV[[paste0('test_', risk_lab)]],,i_med,drop=FALSE], 2, sum))
+          num1_to_2 = prop1_to_2 * (rowSums(aperm(prevdt[sHIV[[paste0('D1_', risk_lab)]],,i_med, drop = FALSE], c(2,1,3))) + rowSums(aperm(HIV_trans[tHIV[[paste0('test_', risk_lab)]],,i_med,drop=FALSE], c(2,1,3))))
           num2_to_3 = prop2_to_3 * rowSums(aperm(prevdt[sHIV[[paste0('D2_', risk_lab)]],,i_med, drop = FALSE], c(2,1,3))) + care_cascade[2] * num1_to_2
 
           HIV_trans[paste0('treat_', risk_lab),,i_med] = num1_to_2
