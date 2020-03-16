@@ -17,7 +17,9 @@ plot_index = rbind(
   c('num_treat_tot', 'num_cascade'),
   c('num_suppr_tot', 'num_cascade'),
   c('HIV_diag_new', 'HIV_diag_new'),
-  c('HIV_diag_old', 'HIV_diag_old')
+  c('HIV_diag_old', 'HIV_diag_old'),
+  c('diagnosed_treated', 'diagnosed_treated'),
+  c('treated_virally_suppressed', 'treated_virally_suppressed')
 )
 colnames(plot_index) = c('pid', 'plot')
 plot_index = data.frame(plot_index)
@@ -37,7 +39,9 @@ plot_key_index = rbind(
   c('num_cascade', 'PLHIV by care cascade'),
   c('HIV_diag_by_pop', 'Annual HIV diagnoses by pop'),
   c('HIV_diag_new', 'Annual early HIV diagnoses'),
-  c('HIV_diag_old', 'Annual late HIV diagnoses')
+  c('HIV_diag_old', 'Annual late HIV diagnoses'),
+  c('diagnosed_treated', 'Proportion of diagnosed PLHIV on treatment'),
+  c('treated_virally_suppressed', 'Proportion of treated PLHIV on viral suppression')
 )
 
 plot_keys = plot_key_index[,1]

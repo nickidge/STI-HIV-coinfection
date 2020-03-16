@@ -197,11 +197,29 @@ extr = function(output, keys, tvec=tvec_base){
       thisD3plus = get_num_ppl('D3plus')
       
       this_df_template = data.frame(t = names(thisPLHIV), type = 'pop', dt = 1,
-                                     sti_pop = 'all', risk_pop = 'all', plot='care_cascade')
+                                    sti_pop = 'all', risk_pop = 'all', plot='care_cascade')
       
       thisD1plus_df = data.frame(this_df_template, value = thisD1plus / thisPLHIV, pid='num_diag_prop', HIV_pop = 'num_diag')
       thisD2plus_df = data.frame(this_df_template, value = thisD2plus / thisD1plus, pid='num_treat_prop', HIV_pop = 'num_treat')
       thisD3plus_df = data.frame(this_df_template, value = thisD3plus / thisD2plus, pid='num_suppr_prop', HIV_pop = 'num_suppr')
+      
+      thisdf = rbind.fill(thisD1plus_df, thisD2plus_df, thisD3plus_df)
+      
+    } else if(key == 'diagnosed_treated'){
+      
+      get_num_ppl = function(comp_key) apply(SID[tvec,sHIV[[comp_key]],,], 1, sum)
+      
+      thisPLHIV = get_num_ppl('PLHIV')
+      thisD1plus = get_num_ppl('D1plus')
+      thisD2plus = get_num_ppl('D2plus')
+      thisD3plus = get_num_ppl('D3plus')
+      
+      this_df_template = data.frame(t = names(thisPLHIV), type = 'pop', dt = 1,
+                                    sti_pop = 'all', risk_pop = 'all')
+      
+      # thisD1plus_df = data.frame(this_df_template, value = thisD1plus / thisPLHIV, pid='num_diag_prop', HIV_pop = 'num_diag')
+      thisD2plus_df = data.frame(this_df_template, value = thisD2plus / thisD1plus, pid='num_treat_prop', HIV_pop = 'num_treat', plot='diagnosed_treated')
+      thisD3plus_df = data.frame(this_df_template, value = thisD3plus / thisD2plus, pid='num_suppr_prop', HIV_pop = 'num_suppr', plot='treated_virally_suppressed')
       
       thisdf = rbind.fill(thisD1plus_df, thisD2plus_df, thisD3plus_df)
       
