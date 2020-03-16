@@ -1,7 +1,8 @@
-l2 = function(x, y){
+l2 = function(x, y, weights=1){
   v = (x - y) / pmin(x, y)
   v = fixnan(v)
   v = v^2
+  v = v * weights
   return(sum(v, na.rm=T))
 }
 
@@ -26,7 +27,9 @@ distance_given_cal_vec = function(x, keys, norm=l2){
   
   df = compare_model_to_data(output)
   
-  distance = norm(df$data, df$model)
+  df$weights = cal_keys[as.character(df$plot)]
+  
+  distance = norm(df$data, df$model, weights=df$weights)
   
   if(prob(0)){
     p = plot_uncertainty(df)

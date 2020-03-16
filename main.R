@@ -5,7 +5,7 @@ source("init.R", echo = T)
 # calibrate model
 if(!exists('cal')){
   baselist = load_time_par_sheet('timepars', deflist = defaultlist)
-  cal_keys = c('PLHIV', 'HIV_diag', 'care_cascade', 'HIV_prev')
+  cal_keys = c('PLHIV' = 1, 'HIV_diag' = 1, 'care_cascade' = 1, 'HIV_prev' = 2)
   cal_pars = c('f_infect_HIV', 'init_prev_HIV_aus', 'init_diag_prop', 'init_late_prop', 'high_risk_factor', 'init_pop_aus')
   if(medicare_ineligible){cal_pars = union(cal_pars, 'init_pop_int')}
   gen_calibration(cal_pars, control = list(tol = 1e-6))
