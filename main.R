@@ -8,12 +8,12 @@ if(!exists('cal')){
   cal_keys = c('PLHIV' = 1, 'HIV_diag' = 1, 'care_cascade' = 1, 'HIV_prev' = 2)
   cal_pars = c('f_infect_HIV', 'init_prev_HIV_aus', 'init_diag_prop', 'init_late_prop', 'high_risk_factor', 'init_pop_aus')
   if(medicare_ineligible){cal_pars = union(cal_pars, 'init_pop_int')}
-  gen_calibration(cal_pars, control = list(tol = 1e-6))
+  gen_calibration(cal_pars, control = list(tol = 1e-3))
 }
 
 # run base scenario (with uncertainty)
 if(!exists('base_df')){
-  base_df = gen_uncertainty(100)
+  base_df = gen_uncertainty(10)
   saveopen(plot_cals(base_df), 'calibration', 'plots', width=2*1.1*page_width)
 }
 
@@ -24,7 +24,7 @@ input_scenarios = list(list(sheet = 'scen_1',
                        list(sheet = 'scen_2',
                             short = 'care_cascade_stops',
                             long = 'Care cascade stays constant after 2014'))
-scen_df = gen_scenarios(base_df=base_df, scenarios=input_scenarios, ntrials=100)
+scen_df = gen_scenarios(base_df=base_df, scenarios=input_scenarios, ntrials=10)
 saveopen(plot_scens(scen_df, base_uncertainty = T), 'scenarios', 'plots', width=1.5*1.1*page_width)
 
 # # create table of scenario results (old)
