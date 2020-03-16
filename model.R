@@ -98,7 +98,7 @@ run_model = function(y0=NULL, tvec=tvec_base, modelpars=list(), options=list(), 
     TT = as.character(tvec[t])
     
     for(key in interpvars){
-      assign(key, asub(modelpars[[key]], TT, 1))
+      assign(key, modelpars[[key]][TT,])
     }
     
     thispopsize = popsize[TT,]
@@ -177,13 +177,15 @@ run_model = function(y0=NULL, tvec=tvec_base, modelpars=list(), options=list(), 
     rel_inf_STI = 0
     
     mix_pops = makearray(list(c('inf', 'pop'), medi_states))
-    for(i_mix in 1:nrow(mixing)){
-      mix_to = medi_states[i_mix]
-      mix_to_split = strsplit(mix_to, "_")[[1]]
-      mix_pops['inf', mix_to] = sum(prevdt[sHIV[[paste0('I_', mix_to_split[1])]],,mix_to_split[2]])
-      mix_pops['pop', mix_to] = sum(prevdt[sHIV[[mix_to_split[1]]],,mix_to_split[2]])
-      mix_pops['inf', mix_to] = mix_pops['inf', mix_to] + sum(treatment_eff[1]*prevdt[paste0('D1_', mix_to_split[1]),,mix_to_split[2]] + treatment_eff[2]*prevdt[paste0('D2_', mix_to_split[1]),,mix_to_split[2]] + treatment_eff[3]*prevdt[paste0('D3_', mix_to_split[1]),,mix_to_split[2]])
-      mix_pops['pop', mix_to] = mix_pops['pop', mix_to] + sum(prevdt[sHIV[[paste0('D_', mix_to_split[1])]],,mix_to_split[2]])
+    for(i_med in med_labs){
+      for(i_risk in HIV_risk_labs){
+        mix_to = paste0(i_risk, '_', i_med)
+        mix_pops['inf', mix_to] = sum(prevdt[sHIV[[paste0('I_', i_risk)]],,i_med])
+        mix_pops['pop', mix_to] = sum(prevdt[sHIV[[i_risk]],,i_med])
+        # mix_pops['inf', mix_to] = mix_pops['inf', mix_to] + sum(treatment_eff[1]*prevdt[paste0('D1_', i_risk),,i_med] + treatment_eff[2]*prevdt[paste0('D2_', i_risk),,i_med] + treatment_eff[3]*prevdt[paste0('D3_', i_risk),,i_med])
+        mix_pops['inf', mix_to] = mix_pops['inf', mix_to] + sum(treatment_eff*prevdt[paste0('D', 1:3, '_', i_risk),,i_med])
+        mix_pops['pop', mix_to] = mix_pops['pop', mix_to] + sum(prevdt[sHIV[[paste0('D_', i_risk)]],,i_med])
+      }
     }
     
     foi_mix = mix_pops['inf',] %*% mixing / mix_pops['pop',] %*% mixing
@@ -296,9 +298,9 @@ run_model = function(y0=NULL, tvec=tvec_base, modelpars=list(), options=list(), 
         risk_lab = HIV_risk_labs[j_risk]
         
         # care cascade info
-        d1 = sum(prevdt[sHIV[[paste0('D1_', risk_lab)]],,i_med]) + sum(get_movement(paste0('D1_', risk_lab), HIV_trans, med=i_med))
-        d2 = sum(prevdt[sHIV[[paste0('D2_', risk_lab)]],,i_med]) + sum(get_movement(paste0('D2_', risk_lab), HIV_trans, med=i_med))
-        d3 = sum(prevdt[sHIV[[paste0('D3_', risk_lab)]],,i_med]) + sum(get_movement(paste0('D3_', risk_lab), HIV_trans, med=i_med))
+        d1 = sum(prevdt[sHIV[[paste0('D1_', risk_lab)]],,i_med]) + get_movement(paste0('D1_', risk_lab), HIV_trans, med=i_med, sum=TRUE)
+        d2 = sum(prevdt[sHIV[[paste0('D2_', risk_lab)]],,i_med]) + get_movement(paste0('D2_', risk_lab), HIV_trans, med=i_med, sum=TRUE)
+        d3 = sum(prevdt[sHIV[[paste0('D3_', risk_lab)]],,i_med]) + get_movement(paste0('D3_', risk_lab), HIV_trans, med=i_med, sum=TRUE)
         d1plus = d1 + d2 + d3
         d2plus = d2 + d3
         
