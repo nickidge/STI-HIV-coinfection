@@ -342,12 +342,16 @@ extr = function(output, keys, tvec=tvec_base){
   return(df)
 }
 
-get_movement = function(compartment, HIV_trans, med=0){
-  going_in = colSums(HIV_trans[HIV_transitions[,'to'] == compartment,,,drop=FALSE])
-  going_out = colSums(HIV_trans[HIV_transitions[,'from'] == compartment,,,drop=FALSE])
-  d = going_in - going_out
-  if(med != 0){
-    d = d[,med]
+get_movement = function(compartment, HIV_trans, med=1:length(med_labs), sum=FALSE){
+  this = HIV_trans[,,med,drop=FALSE]
+  if(sum){
+    going_in = sum(this[HIV_transitions[,'to'] == compartment,,])
+    going_out = sum(this[HIV_transitions[,'from'] == compartment,,])
+    return(going_in - going_out)
+  } else {
+    going_in = colSums(this[HIV_transitions[,'to'] == compartment,,,drop=FALSE])
+    going_out = colSums(this[HIV_transitions[,'from'] == compartment,,,drop=FALSE])
+    d = going_in - going_out
+    return(d)
   }
-  return(d)
 }
