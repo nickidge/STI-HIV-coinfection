@@ -1,5 +1,5 @@
 
-gen_scenarios = function(scen_df=NULL, scenarios = scenarios, ntrials=0, variance=base_variance){
+gen_scenarios = function(base_df=NULL, scenarios = scenarios, ntrials=0, variance=base_variance){
   
   dat = all_dat
   dat$scen = 'data'
@@ -7,21 +7,26 @@ gen_scenarios = function(scen_df=NULL, scenarios = scenarios, ntrials=0, varianc
   dat$scen_long = 'Data'
   dat = widen_sources(dat)
   
-  
-  if(is.null(scen_df)){
+  scen_df = data.frame()
+  if(is.null(base_df)){
     if(base_uncertainty){
-      scen_df = ci_df(ntrials, basevar=variance, options=list('keep_static'=TRUE))
+      base_df = ci_df(ntrials, basevar=variance, options=list('keep_static'=TRUE))
     } else {
-      scen_df = run_model(y0=y0, tvec=tvec, modelpars=timepars, options=options)
-      scen_df = extr(scen_df, plot_keys)
+      base_df = run_model(y0=y0, tvec=tvec, modelpars=timepars, options=options)
+      base_df = extr(base_df, plot_keys)
     }
       
-    scen_df = widen_sources(scen_df)
-    scen_df$scen = 'base'
-    scen_df$scen_long = 'Base'
+    base_df = widen_sources(base_df)
+    base_df$scen = 'base'
+    base_df$scen_long = 'Base'
   }
+  scen_df = rbind.fill(scen_df, base_df)
   scen_df$scen_short = 'base'
- 
+  
+  # base_interval_df = subset(base_df, t >= split_year - 1 & t < split_year)
+  base_interval_df = subset(base_df, t == split_year - 1 & scen == 'base')
+  base_interval_df$lower_ci = base_interval_df$model
+  base_interval_df$upper_ci = base_interval_df$model
   
   dat = subset(dat, med_pop %in% unique(scen_df$med_pop))
   
@@ -34,6 +39,7 @@ gen_scenarios = function(scen_df=NULL, scenarios = scenarios, ntrials=0, varianc
     
     thisdf = this_scen_trials
     thisdf = widen_sources(thisdf)
+    thisdf = rbind.fill(base_interval_df, thisdf)
     thisdf$scen = s$short
     thisdf$scen_short = s$short
     thisdf$scen_long = s$long
