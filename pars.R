@@ -77,6 +77,10 @@ modelpar = function(t=t_dat, y=NULL, parname=NA, pop=NA, subpop=NA, tvec=tvec_ba
   } else if(parname == 'num_prep'){
     col = match(subpop, med_labs)
     refvar = 'num_prep'
+    maxcol = 2  
+  } else if(parname == 'annual_pop_growth'){
+    col = match(subpop, med_labs)
+    refvar = 'annual_pop_growth'
     maxcol = 2
   } else if(parname == 'eff_prep'){
     col = 1
@@ -306,7 +310,10 @@ load_time_par_sheet = function(sheetname, deflist = baselist, syear=NA){
   thislist = fill_list(thislist, deflist = deflist)
   
   # thislist$num_prep = constant_prep(thislist$num_prep)
-  to_smooth = list('prop_high_risk' = 1)
+  to_smooth = list()
+  if(is.na(syear) | syear == 0){
+    to_smooth = c(to_smooth, list('prop_high_risk' = 1))
+  }
   for(i_smooth in names(to_smooth)){
     for(j_smooth in 1:length(to_smooth[i_smooth])){
       thislist[[i_smooth]] = smooth_par(thislist[[i_smooth]], j_smooth)
