@@ -313,9 +313,9 @@ load_time_par_sheet = function(sheetname, deflist = baselist, syear=NA){
   
   # thislist$num_prep = constant_prep(thislist$num_prep)
   to_smooth = list()
-  if(is.na(syear) | syear == 0){
-    to_smooth = c(to_smooth, list('prop_high_risk' = 1))
-  }
+  # if(is.na(syear) | syear == 0){
+  #   to_smooth = c(to_smooth, list('prop_high_risk' = 1))
+  # }
   for(i_smooth in names(to_smooth)){
     for(j_smooth in 1:length(to_smooth[i_smooth])){
       thislist[[i_smooth]] = smooth_par(thislist[[i_smooth]], j_smooth)
