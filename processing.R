@@ -32,7 +32,8 @@ duration2rate = function(x, dt=1/12) 1 - exp(-dt / x)
 
 sum_dim = function(thisarr, thisdim){
   thisarr = abind(thisarr, apply(thisarr, setdiff(1:length(dim(thisarr)), thisdim), sum), along=thisdim)
-  last(dimnames(thisarr)[[thisdim]]) = 'tot'
+  # last(dimnames(thisarr)[[thisdim]]) = 'tot'
+  dimnames(thisarr)[[thisdim]][length(dimnames(thisarr)[[thisdim]])] = 'tot'
   return(thisarr)
 }
 
