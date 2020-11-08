@@ -82,7 +82,7 @@ prev_dat = data.frame(t = 2014, value = 0.07, type='pop', dt=1, pid='HIV_prev_pr
 all_dat = rbind.fill(PLHIV_dat, HIV_diag_dat, prop_diag_dat)
 all_dat = rbind.fill(all_dat, HIV_diag_new, HIV_diag_old)
 all_dat = rbind.fill(all_dat, prev_dat)
-if(!medicare_ineligible){all_dat = subset(all_dat, med_pop %nin% med_labs)}
+if(!medicare_ineligible){all_dat = subset(all_dat, !(med_pop %in% med_labs))}
 all_dat$plot[is.na(all_dat$plot)] = all_dat$HIV_pop[is.na(all_dat$plot)]
 all_dat$scen = 'data'
 all_dat$scen_long = 'Data'

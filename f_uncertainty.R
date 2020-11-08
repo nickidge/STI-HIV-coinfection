@@ -1,4 +1,4 @@
-
+# generate uncertainty range for scenario
 gen_uncertainty = function(ntrials=0, variance=base_variance){
   trials_df = ci_df(ntrials=ntrials, basevar=variance, options=list('keep_static'=TRUE))
   
@@ -8,7 +8,7 @@ gen_uncertainty = function(ntrials=0, variance=base_variance){
   
   this_data_wide = data_wide
   # this_data_wide = subset(this_data_wide, med_pop %in% unique(cal_wide$med_pop))
-  if(!medicare_ineligible){this_data_wide = subset(this_data_wide, med_pop %nin% med_labs)}
+  if(!medicare_ineligible){this_data_wide = subset(this_data_wide, !(med_pop %in% med_labs))}
   
   cal_wide = rbind.fill(cal_wide, this_data_wide)
   
@@ -257,11 +257,11 @@ summarise_trials = function(df, value='value', lbfunc=lower_ci, ubfunc=upper_ci,
   # }
   # 
   # if(med_count == 1){
-  #   df = subset(df, med_pop %nin% c(med_exclude, 'tot'))
+  #   df = subset(df, !(med_pop %in% c(med_exclude, 'tot'))_)
   # }
   
   if(!medicare_ineligible){
-    df = subset(df, med_pop %nin% med_labs)
+    df = subset(df, !(med_pop %in% med_labs))
   }
   
   df = df %>%
@@ -279,6 +279,7 @@ summarise_trials = function(df, value='value', lbfunc=lower_ci, ubfunc=upper_ci,
   return(df)
 }
 
+# find confidence interval
 ci_df = function(ntrials=5, timepars=baselist, basevar=0.05, y0=NULL, tvec=tvec_base, options=list(), syear=0){
   trials_df = run_model(y0=y0, tvec=tvec, modelpars=timepars, options=options)
   trials_df = extr(trials_df, plot_keys)

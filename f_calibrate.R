@@ -27,7 +27,7 @@ distance_given_cal_vec = function(x, keys, norm=l2){
   
   df = compare_model_to_data(output)
   
-  df$weights = cal_keys[as.character(df$plot)]
+  df$weights = cal_weights[as.character(df$plot)]
   
   distance = norm(df$data, df$model, weights=df$weights)
   

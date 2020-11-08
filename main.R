@@ -5,10 +5,10 @@ source("init.R", echo = T)
 # calibrate model
 if(!exists('cal')){
   baselist = load_time_par_sheet('timepars', deflist = defaultlist)
-  cal_keys = c('PLHIV' = 0, 'HIV_diag' = 1, 'care_cascade' = 1, 'HIV_prev' = 2)
-  cal_pars = c('f_infect_HIV', 'init_prev_HIV_aus', 'init_diag_prop', 'init_late_prop', 'high_risk_factor', 'init_pop_aus')
-  if(medicare_ineligible){cal_pars = union(cal_pars, 'init_pop_int')}
-  gen_calibration(cal_pars, control = list(tol = 1e-3))
+  cal_weights = c('PLHIV' = 0, 'HIV_diag' = 1, 'care_cascade' = 1, 'HIV_prev' = 2) # these define the weighting of each data type in the calibration
+  cal_pars = c('f_infect_HIV', 'init_prev_HIV_aus', 'init_diag_prop', 'init_late_prop', 'high_risk_factor', 'init_pop_aus') # parameters to change in the calibration
+  if(medicare_ineligible){cal_pars = union(cal_pars, 'init_pop_int')} # if stratifying by medicare ineligibility, make init_pop_int variable
+  gen_calibration(cal_pars, control = list(tol = 1e-3)) # run calibration with desired tolerance
 }
 
 # run base scenario (with uncertainty)

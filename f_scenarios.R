@@ -69,7 +69,7 @@ plot_scens = function(this_df, base_uncertainty=F){
   scen_colours = c('black', 'red', 'green')
   
   this_df = scen_update(this_df)
-  if(!medicare_ineligible){this_df = subset(this_df, med_pop %nin% med_labs)}
+  if(!medicare_ineligible){this_df = subset(this_df, !(med_pop %in% med_labs))}
   
   if(!base_uncertainty){
     baserows = this_df$scen == 'Base'
@@ -88,7 +88,7 @@ plot_scens = function(this_df, base_uncertainty=F){
   # plot information
   p = p + geom_point(aes(y = data), na.rm=T, size=1.3)
   p = p + geom_path(aes(y = model), na.rm=T, lwd=1.3)
-  p = p + geom_ribbon(aes(ymin = lower_ci, ymax = upper_ci, x=t), alpha=0.2, colour=NA)
+  p = p + geom_ribbon(aes(ymin = lower_ci, ymax = upper_ci, x=t), alpha=0.2, colour=NA, na.rm=F)
   
   # define axes scales
   # p = p + geom_blank(data=max_df, aes(y=upperlim), inherit.aes = F)
@@ -97,7 +97,7 @@ plot_scens = function(this_df, base_uncertainty=F){
                              limits = c(min(this_df$t), max(this_df$t)),
                              expand = c(0, 0))
   # p = p + scale_y_continuous(expand = c(0,0))
-  p = p + scale_y_continuous(expand = expand_scale(mult = c(0, 0.1)))
+  p = p + scale_y_continuous(expand = expansion(mult = c(0, 0.1)))
   p = p + expand_limits(y = 0)
   p = p + coord_cartesian(xlim = plot_years)
   
