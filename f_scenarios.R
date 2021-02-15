@@ -64,12 +64,13 @@ scen_update = function(this_df){
   return(this_df)
 }
 
-plot_scens = function(this_df, base_uncertainty=F){
+plot_scens = function(this_df, base_uncertainty=F, med_pop_plot='tot'){
   
-  scen_colours = c('black', 'red', 'green')
+  scen_colours = c('black', 'red', 'green', 'blue')
   
   this_df = scen_update(this_df)
-  if(!medicare_ineligible){this_df = subset(this_df, !(med_pop %in% med_labs))}
+  # if(!medicare_ineligible){this_df = subset(this_df, !(med_pop %in% med_labs))}
+  this_df = subset(this_df, (med_pop %in% med_pop_plot)|is.na(med_pop))
   
   if(!base_uncertainty){
     baserows = this_df$scen == 'Base'
@@ -79,7 +80,10 @@ plot_scens = function(this_df, base_uncertainty=F){
   max_df = max_df_base[max_df_base$plot %in% this_df$plot,]
   max_df$plot = factor(max_df$plot)
   
-  this_df = subset(this_df, t >= plot_years[1] & t <= plot_years[2])
+  this_df = this_df %>% 
+    filter(t >= plot_years[1] & t <= plot_years[2]) %>%
+    # filter(!(med_pop %in% med_labs)) %>%
+    filter()
   
   # initialise plot
   p = ggplot(this_df, aes(x=t, group=scen, colour=scen, fill=scen))
@@ -88,7 +92,7 @@ plot_scens = function(this_df, base_uncertainty=F){
   # plot information
   p = p + geom_point(aes(y = data), na.rm=T, size=1.3)
   p = p + geom_path(aes(y = model), na.rm=T, lwd=1.3)
-  p = p + geom_ribbon(aes(ymin = lower_ci, ymax = upper_ci, x=t), alpha=0.2, colour=NA, na.rm=F)
+  p = p + geom_ribbon(data=filter(this_df, !is.na(lower_ci)), aes(ymin = lower_ci, ymax = upper_ci, x=t), alpha=0.2, colour=NA, na.rm=T)
   
   # define axes scales
   # p = p + geom_blank(data=max_df, aes(y=upperlim), inherit.aes = F)
@@ -102,18 +106,19 @@ plot_scens = function(this_df, base_uncertainty=F){
   p = p + coord_cartesian(xlim = plot_years)
   
   scen_longs = unique(this_df$scen_long)
+  n_scens = length(scen_longs)-1
   
   # guides / legend
   p = p + guides(colour = guide_legend(override.aes = list(
-    linetype = c(0, 1, 1, 1),
-    shape = c(19, NA, NA, NA),
+    linetype = c(0, rep(1, n_scens)),
+    shape = c(19, rep(NA, n_scens)),
     fill = NA,
     alpha = 1,
-    size = c(2, 1, 1, 1)
+    size = c(2, rep(1, n_scens))
   )))
   p = p + scale_colour_manual(limits = scen_longs,
                               name='Scenarios',
-                              values=c('black', scen_colours),
+                              values=c('black', scen_colours[1:n_scens]),
                               aesthetics = c("colour", "fill"))
   
   # themes

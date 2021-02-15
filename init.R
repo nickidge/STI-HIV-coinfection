@@ -33,17 +33,11 @@ library(openxlsx)
 
 # base model information
 tvec_base = seq(2007, 2030, by=1/12)
-plot_years = c(2010, 2030)
+plot_years = c(2010, 2025)
 split_year = 2013
 base_variance = 0.1
 
 # scenario details (names, tab in data_sti.xlsx)
-scenarios = list(list(sheet = 'scen_1',
-                      short = 'no_prep',
-                      long = 'Everyone stops using PrEP'),
-                 list(sheet = 'scen_2',
-                      short = 'care_cascade_stops',
-                      long = 'Care cascade stays constant after 2014'))
 scen_keys = c('pop', 'PLHIV', 'HIV_prev', 'prop_prep', 'HIV_diag', 'HIV_inf', 'HIV_diag_new', 'HIV_diag_old', 'care_cascade',
               'diagnosed_treated', 'treated_virally_suppressed', 'prev_lo', 'prev_hi', 'prev_pr')
 
@@ -52,6 +46,7 @@ label_years = unique(c(plot_years, seq(2000, 2050, by=5)))
 options(stringsAsFactors = FALSE)
 
 # bulk of code
+source("input.R", echo=F)
 source("processing.R", echo=F)
 source("info.R", echo = F)
 source("plotting.R", echo = F)

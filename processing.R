@@ -197,7 +197,7 @@ extr = function(output, keys, tvec=tvec_base){
       thisD2plus = get_num_ppl('D2plus')
       thisD3plus = get_num_ppl('D3plus')
       
-      this_df_template = data.frame(t = names(thisPLHIV), type = 'pop', dt = 1,
+      this_df_template = data.frame(t = names(thisPLHIV), type = 'pop', dt = 1, med_pop='tot',
                                     sti_pop = 'all', risk_pop = 'all', plot='care_cascade')
       
       thisD1plus_df = data.frame(this_df_template, value = thisD1plus / thisPLHIV, pid='num_diag_prop', HIV_pop = 'num_diag')
@@ -216,6 +216,7 @@ extr = function(output, keys, tvec=tvec_base){
       thisD3plus = get_num_ppl('D3plus')
       
       this_df_template = data.frame(t = names(thisPLHIV), type = 'pop', dt = 1,
+                                    med_pop = 'tot',
                                     sti_pop = 'all', risk_pop = 'all')
       
       # thisD1plus_df = data.frame(this_df_template, value = thisD1plus / thisPLHIV, pid='num_diag_prop', HIV_pop = 'num_diag')
@@ -283,8 +284,8 @@ extr = function(output, keys, tvec=tvec_base){
       thisprevall = melt(thisprev)
       colnames(thisprevall) = c('t', 'risk_pop', 'med_pop', 'value')
       
-      thisprevall = subset(thisprevall, med_pop == 'tot')
-      thisprevall$med_pop = 'all'
+      # thisprevall = subset(thisprevall, med_pop == 'tot')
+      # thisprevall$med_pop = 'all'
       
       thisdf = data.frame(thisprevall, type = 'pop', dt = 1, pid = 'HIV_prev_by_risk_prop',
                           sti_pop = 'all', HIV_pop = 'HIV_prev', plot='HIV_prev_by_risk')
@@ -351,6 +352,7 @@ extr = function(output, keys, tvec=tvec_base){
       for(i_risk in HIV_risk_labs){
         thisvalues = PLHIV_risk[,i_risk,"tot","tot"] / rowSums(pop[,sHIV[[i_risk]],"tot","tot"])
         thisdf_risk = data.frame(t = names(thisvalues), value = thisvalues, pid=paste0('prev_', i_risk), plot=paste0('prev_', i_risk),
+                                 med_pop = 'tot',
                                  dt = 1/12, sti_pop='all', risk_pop='all', HIV_pop=paste0('prev_', i_risk))
         thisdf = rbind.fill(thisdf, thisdf_risk)
       }
@@ -379,4 +381,8 @@ get_movement = function(compartment, HIV_trans, med=1:length(med_labs), sum=FALS
     going_out = colSums(this[HIV_transitions[,'from'] == compartment,,,drop=FALSE])
   }
   return(going_in - going_out)
+}
+
+filter_extr = function(d){
+  d %>% filter(!(plot == 'HIV_prev_by_risk' & med_pop %in% med_labs))
 }

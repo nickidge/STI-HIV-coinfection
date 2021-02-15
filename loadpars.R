@@ -74,6 +74,7 @@ diagnoses_sti0 = diagnoses_sti0[diagnoses_sti0_index[,1],]
 
 
 prop_diag_dat = data.frame(t = prop_diag0$Year, value = prop_diag0$prop_HIV_diagnosed, type='pop', dt=1, pid='num_diag_prop',
+                           med_pop='tot',
                           sti_pop='all', risk_pop='all', HIV_pop='num_diag', source='data', scen='', plot='care_cascade')
 
 prev_dat = data.frame(t = 2014, value = 0.07, type='pop', dt=1, pid='HIV_prev_prop', plot='HIV_prev', sti_pop='all', HIV_pop='HIV_prev',

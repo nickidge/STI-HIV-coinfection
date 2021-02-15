@@ -12,6 +12,8 @@ gen_uncertainty = function(ntrials=0, variance=base_variance){
   
   cal_wide = rbind.fill(cal_wide, this_data_wide)
   
+  cal_wide = filter_extr(cal_wide)
+  
   return(cal_wide)
 }
 
@@ -98,7 +100,7 @@ plot_uncertainty = function(thisdf, colour_strat='cascade', toplot=NULL){
                              limits = c(min(thisdf$t), max(thisdf$t)),
                              expand = c(0, 0))
   # p = p + scale_y_continuous(expand = c(0,0))
-  p = p + scale_y_continuous(expand = expand_scale(mult = c(0, 0.1)))
+  p = p + scale_y_continuous(expand = expansion(mult = c(0, 0.1)))
   p = p + expand_limits(y = 0)
   
   # guides / legend

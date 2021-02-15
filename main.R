@@ -1,6 +1,6 @@
 setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
-medicare_ineligible = FALSE
-source("init.R", echo = T)
+medicare_ineligible = T
+source("init.R", echo = F)
 
 # calibrate model
 if(!exists('cal')){
@@ -18,13 +18,7 @@ if(!exists('base_df')){
 }
 
 # run all scenarios (with uncertainty)
-input_scenarios = list(list(sheet = 'scen_1',
-                            short = 'no_prep',
-                            long = 'Everyone stops using PrEP'),
-                       list(sheet = 'scen_2',
-                            short = 'care_cascade_stops',
-                            long = 'Care cascade stays constant after 2014'))
-scen_df = gen_scenarios(base_df=base_df, scenarios=input_scenarios, ntrials=10)
+scen_df = gen_scenarios(base_df=base_df, scenarios=scenarios, ntrials=10)
 saveopen(plot_scens(scen_df, base_uncertainty = T), 'scenarios', 'plots', width=2*1.1*page_width)
 
 # # create table of scenario results (old)
