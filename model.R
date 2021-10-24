@@ -88,6 +88,8 @@ run_model = function(y0=NULL, tvec=tvec_base, modelpars=list(), options=list(), 
   deaths_log = makearray(list(tvec, HIV_labs, STI_labs, med_labs))
   popgrowth_log = makearray(list(tvec, colnames(popsize)))
   
+  negative_become_high_risk = F
+  
   t_total = 0
   t_start = Sys.time()
   
@@ -131,7 +133,8 @@ run_model = function(y0=NULL, tvec=tvec_base, modelpars=list(), options=list(), 
       become_high_risk = 0
     }
     if(any(become_high_risk < -100)){
-      print('negative become_high_risk')
+      negative_become_high_risk=T
+      # print('negative become_high_risk')
     }
     
     prevdt[sHIV[['lo']],,1] = prevdt[sHIV[['lo']],,1] - become_high_risk
@@ -339,15 +342,19 @@ run_model = function(y0=NULL, tvec=tvec_base, modelpars=list(), options=list(), 
     popgrowth = thispopsize - apply(prevdt, 3, sum)
     popgrowth = thispopsize - rowSums(aperm(prevdt, c(3, 1, 2)))
     
-    thisgrowth = makearray(list(c("S_lo", "S_hi"), med_labs))
+    thisgrowth = makearray(list(c("lo_risk", "hi_risk"), med_labs))
     thisgrowth[,1] = popgrowth[1] * c((1-prop_high_risk), prop_high_risk)
     thisgrowth[2,2] = popgrowth[2]
     
+    thisgrowth_inf = sweep(thisgrowth,2,inc_prevalence,FUN="*")
+    thisgrowth_sus = thisgrowth - thisgrowth_inf
+    
     # apply pop growth
-    if(any(thisgrowth < 0)){
+    if(any(thisgrowth < 0) | any(thisgrowth_sus < 0) | any(thisgrowth_inf < 0)){
       print('Negative population growth?!')
     } else {
-      prevdt[c("S_lo", "S_hi"), 1,] = prevdt[c("S_lo", "S_hi"), 1,] + thisgrowth
+      prevdt[c("S_lo", "S_hi"), 1,] = prevdt[c("S_lo", "S_hi"), 1,] + thisgrowth_sus
+      prevdt[c("I_lo_new", "I_hi_new"), 1,] = prevdt[c("I_lo_new", "I_hi_new"), 1,] + thisgrowth_inf
     }
     
     if(any(prevdt < 0)){
@@ -367,6 +374,10 @@ run_model = function(y0=NULL, tvec=tvec_base, modelpars=list(), options=list(), 
     
     ################
     
+  }
+  
+  if(negative_become_high_risk){
+    print('negative become_high_risk')
   }
   
   # print(paste0('time prop = ', round(as.numeric(t_total) / as.numeric(as.numeric(Sys.time()) - as.numeric(t_start)), 3)))

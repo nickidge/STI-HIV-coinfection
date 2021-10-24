@@ -13,6 +13,7 @@ defaultlist[['care_cascade']] = c(0.8, 0.8)
 defaultlist[['stay_time']] = 1/3
 defaultlist[['stay_prop']] = 0.2
 defaultlist[['annual_pop_growth']] = c(1.02, 1.02)
+defaultlist[['inc_prevalence']] = c(1.02, 1.02)
 for(thisname in names(defaultlist)){
   if(length(DIM(defaultlist[[thisname]])) == 1){
     defaultlist[[thisname]] = matrix(defaultlist[[thisname]], nrow=1)

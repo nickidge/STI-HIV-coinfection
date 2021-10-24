@@ -106,6 +106,10 @@ modelpar = function(t=t_dat, y=NULL, parname=NA, pop=NA, subpop=NA, tvec=tvec_ba
     col = 1
     refvar = 'stay_prop'
     maxcol = 1
+  } else if(parname == 'inc_prevalence'){
+    col = match(subpop, med_labs)
+    refvar = 'inc_prevalence'
+    maxcol = 2  
   } else {
     col = 0
     refvar = 'cant_find'
