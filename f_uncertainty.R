@@ -73,7 +73,7 @@ plot_uncertainty = function(thisdf, colour_strat='cascade', toplot=NULL){
   p = p + facet_wrap(.~plot, scales="free", ncol=2, labeller = labeller(plot = setNames(plot_long, plot_keys)))
   
   # plot information
-  p = p + geom_point(aes(y = data), na.rm=T, size=1.3) # data points
+  p = p + geom_point(aes(y = data), na.rm=T, size=1.7) # data points
   
   if(colour_strat == 'prev'){
     p = p + geom_path(aes(y = model, linetype = med_pop), na.rm=T, lwd=1.3, alpha=0.5) # best estimate line

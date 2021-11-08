@@ -110,6 +110,10 @@ modelpar = function(t=t_dat, y=NULL, parname=NA, pop=NA, subpop=NA, tvec=tvec_ba
     col = match(subpop, med_labs)
     refvar = 'inc_prevalence'
     maxcol = 2  
+  } else if(parname == 't_test_mult'){
+    col = 1
+    refvar = 't_test_mult'
+    maxcol = 1
   } else {
     col = 0
     refvar = 'cant_find'

@@ -2,6 +2,7 @@
 defaultlist = list()
 
 defaultlist[['t_testing']] = rep(1, 12) # testing for i_lo_new, i_lo_old, i_hi_new, i_hi_old
+defaultlist[['t_test_mult']] = 1 # testing time multiplier
 defaultlist[['condom_usage']] = c(1, 0, 0, 1, 0, 0) # condom use for low risk hiv-, high risk hiv-, hiv+
 defaultlist[['gel_mat']] = c(c(0, 0, 0), c(0, 0, 0)) # gel up for low risk hiv-, high risk hiv-, hiv+, and gel down for same groups
 defaultlist[['eff_condom']] = 0.7 # effectiveness of condoms for HIV
@@ -13,7 +14,8 @@ defaultlist[['care_cascade']] = c(0.8, 0.8)
 defaultlist[['stay_time']] = 1/3
 defaultlist[['stay_prop']] = 0.2
 defaultlist[['annual_pop_growth']] = c(1.02, 1.02)
-defaultlist[['inc_prevalence']] = c(1.02, 1.02)
+# defaultlist[['inc_prevalence']] = c(1.02, 1.02)
+defaultlist[['inc_prevalence']] = c(0, 0)
 for(thisname in names(defaultlist)){
   if(length(DIM(defaultlist[[thisname]])) == 1){
     defaultlist[[thisname]] = matrix(defaultlist[[thisname]], nrow=1)

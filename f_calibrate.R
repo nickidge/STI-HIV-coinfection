@@ -1,8 +1,8 @@
-l2 = function(x, y, weights=1){
-  v = (x - y) / pmin(x, y)
+l_ = function(x, y, weights=1, exponent=2){
+  v = abs(x - y) / pmin(abs(x), abs(y))
   v = fixnan(v)
-  v = v^2
-  v = v * weights
+  v = v^exponent
+  v = v*weights
   return(sum(v, na.rm=T))
 }
 
@@ -16,7 +16,7 @@ prob = function(x) {
   }
 }
 
-distance_given_cal_vec = function(x, keys, norm=l2){
+distance_given_cal_vec = function(x, keys, norm=l_){
   callist = baselist
   for(i in 1:length(x)){
     callist[[keys[i]]] = x[i]
@@ -29,7 +29,7 @@ distance_given_cal_vec = function(x, keys, norm=l2){
   
   df$weights = cal_weights[as.character(df$plot)]
   
-  distance = norm(df$data, df$model, weights=df$weights)
+  distance = norm(df$data, df$model, weights=df$weights, exponent=1)
   
   if(prob(0)){
     p = plot_uncertainty(df)
@@ -57,8 +57,8 @@ compare_model_to_data = function(output){
 
 gen_calibration = function(cal_vars = c('f_infect_HIV', 'init_diag_prop'), control=list()){
   
-  cal_raw = data.frame(read_excel("data_sti.xlsx", sheet="calibration"), row.names=1)
-  this_cal_raw = cal_raw[cal_vars,]
+  cal_raw <<- data.frame(read_excel("data_sti.xlsx", sheet="calibration"), row.names=1)
+  this_cal_raw <<- cal_raw[cal_vars,]
   
   optim_result <<- nmkb(par=this_cal_raw$bes,
                         fn=distance_given_cal_vec,
