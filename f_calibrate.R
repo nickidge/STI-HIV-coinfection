@@ -16,6 +16,12 @@ prob = function(x) {
   }
 }
 
+year_weighting = data.frame(
+  pid = "HIV_diag_tot",
+  t = 2016:2019,
+  year_weight = 6
+)
+
 distance_given_cal_vec = function(x, keys, norm=l_){
   callist = baselist
   for(i in 1:length(x)){
@@ -25,9 +31,11 @@ distance_given_cal_vec = function(x, keys, norm=l_){
   output = run_model(tvec=seq(min(tvec_base), max(all_dat$t)+1, by=dt),
                      modelpars=callist, options=list('only_cal_outs' = TRUE))
   
-  df = compare_model_to_data(output)
-  
-  df$weights = cal_weights[as.character(df$plot)]
+  df = compare_model_to_data(output) %>% 
+    mutate(data_weight = cal_weights[as.character(plot)]) %>% 
+    left_join(year_weighting, by=intersect(names(.), names(year_weighting))) %>%
+    mutate(year_weight = replace_na(year_weight, 1),
+           weights = data_weight * year_weight)
   
   distance = norm(df$data, df$model, weights=df$weights, exponent=1)
   
