@@ -83,7 +83,7 @@ extr = function(output, keys, tvec=tvec_base){
       pop = sum_dim(pop, i)
     }
   }
-  if(any(grepl('PLHIV', keys))){
+  if(any(grepl('PLHIV', keys) | grepl('risk', keys) | grepl('prev_lo', keys))){
     PLHIV_risk = SID[,sHIV[['PLHIV']],,,drop=FALSE]
     dimnames(PLHIV_risk)[[2]] = HIV_risk_index[dimnames(PLHIV_risk)[[2]]]
     PLHIV_risk = acast(melt(PLHIV_risk), Var1 ~ Var2 ~ Var3 ~ Var4, fun.aggregate = sum)

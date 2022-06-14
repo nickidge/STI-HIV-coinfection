@@ -42,6 +42,7 @@ scen_keys = c('pop', 'PLHIV', 'HIV_prev', 'prop_prep', 'HIV_diag', 'HIV_inf', 'H
               'diagnosed_treated', 'treated_virally_suppressed', 'prev_lo', 'prev_hi', 'prev_pr')
 
 label_years = unique(c(plot_years, seq(2000, 2050, by=5)))
+tvec_split = tvec_base[tvec_base >= split_year]
 
 options(stringsAsFactors = FALSE)
 

@@ -303,8 +303,8 @@ smooth_par = function(thispar, thiscol=1){
 
 load_time_par_sheet = function(sheetname, deflist = baselist, syear=NA){
   
-  timepars_raw = read_excel("data_sti.xlsx", sheet=sheetname, col_names = F)
-  timepars_raw = as.data.frame(timepars_raw)
+  timepars_raw = suppressMessages(read_excel("data_sti.xlsx", sheet=sheetname, col_names = F)) %>% 
+    as.data.frame
   
   timepars_col = ncol(timepars_raw)
   timepars_row = nrow(timepars_raw)

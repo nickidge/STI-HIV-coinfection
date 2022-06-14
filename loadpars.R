@@ -98,7 +98,7 @@ mixing[!is.finite(suppressWarnings(as.numeric(mixing)))] = 0
 class(mixing) = 'numeric'
 
 # import parameters, including upper and lower bounds (if they exist)
-pars_raw = read_excel("data_sti.xlsx", sheet="pars", col_names=TRUE)
+pars_raw = suppressMessages(read_excel("data_sti.xlsx", sheet="pars", col_names=TRUE))
 
 static_pars = list()
 for(i in 1:nrow(pars_raw)){

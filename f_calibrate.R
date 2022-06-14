@@ -75,16 +75,10 @@ gen_calibration = function(cal_vars = c('f_infect_HIV', 'init_diag_prop'), contr
                         control=control,
                         keys=cal_vars)
   
-  for(i in 1:length(cal_vars)){
-    baselist[[cal_vars[i]]] = optim_result$par[i]
-  }
+  calibrated_values = lapply(1:length(cal_vars), function(x) optim_result$par[x]) %>% 
+    setNames(cal_vars)
   
-  baselist <<- baselist
-  cal <<- run_model(modelpars=baselist)
-  
-  tvec_split <<- tvec_base[tvec_base >= split_year]
-  y0_split <<- adrop(cal$SID[as.character(split_year),,,,drop=FALSE], 1)
-  
+  return(calibrated_values)
 }
 
 plot_cals = function(df){

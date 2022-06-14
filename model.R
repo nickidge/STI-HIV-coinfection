@@ -211,7 +211,7 @@ run_model = function(y0=NULL, tvec=tvec_base, modelpars=list(), options=list(), 
     
     for(i_med in 1:length(med_labs)){
       this_testing = t_testing[((6 * i_med) - 5) : ((6 * i_med))] / 2 * t_test_mult
-      HIV_p[paste0(sHIV$I, '_d_', med_labs[i_med])] = duration2rate(this_testing)
+      HIV_p[paste0(sHIV$I, '_d_', med_labs[i_med])] = prop_test * duration2rate(this_testing)
     }
     
     # ensure all transitions are as expected
