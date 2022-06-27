@@ -108,6 +108,17 @@ extr = function(output, keys, tvec=tvec_base){
       # thisdf = data.frame(t = names(this), value = this, type = 'pop', dt = 1, pid='PLHIV_tot',
       #                     sti_pop = 'all', risk_pop = 'all', HIV_pop = 'PLHIV')
       
+    } else if(key == 'PLHIV_diag'){
+      
+      this = SID[tvec,sHIV$D,,,drop=FALSE]
+      this = apply(this, c(1,4), sum)
+      this = as.data.frame(this)
+      this$tot = rowSums(this)
+      this = melt(as.matrix(this))
+      colnames(this) = c('t', 'med_pop', 'value')
+      thisdf = data.frame(this, type = 'pop', dt = 1, pid='PLHIV_diag_tot',
+                          sti_pop = 'all', HIV_pop = 'PLHIV_d', risk_pop = 'all')
+      
     } else if(key == 'pop'){
       this = SID[tvec,,,,drop=FALSE]
       this = apply(this, c(1,4), sum)
@@ -338,13 +349,13 @@ extr = function(output, keys, tvec=tvec_base){
       thisD2 = get_num_ppl(sHIV$D2)
       thisD3 = get_num_ppl(sHIV$D3)
       
-      this_df_template = data.frame(t = names(thisund), type='pop', dt = 1/12, sti_pop = 'all', risk_pop = 'all', plot='num_cascade')
+      this_df_template = data.frame(t = names(thisund), type='pop', dt = 1/12, sti_pop = 'all', risk_pop = 'all', plot='num_cascade', med_pop = 'tot')
       
       thisund_df = data.frame(this_df_template, value = thisund, pid='num_und_tot', HIV_pop = 'num_und')
       thisd1_df = data.frame(this_df_template, value = thisD1, pid='num_diag_tot', HIV_pop = 'num_diag')
       thisd2_df = data.frame(this_df_template, value = thisD2, pid='num_treat_tot', HIV_pop = 'num_treat')
       thisd3_df = data.frame(this_df_template, value = thisD3, pid='num_suppr_tot', HIV_pop = 'num_suppr')
-
+      
       thisdf = rbind.fill(thisund_df, thisd1_df, thisd2_df, thisd3_df)
       
     } else if(key == 'prev_lo'){

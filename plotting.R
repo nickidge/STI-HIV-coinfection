@@ -1,8 +1,9 @@
 
-plot_index = rbind(
+plot_index_vec = rbind(
   c('pop_tot', 'pop'),
   c('pop_by_risk', 'popsize_by_risk'),
   c('PLHIV_tot', 'PLHIV'),
+  c('PLHIV_diag_tot', 'PLHIV_diag'),
   c('num_prep_prop', 'prop_prep'),
   c('HIV_diag_tot', 'HIV_diag'),
   c('HIV_inf_tot', 'HIV_inf'),
@@ -24,13 +25,14 @@ plot_index = rbind(
   c('prev_hi', 'prev_hi'),
   c('prev_pr', 'prev_pr')
 )
-colnames(plot_index) = c('pid', 'plot')
-plot_index = data.frame(plot_index)
+colnames(plot_index_vec) = c('pid', 'plot')
+plot_index = data.frame(plot_index_vec)
 
 plot_key_index = rbind(
   c('pop', 'Population'),
   c('popsize_by_risk', 'Population by risk status'),
   c('PLHIV','Total PLHIV'),
+  c('PLHIV_diag','Total PLHIV diagnosed'),
   c('prop_prep', 'Proportion HIV- on PrEP'),
   c('HIV_diag', 'Annual HIV diagnoses'),
   c('HIV_inf', 'Annual HIV incidence'),

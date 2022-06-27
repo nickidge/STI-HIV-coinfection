@@ -19,12 +19,17 @@ gen_uncertainty = function(ntrials=0, variance=base_variance){
 
 plot_uncertainty = function(thisdf, colour_strat='cascade', toplot=NULL){
   
-  max_df = max_df_base[max_df_base$plot %in% thisdf$plot,]
-  max_df$plot = factor(max_df$plot)
+  plot_which = plot_index %>% filter(plot %in% toplot)
+  pid_which = plot_which$pid
+  max_df = max_df_base %>% 
+    filter(plot %in% thisdf$plot) %>% 
+    mutate(plot = factor(plot))
   if(!is.null(toplot)){
-    thisdf = subset(thisdf, plot %in% toplot)
-    max_df = subset(max_df, plot %in% toplot)
-    thisdf$plot = factor(thisdf$plot, levels = toplot)
+    thisdf = filter(thisdf, pid %in% pid_which)
+    max_df = filter(max_df, plot %in% toplot)
+    thisdf = lapply(1:nrow(plot_which), function(x) thisdf %>% filter(pid == plot_which[x,"pid"]) %>%  mutate(plot=plot_which[x,"plot"])) %>% 
+      bind_rows %>% 
+      mutate(plot = factor(plot, levels=toplot))
   }
   
   if(colour_strat == 'cascade'){
