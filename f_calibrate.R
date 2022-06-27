@@ -82,7 +82,7 @@ gen_calibration = function(cal_vars = c('f_infect_HIV', 'init_diag_prop'), contr
 }
 
 plot_cals = function(df){
-  p1 = plot_uncertainty(df, toplot=c('pop', 'PLHIV', 'HIV_prev', 'prop_prep', 'HIV_diag', 'HIV_inf', 'HIV_diag_new', 'HIV_diag_old'), colour_strat = 'med')
+  p1 = plot_uncertainty(df, toplot=c('pop', 'PLHIV_diag', 'HIV_prev', 'prop_prep', 'HIV_diag', 'HIV_inf', 'HIV_diag_new', 'HIV_diag_old'), colour_strat = 'med')
   p2 = plot_uncertainty(df, toplot=c('popsize_by_risk', 'num_cascade', 'HIV_prev_by_risk', 'care_cascade', 'HIV_diag_by_pop'))
   p = arrangeGrob(p1, p2, nrow=1)
   return(p)

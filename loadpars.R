@@ -39,9 +39,9 @@ risk_data_to_frame = function(this_str){
 HIV_diag_dat = data.frame(risk_data_to_frame('HIV_diag_..._all'),
                        type='trans', dt=1, pid='HIV_diag_tot',
                        sti_pop='all', risk_pop='all', HIV_pop='HIV_diag', source='data', scen='')
-PLHIV_dat = data.frame(risk_data_to_frame('PLHIV_...'),
-                       type='pop', dt=1, pid = 'PLHIV_tot',
-                       sti_pop='all', risk_pop='all', HIV_pop='PLHIV', source='data', scen='')
+PLHIV_diag_dat = data.frame(risk_data_to_frame('PLHIV_...'),
+                       type='pop', dt=1, pid = 'PLHIV_diag_tot',
+                       sti_pop='all', risk_pop='all', HIV_pop='PLHIV_d', source='data', scen='')
 data_pop = data.frame(risk_data_to_frame('pop_...'))
 
 HIV_diag_new = risk_data_to_frame('HIV_diag_new_...')
@@ -80,7 +80,7 @@ prop_diag_dat = data.frame(t = prop_diag0$Year, value = prop_diag0$prop_HIV_diag
 prev_dat = data.frame(t = 2014, value = 0.07, type='pop', dt=1, pid='HIV_prev_prop', plot='HIV_prev', sti_pop='all', HIV_pop='HIV_prev',
                       med_pop = 'tot', risk_pop = 'all', source='data', scen='')
 
-all_dat = rbind.fill(PLHIV_dat, HIV_diag_dat, prop_diag_dat)
+all_dat = rbind.fill(PLHIV_diag_dat, HIV_diag_dat, prop_diag_dat)
 all_dat = rbind.fill(all_dat, HIV_diag_new, HIV_diag_old)
 all_dat = rbind.fill(all_dat, prev_dat)
 if(!medicare_ineligible){all_dat = subset(all_dat, !(med_pop %in% med_labs))}
