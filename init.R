@@ -32,16 +32,17 @@ library(stringr)
 library(openxlsx)
 
 # base model information
-tvec_base = seq(2007, 2030, by=1/12)
-plot_years = c(2010, 2025)
-split_year = 2013
+
+tvec_base = seq(2007, 2020, by=1/12)
+plot_years = c(2010, 2019)
+split_year = 2015
 base_variance = 0.1
 
 # scenario details (names, tab in data_sti.xlsx)
 scen_keys = c('pop', 'PLHIV', 'HIV_prev', 'prop_prep', 'HIV_diag', 'HIV_inf', 'HIV_diag_new', 'HIV_diag_old', 'care_cascade',
               'diagnosed_treated', 'treated_virally_suppressed', 'prev_lo', 'prev_hi', 'prev_pr')
 
-label_years = unique(c(plot_years, seq(2000, 2050, by=5)))
+label_years = unique(c(plot_years, seq(2000, 2020, by=1)))
 tvec_split = tvec_base[tvec_base >= split_year]
 
 options(stringsAsFactors = FALSE)
